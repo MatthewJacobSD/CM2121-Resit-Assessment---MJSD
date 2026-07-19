@@ -1,0 +1,12 @@
+# Blender 5.1.2 MTL File: 'Stairsblend.blend'
+# www.blender.org
+
+newmtl Material.001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/2506116/source/class/project-demo-assessment/Assets/Art/Photogrammery/RawScans/Stairs/textures/e7201bf2774476c3b37b5146fcd463e2.jpg

@@ -7,107 +7,278 @@ public class PlayerMovement : MonoBehaviour
     [Header("Input Actions")]
     [SerializeField] private InputActionAsset playerControls;
 
+
     [Header("Movement Settings")]
     [SerializeField] private float walkSpeed = 5f;
-    [SerializeField] private float sprintSpeed = 8f;
+    [SerializeField] private float sprintSpeed = 8.5f;
+
+    [SerializeField] private float acceleration = 35f;
+    [SerializeField] private float deceleration = 25f;
+
+    [Range(0f, 1f)]
+    [SerializeField] private float airControl = 0.6f;
+
 
     [Header("Jump Settings")]
-    [SerializeField] private float jumpHeight = 1.5f;
-    [SerializeField] private float gravity = -18f;
-    [SerializeField] private float fallMultiplier = 3.5f;
+    [SerializeField] private float jumpHeight = 1.8f;
 
-    [Header("Ground Detection")]
+    [SerializeField] private float gravity = -18f;
+
+    [SerializeField] private float fallMultiplier = 2.5f;
+
+
+    [Header("Ground Check")]
     [SerializeField] private Transform groundCheck;
-    [SerializeField] private float groundDistance = 0.25f;
+
+    [SerializeField] private float groundDistance = 0.2f;
+
     [SerializeField] private LayerMask groundMask;
 
+
+    // Components
     private CharacterController controller;
-    private InputAction moveWASD;
-    private InputAction moveArrows;
+
+
+    // Input Actions
+    private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction sprintAction;
+
+
+    // Movement variables
+    private Vector2 moveInput;
+
     private Vector3 velocity;
-    private bool sprinting;
+
+    private Vector3 currentMovement;
+
+
     private bool isGrounded;
+
+    private bool sprinting;
+
+
 
     private void Awake()
     {
         controller = GetComponent<CharacterController>();
-        moveWASD = playerControls.FindActionMap("Move", true).FindAction("WASD", true);
-        moveArrows = playerControls.FindActionMap("Move", true).FindAction("ArrowsKeys", true);
-        jumpAction = playerControls.FindActionMap("Jump", true).FindAction("Jump", true);
-        sprintAction = playerControls.FindActionMap("Sprint", true).FindAction("Run", true);
+
+
+        // Get actions from Input System
+        InputActionMap playerMap =
+            playerControls.FindActionMap("Player", true);
+
+
+        moveAction =
+            playerMap.FindAction("Movement", true);
+
+
+        jumpAction =
+            playerMap.FindAction("Jump", true);
+
+
+        sprintAction =
+            playerMap.FindAction("Sprint", true);
     }
+
+
 
     private void OnEnable()
     {
-        moveWASD.Enable();
-        moveArrows.Enable();
+        moveAction.Enable();
         jumpAction.Enable();
         sprintAction.Enable();
     }
 
+
+
     private void OnDisable()
     {
-        moveWASD.Disable();
-        moveArrows.Disable();
+        moveAction.Disable();
         jumpAction.Disable();
         sprintAction.Disable();
     }
 
+
+
     private void Update()
     {
         CheckGround();
-        HandleSprint();
-        MovePlayer();
+
+        ReadInput();
+
+        HandleJump();
+
         ApplyGravity();
+
+        MovePlayer();
     }
 
+
+
+    /// <summary>
+    /// Reads movement, sprint input.
+    /// </summary>
+    private void ReadInput()
+    {
+        moveInput =
+            moveAction.ReadValue<Vector2>();
+
+
+        // Prevent faster diagonal movement
+        moveInput =
+            Vector2.ClampMagnitude(moveInput, 1f);
+
+
+        sprinting =
+            sprintAction.ReadValue<float>() > 0.5f;
+    }
+
+
+
+    /// <summary>
+    /// Checks if player is touching the ground.
+    /// </summary>
     private void CheckGround()
     {
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-    }
+        isGrounded =
+            Physics.CheckSphere(
+                groundCheck.position,
+                groundDistance,
+                groundMask,
+                QueryTriggerInteraction.Ignore
+            );
 
-    private void HandleSprint()
-    {
-        sprinting = sprintAction.ReadValue<float>() > 0f;
-    }
 
-    private void MovePlayer()
-    {
-        Vector2 input = moveWASD.ReadValue<Vector2>() + moveArrows.ReadValue<Vector2>();
-        float currentSpeed = sprinting ? sprintSpeed : walkSpeed;
-        Vector3 movement = transform.right * input.x + transform.forward * input.y;
-        controller.Move(currentSpeed * Time.deltaTime * movement);
-    }
-
-    private void ApplyGravity()
-    {
-        // Reset vertical velocity when grounded to prevent accumulation
         if (isGrounded && velocity.y < 0)
         {
+            // Keeps player grounded
             velocity.y = -2f;
         }
+    }
 
-        // Check for jump input while grounded
+
+
+    /// <summary>
+    /// Handles walking and sprinting.
+    /// </summary>
+    private void MovePlayer()
+    {
+        float targetSpeed =
+            sprinting && isGrounded
+            ? sprintSpeed
+            : walkSpeed;
+
+
+        // Movement based on where the player is looking
+        Vector3 inputDirection =
+            (
+                transform.forward * moveInput.y +
+                transform.right * moveInput.x
+            ).normalized;
+
+
+
+        float currentAcceleration =
+            isGrounded
+            ? acceleration
+            : acceleration * airControl;
+
+
+
+        if (moveInput.sqrMagnitude > 0.01f)
+        {
+            currentMovement =
+                Vector3.MoveTowards(
+                    currentMovement,
+                    inputDirection,
+                    currentAcceleration * Time.deltaTime
+                );
+        }
+        else
+        {
+            currentMovement =
+                Vector3.MoveTowards(
+                    currentMovement,
+                    Vector3.zero,
+                    deceleration * Time.deltaTime
+                );
+        }
+
+
+
+        Vector3 horizontalVelocity =
+            currentMovement * targetSpeed;
+
+
+        Vector3 finalMovement =
+            horizontalVelocity +
+            Vector3.up * velocity.y;
+
+
+
+        controller.Move(
+            finalMovement * Time.deltaTime
+        );
+    }
+
+
+
+    /// <summary>
+    /// Handles jumping.
+    /// </summary>
+    private void HandleJump()
+    {
         if (jumpAction.WasPressedThisFrame() && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
+            velocity.y =
+                Mathf.Sqrt(
+                    jumpHeight * -2f * gravity
+                );
         }
-
-        // Apply extra gravity when falling so the descent feels snappy, not floaty
-        if (!isGrounded)
-        {
-            velocity.y += gravity * (fallMultiplier - 1f) * Time.deltaTime;
-        }
-
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
     }
+
+
+
+    /// <summary>
+    /// Applies gravity with faster falling.
+    /// </summary>
+    private void ApplyGravity()
+    {
+        if (velocity.y < 0)
+        {
+            // Faster fall
+            velocity.y +=
+                gravity *
+                fallMultiplier *
+                Time.deltaTime;
+        }
+        else
+        {
+            // Normal jump ascent
+            velocity.y +=
+                gravity *
+                Time.deltaTime;
+        }
+    }
+
+
 
     private void OnDrawGizmosSelected()
     {
-        if (groundCheck == null) return;
-        Gizmos.DrawWireSphere(groundCheck.position, groundDistance);
+        if (groundCheck == null)
+            return;
+
+
+        Gizmos.color =
+            isGrounded
+            ? Color.green
+            : Color.red;
+
+
+        Gizmos.DrawWireSphere(
+            groundCheck.position,
+            groundDistance
+        );
     }
 }

@@ -1,69 +1,88 @@
-using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class PlayerInteraction : MonoBehaviour
 {
-    [Header("Raycast Settings")]
+    [Header("Input Actions")]
+    [SerializeField] private InputActionAsset playerControls;
+
+    [Header("Raycast")]
     [SerializeField] private Transform rayOrigin;
-    [SerializeField] private float interactDistance = 3f;
+    [SerializeField] private float interactDistance = 3.5f;
     [SerializeField] private LayerMask interactLayer;
 
-    [Header("Pickup Settings")]
+    [Header("Pickup")]
     [SerializeField] private Transform holdPosition;
+    [SerializeField] private float throwForce = 12f;
 
-    private PickupObject currentObject;
+    private PickupObject currentHeldObject;
+    private InputAction interactAction;
+    private InputAction dropAction;
 
-    void Update()
+    private void Awake()
     {
-        DetectObject();        
+        var playerMap = playerControls.FindActionMap("Player", true);
+        interactAction = playerMap.FindAction("Interact", true);
+        dropAction = playerMap.FindAction("Drop", true);
     }
 
-    private void DetectObject()
+    private void OnEnable()
     {
-        Ray ray = new(rayOrigin.position, rayOrigin.forward);
+        interactAction.performed += OnInteract;
+        dropAction.performed += OnDrop;
+    }
 
-        if (Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactLayer))
+    private void OnDisable()
+    {
+        interactAction.performed -= OnInteract;
+        dropAction.performed -= OnDrop;
+    }
+
+    private void Update()
+    {
+        HighlightInteractable();
+    }
+
+    private void HighlightInteractable()
+    {
+        if (Physics.Raycast(rayOrigin.position, rayOrigin.forward, out RaycastHit hit, interactDistance, interactLayer))
         {
-            PickupObject pickup = hit.collider.GetComponent<PickupObject>();
-
-            if (pickup != null) 
+            if (hit.collider.TryGetComponent<PickupObject>(out var pickup))
             {
-                Debug.DrawRay(ray.origin, ray.direction * interactDistance, Color.green);
-                Debug.Log("Looking at: " + hit.collider.name);
+                Debug.DrawRay(rayOrigin.position, rayOrigin.forward * hit.distance, Color.cyan);
             }
         }
     }
 
-    public void OnIteract(InputAction.CallbackContext context)
+    private void OnInteract(InputAction.CallbackContext ctx)
     {
-        if (!context.performed) return;
+        if (currentHeldObject != null) return;
 
-        if (currentObject != null) return;
-
-        Ray ray = new(rayOrigin.position, rayOrigin.forward);
-
-        if (Physics.Raycast(ray, out RaycastHit hit, interactDistance, interactLayer))
+        if (Physics.Raycast(rayOrigin.position, rayOrigin.forward, out RaycastHit hit, interactDistance, interactLayer))
         {
-            PickupObject pickup = hit.collider.GetComponent<PickupObject>();
-            if (pickup != null)
+            if (hit.collider.TryGetComponent<PickupObject>(out var pickup))
             {
-                currentObject = pickup;
-                currentObject.Pickup(holdPosition);
-                Debug.Log("Picked up: " + hit.collider.name);
+                currentHeldObject = pickup;
+                currentHeldObject.Pickup(holdPosition);
             }
         }
     }
 
-    public void OnDrop(InputAction.CallbackContext context)
+    private void OnDrop(InputAction.CallbackContext ctx)
     {
-        if (!context.performed) return;
+        if (currentHeldObject == null) return;
+        currentHeldObject.Drop();
+        currentHeldObject = null;
+    }
 
-        if (currentObject == null) return;
-        
-        currentObject.Drop();
-        Debug.Log("Dropped: " + currentObject.name);
-        
-        currentObject = null;
+    public void ThrowHeldObject()
+    {
+        if (currentHeldObject == null) return;
+        currentHeldObject.Drop();
+        if (currentHeldObject.TryGetComponent<Rigidbody>(out var rb))
+        {
+            rb.AddForce(rayOrigin.forward * throwForce, ForceMode.Impulse);
+        }
+        currentHeldObject = null;
     }
 }

@@ -3,16 +3,19 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 3
-  tags: []
+  tags:
+  - Recyclable
+  - NonRecyclable
+  - RecyclingBin
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - Interactable
+  - 
   - Water
   - UI
-  - Ground
-  - Recyclable
+  - Environment
+  - Interactable
   - Non-Recyclable
   - Player
   - 

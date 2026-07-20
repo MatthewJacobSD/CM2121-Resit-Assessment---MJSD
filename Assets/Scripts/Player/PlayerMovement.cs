@@ -63,25 +63,19 @@ public class PlayerMovement : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
 
-
         // Get actions from Input System
         InputActionMap playerMap =
             playerControls.FindActionMap("Player", true);
 
-
         moveAction =
             playerMap.FindAction("Movement", true);
-
 
         jumpAction =
             playerMap.FindAction("Jump", true);
 
-
         sprintAction =
             playerMap.FindAction("Sprint", true);
     }
-
-
 
     private void OnEnable()
     {
@@ -90,16 +84,12 @@ public class PlayerMovement : MonoBehaviour
         sprintAction.Enable();
     }
 
-
-
     private void OnDisable()
     {
         moveAction.Disable();
         jumpAction.Disable();
         sprintAction.Disable();
     }
-
-
 
     private void Update()
     {
@@ -114,8 +104,6 @@ public class PlayerMovement : MonoBehaviour
         MovePlayer();
     }
 
-
-
     /// <summary>
     /// Reads movement, sprint input.
     /// </summary>
@@ -124,17 +112,13 @@ public class PlayerMovement : MonoBehaviour
         moveInput =
             moveAction.ReadValue<Vector2>();
 
-
         // Prevent faster diagonal movement
         moveInput =
             Vector2.ClampMagnitude(moveInput, 1f);
 
-
         sprinting =
             sprintAction.ReadValue<float>() > 0.5f;
     }
-
-
 
     /// <summary>
     /// Checks if player is touching the ground.
@@ -149,15 +133,12 @@ public class PlayerMovement : MonoBehaviour
                 QueryTriggerInteraction.Ignore
             );
 
-
         if (isGrounded && velocity.y < 0)
         {
             // Keeps player grounded
             velocity.y = -2f;
         }
     }
-
-
 
     /// <summary>
     /// Handles walking and sprinting.
@@ -169,7 +150,6 @@ public class PlayerMovement : MonoBehaviour
             ? sprintSpeed
             : walkSpeed;
 
-
         // Movement based on where the player is looking
         Vector3 inputDirection =
             (
@@ -177,14 +157,10 @@ public class PlayerMovement : MonoBehaviour
                 transform.right * moveInput.x
             ).normalized;
 
-
-
         float currentAcceleration =
             isGrounded
             ? acceleration
             : acceleration * airControl;
-
-
 
         if (moveInput.sqrMagnitude > 0.01f)
         {
@@ -205,24 +181,17 @@ public class PlayerMovement : MonoBehaviour
                 );
         }
 
-
-
         Vector3 horizontalVelocity =
             currentMovement * targetSpeed;
-
 
         Vector3 finalMovement =
             horizontalVelocity +
             Vector3.up * velocity.y;
 
-
-
         controller.Move(
             finalMovement * Time.deltaTime
         );
     }
-
-
 
     /// <summary>
     /// Handles jumping.
@@ -237,8 +206,6 @@ public class PlayerMovement : MonoBehaviour
                 );
         }
     }
-
-
 
     /// <summary>
     /// Applies gravity with faster falling.
@@ -262,19 +229,15 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
-
     private void OnDrawGizmosSelected()
     {
         if (groundCheck == null)
             return;
 
-
         Gizmos.color =
             isGrounded
             ? Color.green
             : Color.red;
-
 
         Gizmos.DrawWireSphere(
             groundCheck.position,

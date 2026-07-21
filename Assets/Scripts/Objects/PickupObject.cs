@@ -3,6 +3,10 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class PickupObject : MonoBehaviour
 {
+    [Header("Scoring")]
+    [SerializeField] private int scoreValue = 10;
+    [SerializeField] private string itemName = "Item";
+
     [Header("Physics")]
     [SerializeField] private float dropVelocityDamping = 0.85f;
     [SerializeField] private bool disableColliderWhileHeld = true;
@@ -13,6 +17,8 @@ public class PickupObject : MonoBehaviour
     private bool isBeingHeld;
 
     public bool IsBeingHeld => isBeingHeld;
+    public int ScoreValue => scoreValue;
+    public string ItemName => itemName;
 
     private void Awake()
     {

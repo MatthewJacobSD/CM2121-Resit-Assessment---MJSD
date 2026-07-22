@@ -31,10 +31,9 @@ public class PickupObject : MonoBehaviour
         if (isBeingHeld) return;
 
         originalParent = transform.parent;
-        transform.SetParent(holdPosition, worldPositionStays: true);
 
-        rb.linearVelocity = Vector3.zero;
-        rb.angularVelocity = Vector3.zero;
+        transform.SetParent(holdPosition, false);
+        transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);
         rb.isKinematic = true;
 
         if (disableColliderWhileHeld)
@@ -54,6 +53,25 @@ public class PickupObject : MonoBehaviour
 
         if (disableColliderWhileHeld)
             SetCollidersEnabled(true);
+
+        isBeingHeld = false;
+    }
+
+    public void Throw(Vector3 direction, float force)
+    {
+        if (!isBeingHeld) return;
+
+        transform.SetParent(originalParent, worldPositionStays: true);
+
+        rb.isKinematic = false;
+
+        if (disableColliderWhileHeld)
+            SetCollidersEnabled(true);
+
+        rb.linearVelocity = Vector3.zero;
+        rb.angularVelocity = Vector3.zero;
+
+        rb.AddForce(direction.normalized * force, ForceMode.Impulse);
 
         isBeingHeld = false;
     }

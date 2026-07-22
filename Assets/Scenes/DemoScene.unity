@@ -475,7 +475,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 81204594}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 438008474}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: OnRestart
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &81204594
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1651,6 +1663,85 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1.5, y: 4, z: 1.8}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &437845277
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 437845274}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RecycleBin
+  successVFX: {fileID: 0}
+  errorVFX: {fileID: 0}
+  successSFX: {fileID: 0}
+  errorSFX: {fileID: 0}
+  OnCorrectRecycle:
+    m_PersistentCalls:
+      m_Calls: []
+  OnIncorrectRecycle:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!1 &438008473
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 438008475}
+  - component: {fileID: 438008474}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &438008474
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438008473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  canvasRoot: {fileID: 1897111813}
+  welcomePanel: {fileID: 1765466994}
+  instructionPanel: {fileID: 825093510}
+  hudPanel: {fileID: 684457794}
+  endPanel: {fileID: 1977884181}
+  congratulationText: {fileID: 422771990}
+  finalScoreText: {fileID: 1808114961}
+  perfectCondition: {fileID: 1345108467}
+  defaultCondition: {fileID: 375041894}
+  failureCondition: {fileID: 1713687430}
+  restartButton: {fileID: 81204591}
+  endGameButton: {fileID: 1355720084}
+  playerControls: {fileID: -944628639613478452, guid: 52db62050ed44ed4d92e9e787498aee4, type: 3}
+--- !u!4 &438008475
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 438008473}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.44628, y: 2.23271, z: 3.49969}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &441647389
 GameObject:
   m_ObjectHideFlags: 0
@@ -2651,6 +2742,51 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
+--- !u!1 &947271160
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 947271162}
+  - component: {fileID: 947271161}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &947271161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947271160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 791c048f38c78a948a3c96d26a716644, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  recyclableObjects: []
+--- !u!4 &947271162
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 947271160}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.44628, y: 2.23271, z: 3.49969}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1147248971
 GameObject:
   m_ObjectHideFlags: 0
@@ -3065,6 +3201,10 @@ MonoBehaviour:
   holdFollowSpeed: 15
   holdRotationSpeed: 12
   dropForwardForce: 1.5
+  throwForce: 12
+  maxThrowForce: 20
+  aimForwardOffset: 0.5
+  aimDownOffset: 0.15
 --- !u!114 &1261081362
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3306,7 +3446,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1355720087}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 438008474}
+        m_TargetAssemblyTypeName: UIManager, Assembly-CSharp
+        m_MethodName: OnEndGame
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1355720087
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3486,6 +3638,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1449279184}
   m_CullTransparentMesh: 1
+--- !u!1 &1525541454
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1525541456}
+  - component: {fileID: 1525541455}
+  m_Layer: 0
+  m_Name: ScoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1525541455
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1525541454}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c61b6afa0ca1d0e4fad894b0ac08b49e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
+  scoreText: {fileID: 3623849758492389419}
+  highScoreText: {fileID: 6450450444367754220}
+--- !u!4 &1525541456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1525541454}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.44628, y: 2.23271, z: 3.49969}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1609442097
 GameObject:
   m_ObjectHideFlags: 0
@@ -4341,6 +4539,56 @@ Transform:
   m_Children: []
   m_Father: {fileID: 871825667}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1838788583
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1838788585}
+  - component: {fileID: 1838788584}
+  m_Layer: 0
+  m_Name: HUDManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1838788584
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838788583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HUDManager
+  collectedText: {fileID: 1957344435}
+  remainingText: {fileID: 1986806458}
+  plantScorePopup: {fileID: 1881270764}
+  toyScorePopup: {fileID: 1623911326}
+  plasticBottleScorePopup: {fileID: 856041136}
+  popupDuration: 1.5
+--- !u!4 &1838788585
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838788583}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.44628, y: 2.23271, z: 3.49969}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1854787538
 GameObject:
   m_ObjectHideFlags: 0
@@ -4571,7 +4819,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1897111814
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5848,6 +6096,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
+  scoreValue: -10
+  itemName: 'Dog Plushie '
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &3555356934123909910
@@ -5995,6 +6245,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a8bf91d770187834a957b7ac91340efe, type: 3}
+--- !u!114 &3623849758492389419 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 523767759476274885, guid: a8bf91d770187834a957b7ac91340efe, type: 3}
+  m_PrefabInstance: {fileID: 3623849758492389418}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &3834576435832300216
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6103,6 +6364,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
+  scoreValue: -10
+  itemName: Dog Plushie 2
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &3834576435832300220
@@ -6276,6 +6539,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
+  scoreValue: 10
+  itemName: VasePlant
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &5290879735097381255
@@ -6611,6 +6876,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
+  scoreValue: 10
+  itemName: VasePotPlant
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &5323761392335593060
@@ -7010,6 +7277,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 9175140814611093945, guid: 987bb73c26ad72b41b8194cf0e8d9161, type: 3}
       insertIndex: -1
       addedObject: {fileID: 437845276}
+    - targetCorrespondingSourceObject: {fileID: 9175140814611093945, guid: 987bb73c26ad72b41b8194cf0e8d9161, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 437845277}
   m_SourcePrefab: {fileID: 100100000, guid: 987bb73c26ad72b41b8194cf0e8d9161, type: 3}
 --- !u!1001 &6450450444367754219
 PrefabInstance:
@@ -7108,6 +7378,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a94540af630c8a342b8f469c0b585ec2, type: 3}
+--- !u!114 &6450450444367754220 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6207786519902551754, guid: a94540af630c8a342b8f469c0b585ec2, type: 3}
+  m_PrefabInstance: {fileID: 6450450444367754219}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &6571699285414989633
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -7220,6 +7501,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
+  scoreValue: 10
+  itemName: Bonsay
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &6571699285414989637
@@ -7378,6 +7661,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
+  scoreValue: -5
+  itemName: PlasticBottle
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 0
 --- !u!54 &8057692610695661956
@@ -7442,3 +7727,7 @@ SceneRoots:
   - {fileID: 6308315397264850736}
   - {fileID: 5337394103399334757}
   - {fileID: 441647390}
+  - {fileID: 947271162}
+  - {fileID: 1525541456}
+  - {fileID: 438008475}
+  - {fileID: 1838788585}

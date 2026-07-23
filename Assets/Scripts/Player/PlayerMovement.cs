@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -34,16 +35,13 @@ public class PlayerMovement : MonoBehaviour
 
     [SerializeField] private LayerMask groundMask;
 
-
     // Components
     private CharacterController controller;
-
 
     // Input Actions
     private InputAction moveAction;
     private InputAction jumpAction;
     private InputAction sprintAction;
-
 
     // Movement variables
     private Vector2 moveInput;
@@ -57,6 +55,8 @@ public class PlayerMovement : MonoBehaviour
 
     private bool sprinting;
 
+    public bool IsSprinting => sprinting;
+    public bool IsMoving => moveInput.sqrMagnitude > 0.01f;
 
 
     private void Awake()

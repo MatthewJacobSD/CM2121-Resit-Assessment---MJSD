@@ -1,0 +1,22 @@
+﻿using UnityEngine;
+
+public class SplashSpawner : MonoBehaviour
+{
+    [SerializeField] private SplashEffect splashPrefab;
+
+
+    public void SpawnSplash(
+        Vector3 position,
+        SplashData data)
+    {
+        SplashEffect splash =
+            Instantiate(
+                splashPrefab,
+                position,
+                Quaternion.identity
+            );
+
+
+        splash.PlaySplash(position, data);
+    }
+}

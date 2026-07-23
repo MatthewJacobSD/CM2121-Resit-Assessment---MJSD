@@ -23,6 +23,11 @@ public class PlayerInteraction : MonoBehaviour
     [SerializeField] private float aimForwardOffset = 0.5f;
     [SerializeField] private float aimDownOffset = 0.15f;
 
+    [Header("Audio")]
+    [SerializeField] private AudioSource itemDrop;
+    [SerializeField] private AudioSource plalsticBottleDrop;
+    [SerializeField] private AudioSource itemCollection;
+
     private bool isAiming;
     private float currentThrowForce;
 

@@ -1,0 +1,12 @@
+# Blender 5.1.2 MTL File: 'Plastic_Bottle.blend'
+# www.blender.org
+
+newmtl Material.001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd C:/Users/2506116/source/class/project-demo-assessment/Assets/Art/Photogrammery/RawScans/Plastic_Bottle/textures/b29b7f7f348fcbd96ed785afc88782f8.jpg

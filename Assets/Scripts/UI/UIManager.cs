@@ -22,7 +22,6 @@ public class UIManager : MonoBehaviour
 
     [Header("End Screen Buttons")]
     [SerializeField] private GameObject restartButton;
-    [SerializeField] private GameObject endGameButton;
 
     [Header("Input")]
     [SerializeField] private InputActionAsset playerControls;
@@ -234,11 +233,5 @@ public class UIManager : MonoBehaviour
             GameManager.Instance.RestartGame();
 
         ShowPanel(PanelState.Playing);
-    }
-
-
-    public void OnEndGame()
-    {
-        Application.Quit();
     }
 }

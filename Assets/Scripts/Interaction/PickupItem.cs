@@ -1,11 +1,16 @@
 using UnityEngine;
 
+public enum ItemType { Plant, Toy, Bottle }
+
 [RequireComponent(typeof(Rigidbody))]
 public class PickupItem : MonoBehaviour
 {
+    [Header("Item Info")]
+    [SerializeField] private ItemType itemType = ItemType.Plant;
+    [SerializeField] private string itemName = "Item";
+
     [Header("Scoring")]
     [SerializeField] private int scoreValue = 10;
-    [SerializeField] private string itemName = "Item";
 
     [Header("Physics")]
     [SerializeField] private float dropVelocityDamping = 0.85f;
@@ -17,6 +22,7 @@ public class PickupItem : MonoBehaviour
     private bool isBeingHeld;
 
     public bool IsBeingHeld => isBeingHeld;
+    public ItemType ItemType => itemType;
     public int ScoreValue => scoreValue;
     public string ItemName => itemName;
 

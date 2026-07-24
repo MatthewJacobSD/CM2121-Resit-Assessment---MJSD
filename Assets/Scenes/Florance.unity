@@ -868,8 +868,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5601e92655dae6f45b3104aac08dbdf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SunnyEffect
-  sunLight: {fileID: 0}
-  godRays: {fileID: 0}
+  sunLight: {fileID: 410087040}
+  godRays: {fileID: 479110044}
 --- !u!108 &71494731
 Light:
   m_ObjectHideFlags: 0
@@ -1000,7 +1000,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ff56d141cac546a45b426d6c6d6b708c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeatherAnchorFollow
-  player: {fileID: 0}
+  player: {fileID: 1261081357}
   heightOffset: 50
 --- !u!1 &169612332
 GameObject:
@@ -12678,10 +12678,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RecycleBin
+  acceptedType: 0
   successVFX: {fileID: 0}
   errorVFX: {fileID: 0}
-  successSFX: {fileID: 0}
-  errorSFX: {fileID: 0}
+  successClip: {fileID: 8300000, guid: 135591913192546499ea71ae5b6a86b9, type: 3}
+  errorClip: {fileID: 8300000, guid: a2403926a81898e428479959d005eafe, type: 3}
   OnCorrectRecycle:
     m_PersistentCalls:
       m_Calls: []
@@ -12723,6 +12724,7 @@ MonoBehaviour:
   endPanel: {fileID: 1700447993}
   congratulationText: {fileID: 422771990}
   finalScoreText: {fileID: 1327826879}
+  endMessageText: {fileID: 213877230}
   perfectCondition: {fileID: 916142982}
   defaultCondition: {fileID: 2131618783}
   failureCondition: {fileID: 285983936}
@@ -39096,7 +39098,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 791c048f38c78a948a3c96d26a716644, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  recyclableObjects: []
+  maxLives: 5
+  gameDuration: 300
+  plantsRequired: 6
+  plantScore: 10
+  toyPenalty: 20
+  bottlePenalty: 5
+  chainBonus: 40
+  chainThreshold: 2
 --- !u!4 &947271162
 Transform:
   m_ObjectHideFlags: 0
@@ -60909,8 +60918,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c61b6afa0ca1d0e4fad894b0ac08b49e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScoreManager
-  scoreText: {fileID: 850433620}
-  highScoreText: {fileID: 1327826879}
 --- !u!4 &1525541456
 Transform:
   m_ObjectHideFlags: 0
@@ -67533,48 +67540,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ef8baf0175146244a41f83cd569cc6b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WeatherEffects
-  sunnyParameters:
-    cloudColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.8}
-    cloudEmissionRate: 200
-    rainEmissionRate: 0
-    windSpeed: 0
-    lightingActive: 0
-    sunRaysActive: 0
-  cloudyParameters:
-    cloudColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.8}
-    cloudEmissionRate: 200
-    rainEmissionRate: 0
-    windSpeed: 0
-    lightingActive: 0
-    sunRaysActive: 0
-  windyParameters:
-    cloudColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.8}
-    cloudEmissionRate: 200
-    rainEmissionRate: 0
-    windSpeed: 0
-    lightingActive: 0
-    sunRaysActive: 0
-  rainyParameters:
-    cloudColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.8}
-    cloudEmissionRate: 200
-    rainEmissionRate: 0
-    windSpeed: 0
-    lightingActive: 0
-    sunRaysActive: 0
-  stormyParameters:
-    cloudColor: {r: 0.5, g: 0.5, b: 0.5, a: 0.8}
-    cloudEmissionRate: 200
-    rainEmissionRate: 0
-    windSpeed: 0
-    lightingActive: 0
-    sunRaysActive: 0
+  sunnyParameters: {fileID: 71494732}
+  cloudyParameters: {fileID: 392451097}
+  windyParameters: {fileID: 342524168}
+  rainyParameters: {fileID: 803734005}
+  stormyParameters: {fileID: 1185070776}
   sunnyEffect: {fileID: 71494730}
   cloudEffect: {fileID: 392451094}
   windEffect: {fileID: 342524167}
   rainEffect: {fileID: 803734002}
   lightingEffect: {fileID: 1185070775}
   playerMovement: {fileID: 1261081360}
-  footstepAudio: {fileID: 0}
+  footstepAudio: {fileID: 1261081363}
+  sunnyAmbient: {fileID: 8300000, guid: b9dcdd697adf50d4bb2a7b397c256c2e, type: 3}
+  cloudyAmbient: {fileID: 8300000, guid: b9dcdd697adf50d4bb2a7b397c256c2e, type: 3}
+  windyAmbient: {fileID: 8300000, guid: b9dcdd697adf50d4bb2a7b397c256c2e, type: 3}
+  rainyAmbient: {fileID: 8300000, guid: 60e688bbd2f68a44eacedec0e09c260a, type: 3}
+  stormyAmbient: {fileID: 8300000, guid: bd1bedd12754afb4ea5daee756cfd11a, type: 3}
 --- !u!1 &1837215459
 GameObject:
   m_ObjectHideFlags: 0
@@ -67636,7 +67618,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HUDManager
   collectedText: {fileID: 1957344435}
-  remainingText: {fileID: 1986806458}
+  livesText: {fileID: 0}
+  timerText: {fileID: 0}
+  announcementText: {fileID: 0}
+  announcementDuration: 3
   plantScorePopup: {fileID: 1881270764}
   toyScorePopup: {fileID: 1623911326}
   plasticBottleScorePopup: {fileID: 856041136}
@@ -69316,8 +69301,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
-  scoreValue: -10
+  itemType: 0
   itemName: 'Dog Plushie '
+  scoreValue: -10
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &3555356934123909910
@@ -69476,8 +69462,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
-  scoreValue: -10
+  itemType: 0
   itemName: Dog Plushie 2
+  scoreValue: -10
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &3834576435832300220
@@ -69636,8 +69623,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
-  scoreValue: 10
+  itemType: 0
   itemName: VasePlant
+  scoreValue: 10
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &5290879735097381255
@@ -69796,8 +69784,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
-  scoreValue: 10
+  itemType: 0
   itemName: VasePotPlant
+  scoreValue: 10
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &5323761392335593060
@@ -70163,8 +70152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
-  scoreValue: 10
+  itemType: 0
   itemName: Bonsay
+  scoreValue: 10
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
 --- !u!54 &6571699285414989637
@@ -70323,10 +70313,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupObject
-  scoreValue: -5
+  itemType: 0
   itemName: PlasticBottle
+  scoreValue: -5
   dropVelocityDamping: 0.85
-  disableColliderWhileHeld: 0
+  disableColliderWhileHeld: 1
 --- !u!54 &8057692610695661956
 Rigidbody:
   m_ObjectHideFlags: 0

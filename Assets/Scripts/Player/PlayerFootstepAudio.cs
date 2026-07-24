@@ -2,7 +2,7 @@
 [RequireComponent(typeof(AudioSource))]
 
 [RequireComponent(typeof(CharacterController))]
-public class FootstepAudio : MonoBehaviour
+public class PlayerFootstepAudio : MonoBehaviour
 {
     public enum SurfaceType
     {

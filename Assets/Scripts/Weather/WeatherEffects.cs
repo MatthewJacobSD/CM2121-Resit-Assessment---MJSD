@@ -20,6 +20,13 @@ public class WeatherEffects : MonoBehaviour
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private PlayerFootstepAudio footstepAudio;
 
+    [Header("Ambient Audio")]
+    [SerializeField] private AudioClip sunnyAmbient;
+    [SerializeField] private AudioClip cloudyAmbient;
+    [SerializeField] private AudioClip windyAmbient;
+    [SerializeField] private AudioClip rainyAmbient;
+    [SerializeField] private AudioClip stormyAmbient;
+
     private WeatherEffectParameters currentParameters;
     private WeatherEffectParameters targetParameters;
 
@@ -55,6 +62,19 @@ public class WeatherEffects : MonoBehaviour
         bool isWet = state == WeatherState.State.Rainy || state == WeatherState.State.Stormy;
         if (footstepAudio != null)
             footstepAudio.SetSurface(isWet ? PlayerFootstepAudio.SurfaceType.WetGrass : PlayerFootstepAudio.SurfaceType.DryGrass);
+
+        // Ambient audio crossfade
+        AudioClip ambientClip = state switch
+        {
+            WeatherState.State.Sunny => sunnyAmbient,
+            WeatherState.State.Cloudy => cloudyAmbient,
+            WeatherState.State.Windy => windyAmbient,
+            WeatherState.State.Rainy => rainyAmbient,
+            WeatherState.State.Stormy => stormyAmbient,
+            _ => sunnyAmbient
+        };
+        if (ambientClip != null)
+            AudioManager.Instance?.CrossfadeAmbient(ambientClip);
 
         // Special effects
         lightingEffect?.SetActive(state == WeatherState.State.Stormy);

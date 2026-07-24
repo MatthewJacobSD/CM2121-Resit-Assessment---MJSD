@@ -13,6 +13,7 @@ public class UIManager : MonoBehaviour
     [Header("End Screen")]
     [SerializeField] private TMP_Text congratulationText;
     [SerializeField] private TMP_Text finalScoreText;
+    [SerializeField] private TMP_Text endMessageText;
     [SerializeField] private GameObject perfectCondition;
     [SerializeField] private GameObject defaultCondition;
     [SerializeField] private GameObject failureCondition;
@@ -22,28 +23,30 @@ public class UIManager : MonoBehaviour
 
     private InputAction continueAction;
 
-
     private enum PanelState { Welcome, Instructions, Playing, Ended }
     private PanelState currentState;
 
     private void Awake()
     {
-        var uiMap = playerControls.FindActionMap("UI", true); // Make sure playerControls is assigned in Inspector
+        var uiMap = playerControls.FindActionMap("UI", true);
         continueAction = uiMap.FindAction("Continue", true);
     }
 
     private void Start()
     {
         ShowPanel(PanelState.Welcome);
-
-        if (GameManager.Instance != null)
-            GameManager.Instance.OnGameOver += ShowEndScreen;
     }
 
     private void OnEnable()
     {
         continueAction.Enable();
         continueAction.performed += OnContinue;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnGameWon += OnGameWon;
+            GameManager.Instance.OnGameOver += OnGameOver;
+        }
     }
 
     private void OnDisable()
@@ -52,7 +55,10 @@ public class UIManager : MonoBehaviour
         continueAction.Disable();
 
         if (GameManager.Instance != null)
-            GameManager.Instance.OnGameOver -= ShowEndScreen;
+        {
+            GameManager.Instance.OnGameWon -= OnGameWon;
+            GameManager.Instance.OnGameOver -= OnGameOver;
+        }
     }
 
     private void ShowPanel(PanelState state)
@@ -85,19 +91,33 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void ShowEndScreen()
+    private void OnGameWon()
+    {
+        AudioManager.Instance?.PlayAchievementSFX();
+        ShowEndScreen("Perfect Cleanup!", "You recycled all the plants and saved the environment!");
+    }
+
+    private void OnGameOver()
+    {
+        ShowEndScreen("Game Over", "Time ran out or you lost all your lives. Try again!");
+    }
+
+    private void ShowEndScreen(string title, string message)
     {
         ShowPanel(PanelState.Ended);
 
         int score = ScoreManager.Instance?.CurrentScore ?? 0;
-        finalScoreText.text = $"Final Score: {score}";
+        int lives = GameManager.Instance?.Lives ?? 0;
 
-        perfectCondition?.SetActive(score >= 30);
+        finalScoreText.text = $"Final Score: {score}";
+        congratulationText.text = title;
+
+        if (endMessageText != null)
+            endMessageText.text = message;
+
+        perfectCondition?.SetActive(score >= 30 && lives > 0);
         defaultCondition?.SetActive(score > 0 && score < 30);
         failureCondition?.SetActive(score <= 0);
-
-        congratulationText.text = score >= 30 ? "Perfect Cleanup!" :
-                                 score > 0 ? "Good Effort!" : "Try Again!";
     }
 
     public void OnRestart()

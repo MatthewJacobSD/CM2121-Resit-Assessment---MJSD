@@ -63,7 +63,7 @@ public class AudioManager : MonoBehaviour
         sfxSource = gameObject.AddComponent<AudioSource>();
     }
 
-    private void CrossfadeAmbient(AudioClip newClip)
+    public void CrossfadeAmbient(AudioClip newClip)
     {
         if (crossfadeRoutine != null)
             StopCoroutine(crossfadeRoutine);

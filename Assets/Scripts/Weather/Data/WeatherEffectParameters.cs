@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public class WeatherEffectParameters
+public class WeatherEffectParameters : MonoBehaviour
 {
     [Header("Cloud Settings")]
-    public Color cloudColor = new Color(0.5f, 0.5f, 0.5f, 0.8f);
+    public Color cloudColor = new(0.5f, 0.5f, 0.5f, 0.8f);
 
     [Range(0, 1000)]
     public float cloudEmissionRate = 200f;

@@ -159,6 +159,7 @@ public class PlayerInteraction : MonoBehaviour
                 currentHeldObject = pickup;
                 currentHeldObject.Pickup(holdPosition);
                 currentTarget = null;
+                AudioManager.Instance?.PlayPickupSFX();
                 OnObjectPickedUp?.Invoke(currentHeldObject);
                 OnTargetLost?.Invoke();
             }
@@ -180,6 +181,7 @@ public class PlayerInteraction : MonoBehaviour
 
         currentHeldObject = null;
         isAiming = false;
+        AudioManager.Instance?.PlayDropSFX();
         OnObjectDropped?.Invoke();
     }
 
@@ -192,6 +194,7 @@ public class PlayerInteraction : MonoBehaviour
         currentHeldObject = null;
         isAiming = false;
         currentThrowForce = throwForce;
+        AudioManager.Instance?.PlayDropSFX();
         OnObjectDropped?.Invoke();
     }
 

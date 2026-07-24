@@ -23,10 +23,12 @@ public class WeatherState : MonoBehaviour
     public void SetWeather(State newState)
     {
         if (newState == CurrentWeather) return;
+
         CurrentWeather = newState;
         OnWeatherChanged?.Invoke(CurrentWeather);
     }
 
+    // Quick helper methods
     public void SetSunny() => SetWeather(State.Sunny);
     public void SetRainy() => SetWeather(State.Rainy);
     public void SetStormy() => SetWeather(State.Stormy);

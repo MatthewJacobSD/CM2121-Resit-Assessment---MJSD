@@ -2,53 +2,39 @@
 
 public class WeatherState : MonoBehaviour
 {
-    private int currentStateIndex;
-    public static State currentWeatherState;
-    public delegate void WeatherChangedHandler(State state);
-    public event WeatherChangedHandler OnWeatherChanged;
-
     public enum State
     {
         Sunny,
         Cloudy,
         Windy,
         Rainy,
-        Stormy,
+        Stormy
     }
 
-    public State[] WeatherStateOrder = new State[]
+    [Header("Weather Cycle")]
+    [SerializeField]
+    private State[] weatherOrder =
     {
-        State.Sunny,
-        State.Cloudy,
-        State.Windy,
-        State.Rainy,
-        State.Stormy,
-        State.Rainy,
-        State.Cloudy,
+        State.Sunny, State.Cloudy, State.Windy, State.Rainy, State.Stormy
     };
 
+    private int currentIndex = 0;
+    public State CurrentWeather { get; private set; }
+
+    public event System.Action<State> OnWeatherChanged;
+
     private void Start()
-    { 
-        currentStateIndex = 0;
-        currentWeatherState = WeatherStateOrder[currentStateIndex];
-    }
-
-    public State GetCurrentWeatherState()
     {
-        return WeatherStateOrder[currentStateIndex];
+        CurrentWeather = weatherOrder[0];
     }
 
-    public void CycleWeatherState()
+    public void CycleWeather()
     {
-        currentStateIndex = (currentStateIndex + 1) % WeatherStateOrder.Length;
-        currentWeatherState = WeatherStateOrder[currentStateIndex];
-        print("The wather is now " + currentWeatherState);
+        currentIndex = (currentIndex + 1) % weatherOrder.Length;
+        CurrentWeather = weatherOrder[currentIndex];
 
-        OnWeatherChanged?.Invoke(currentWeatherState);
+        OnWeatherChanged?.Invoke(CurrentWeather);
     }
 
-    public int GetNextWeatherStateIndex()
-    {
-        return (currentStateIndex + 1) % WeatherStateOrder.Length;
-    }
+    public State GetCurrentState() => CurrentWeather;
 }

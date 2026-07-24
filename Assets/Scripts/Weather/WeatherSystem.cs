@@ -2,29 +2,30 @@
 
 public class WeatherSystem : MonoBehaviour
 {
-    public WeatherTimer weatherTimer;
-    public WeatherState weatherState;
-    public WeatherEffects weatherEffects;
+    [Header("Core Components")]
+    [SerializeField] private WeatherState weatherState;
+    [SerializeField] private WeatherTimer weatherTimer;
+    [SerializeField] private WeatherEffects weatherEffects;
 
-    void OnEnable()
+    private void OnEnable()
     {
-        weatherTimer.OnTimerExpired += HandleTimerExpired;
-        weatherState.OnWeatherChanged += HandleWeatherChanged;
+        weatherTimer.OnTimerExpired += OnTimerExpired;
+        weatherState.OnWeatherChanged += OnWeatherChanged;
     }
 
     private void OnDisable()
     {
-        weatherTimer.OnTimerExpired -= HandleTimerExpired;
-        weatherState.OnWeatherChanged -= HandleWeatherChanged;
+        weatherTimer.OnTimerExpired -= OnTimerExpired;
+        weatherState.OnWeatherChanged -= OnWeatherChanged;
     }
 
-    private void HandleTimerExpired()
+    private void OnTimerExpired()
     {
-        weatherState.CycleWeatherState();
+        weatherState.CycleWeather();
     }
 
-    private void HandleWeatherChanged(WeatherState.State state)
+    private void OnWeatherChanged(WeatherState.State newState)
     {
-        weatherEffects.SetWeatherEffect(state);
+        weatherEffects.SetWeather(newState);
     }
 }

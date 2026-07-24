@@ -1,132 +1,110 @@
-﻿using System;
-using System.Collections;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class WeatherEffects : MonoBehaviour
 {
-    private WeatherEffectParameters currentWeatherEffectParameters;
-    private WeatherEffectParameters targetWeatherEffectParameters;
+    [Header("Weather Parameters")]
+    [SerializeField] private WeatherEffectParameters sunnyParameters;
+    [SerializeField] private WeatherEffectParameters cloudyParameters;
+    [SerializeField] private WeatherEffectParameters windyParameters;
+    [SerializeField] private WeatherEffectParameters rainyParameters;
+    [SerializeField] private WeatherEffectParameters stormyParameters;
 
-    [SerializeField] WeatherEffectParameters sunnyWeatherParameters;
-    [SerializeField] WeatherEffectParameters cloudyWeatherParameters;
-    [SerializeField] WeatherEffectParameters windyWeatherParameters;
-    [SerializeField] WeatherEffectParameters rainyWeatherParameters;
-    [SerializeField] WeatherEffectParameters stormyWeatherParameters;
+    [Header("Effects")]
+    [SerializeField] private SunnyEffect sunnyEffect;
+    [SerializeField] private CloudEffect cloudEffect;
+    [SerializeField] private WindEffect windEffect;
+    [SerializeField] private RainEffect rainEffect;
+    [SerializeField] private LightingEffect lightingEffect;
 
-    [SerializeField] SunnyEffect sunnyEffect;
-    [SerializeField] CloudEffect cloudEffect;
-    [SerializeField] WindEffect windEffect;
-    [SerializeField] RainEffect rainEffect;
-    [SerializeField] LightingEffect lightingEffect;
+    [Header("Player References")]
+    [SerializeField] private PlayerMovement playerMovement;
+    [SerializeField] private PlayerFootstepAudio footstepAudio;
 
-    [SerializeField] PlayerMovement playerMovement;
-    [SerializeField] FootstepAudio footstepAudio;
+    private WeatherEffectParameters currentParameters;
+    private WeatherEffectParameters targetParameters;
 
     private void Awake()
     {
-        currentWeatherEffectParameters = sunnyWeatherParameters;
-        targetWeatherEffectParameters = gameObject.AddComponent<WeatherEffectParameters>();
+        currentParameters = new WeatherEffectParameters(sunnyParameters);
+        targetParameters = new WeatherEffectParameters();
     }
 
-    private void Start()
+    public void SetWeather(WeatherState.State state)
     {
-        SetWeatherEffect(WeatherState.State.Sunny);
-    }
-
-    public void SetWeatherEffect(WeatherState.State weatherState)
-    {
-        switch (weatherState)
+        // Set target parameters based on weather state
+        targetParameters = state switch
         {
-            case WeatherState.State.Sunny:
-                targetWeatherEffectParameters = sunnyWeatherParameters;
-                cloudEffect.SetSunny();
-                break;
+            WeatherState.State.Sunny => sunnyParameters,
+            WeatherState.State.Cloudy => cloudyParameters,
+            WeatherState.State.Windy => windyParameters,
+            WeatherState.State.Rainy => rainyParameters,
+            WeatherState.State.Stormy => stormyParameters,
+            _ => sunnyParameters
+        };
 
-            case WeatherState.State.Cloudy:
-                targetWeatherEffectParameters = cloudyWeatherParameters;
-                cloudEffect.SetCloudy();
-                break;
+        // Update visual effects immediately
+        ApplyImmediateEffects(state);
 
-            case WeatherState.State.Rainy:
-                targetWeatherEffectParameters = rainyWeatherParameters;
-                cloudEffect.SetCloudy();
-                break;
-
-            case WeatherState.State.Stormy:
-                targetWeatherEffectParameters = stormyWeatherParameters;
-                cloudEffect.SetStormy();
-                break;
-        }
-
-        footstepAudio.SetSurface(
-            weatherState == WeatherState.State.Rainy ||
-            weatherState == WeatherState.State.Stormy
-                ? FootstepAudio.SurfaceType.WetGrass
-                : FootstepAudio.SurfaceType.DryGrass
-        );
-
-        StartCoroutine(TransitionToNextEffect());
+        // Start smooth transition
+        StartCoroutine(TransitionToWeather());
     }
 
-    private IEnumerator TransitionToNextEffect()
+    private void ApplyImmediateEffects(WeatherState.State state)
     {
-        float transitionTime = 3f;
-        float elapsedTime = 0;
+        // Footsteps
+        bool isWet = state == WeatherState.State.Rainy || state == WeatherState.State.Stormy;
+        if (footstepAudio != null)
+            footstepAudio.SetSurface(isWet ? PlayerFootstepAudio.SurfaceType.WetGrass : PlayerFootstepAudio.SurfaceType.DryGrass);
 
-        WeatherEffectParameters startWeatherEffectParameters = currentWeatherEffectParameters;
+        // Special effects
+        lightingEffect?.SetActive(state == WeatherState.State.Stormy);
+        sunnyEffect?.SetActive(state == WeatherState.State.Sunny);
+    }
 
-        while (elapsedTime < transitionTime)
+    private System.Collections.IEnumerator TransitionToWeather()
+    {
+        float transitionTime = 2.5f;
+        float elapsed = 0f;
+
+        WeatherEffectParameters startParams = new WeatherEffectParameters(currentParameters);
+
+        while (elapsed < transitionTime)
         {
-            elapsedTime += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsedTime / transitionTime);
+            elapsed += Time.deltaTime;
+            float t = elapsed / transitionTime;
 
-            currentWeatherEffectParameters = LerpWeatherEffectParameters(startWeatherEffectParameters, targetWeatherEffectParameters, t);
-            UpdateWeatherEffects(currentWeatherEffectParameters);
+            currentParameters = LerpParameters(startParams, targetParameters, t);
+            ApplyParameters(currentParameters);
+
             yield return null;
         }
-        currentWeatherEffectParameters = targetWeatherEffectParameters;
-        UpdateWeatherEffects(currentWeatherEffectParameters);
+
+        currentParameters = new WeatherEffectParameters(targetParameters);
+        ApplyParameters(currentParameters);
     }
 
-    private WeatherEffectParameters LerpWeatherEffectParameters(WeatherEffectParameters from, WeatherEffectParameters to, float t)
+    private WeatherEffectParameters LerpParameters(WeatherEffectParameters a, WeatherEffectParameters b, float t)
     {
-        WeatherEffectParameters result = new()
+        return new WeatherEffectParameters
         {
-            cloudColor = Color.Lerp(from.cloudColor, to.cloudColor, t),
-            cloudEmissionRate = Mathf.Lerp(from.cloudEmissionRate, to.cloudEmissionRate, t),
-            rainEmissionRate = Mathf.Lerp(from.rainEmissionRate, to.rainEmissionRate, t),
-            windSpeed = Mathf.Lerp(from.windSpeed, to.windSpeed, t),
-            lightingActive = to.lightingActive,
-            sunRaysActive = to.sunRaysActive
+            cloudColor = Color.Lerp(a.cloudColor, b.cloudColor, t),
+            cloudEmissionRate = Mathf.Lerp(a.cloudEmissionRate, b.cloudEmissionRate, t),
+            rainEmissionRate = Mathf.Lerp(a.rainEmissionRate, b.rainEmissionRate, t),
+            windSpeed = Mathf.Lerp(a.windSpeed, b.windSpeed, t),
+            lightingActive = b.lightingActive,
+            sunRaysActive = b.sunRaysActive
         };
-        return result;
     }
 
-    private void UpdateWeatherEffects(WeatherEffectParameters weatherEffectParameters)
+    private void ApplyParameters(WeatherEffectParameters p)
     {
-        cloudEffect.SetCloudDarkness(weatherEffectParameters.cloudColor);
-        cloudEffect.SetCloudEmissionRate(weatherEffectParameters.cloudEmissionRate);
-        rainEffect.SetRainIntensity(weatherEffectParameters.rainEmissionRate, playerMovement);
-        windEffect.SetWindSpeed(weatherEffectParameters.windSpeed);
+        if (cloudEffect != null)
+        {
+            cloudEffect.SetCloudColor(p.cloudColor);
+            // You can add cloudEmissionRate support in CloudEffect if needed
+        }
 
-        if (weatherEffectParameters.lightingActive) lightingEffect.ActiveLightingEffect();
-        else lightingEffect.DeactivateLightingEffect();
-
-        if (weatherEffectParameters.sunRaysActive) sunnyEffect.ActiveSunnyEffect();
-        else sunnyEffect.DeactivateSunnyEffect();
+        rainEffect?.SetIntensity(p.rainEmissionRate);
+        windEffect?.SetWindSpeed(p.windSpeed);
     }
-
-    public WeatherEffectParameters GetCurrentWeatherEffectParameters()
-    {
-        return currentWeatherEffectParameters;
-    }
-    public SunnyEffect GetSunnyEffect() { return sunnyEffect; }
-
-    public CloudEffect GetCloudEffect() { return cloudEffect; }
-
-    public WindEffect GetWindEffect() { return windEffect; }
-
-    public RainEffect GetRainEffect() { return rainEffect; }
-
-    public LightingEffect GetLightingEffect() { return lightingEffect; }
 }

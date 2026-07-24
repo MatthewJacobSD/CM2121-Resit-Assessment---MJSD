@@ -12,7 +12,7 @@ public class HUDManager : MonoBehaviour
     [SerializeField] private GameObject toyScorePopup;
     [SerializeField] private GameObject plasticBottleScorePopup;
 
-    [Header("Popup Timing")]
+    [Header("Popup Settings")]
     [SerializeField] private float popupDuration = 1.5f;
 
     private float popupTimer;
@@ -25,6 +25,7 @@ public class HUDManager : MonoBehaviour
             GameManager.Instance.OnItemRecycled += OnItemRecycled;
             GameManager.Instance.OnGameStarted += UpdateStats;
         }
+
         if (ScoreManager.Instance)
             ScoreManager.Instance.OnScoreChanged += OnScoreChanged;
     }
@@ -36,6 +37,7 @@ public class HUDManager : MonoBehaviour
             GameManager.Instance.OnItemRecycled -= OnItemRecycled;
             GameManager.Instance.OnGameStarted -= UpdateStats;
         }
+
         if (ScoreManager.Instance)
             ScoreManager.Instance.OnScoreChanged -= OnScoreChanged;
     }
@@ -51,8 +53,7 @@ public class HUDManager : MonoBehaviour
         if (popupTimer > 0)
         {
             popupTimer -= Time.deltaTime;
-            if (popupTimer <= 0)
-                HideAllPopups();
+            if (popupTimer <= 0) HideAllPopups();
         }
     }
 
@@ -71,17 +72,15 @@ public class HUDManager : MonoBehaviour
     {
         if (!GameManager.Instance) return;
 
-        if (collectedText)
-            collectedText.text = $"Collected: {GameManager.Instance.ItemsRecycled}";
-        if (remainingText)
-            remainingText.text = $"Remaining: {GameManager.Instance.RemainingItems}";
+        collectedText.text = $"Collected: {GameManager.Instance.ItemsRecycled}";
+        remainingText.text = $"Remaining: {GameManager.Instance.RemainingItems}";
     }
 
     private void ShowPopup(string itemName)
     {
         HideAllPopups();
 
-        if (itemName.Contains("Vase") || itemName.Contains("Bonsay"))
+        if (itemName.Contains("Vase") || itemName.Contains("Bonsai"))
             activePopup = plantScorePopup;
         else if (itemName.Contains("DogPlushie"))
             activePopup = toyScorePopup;
@@ -97,9 +96,9 @@ public class HUDManager : MonoBehaviour
 
     private void HideAllPopups()
     {
-        if (plantScorePopup) plantScorePopup.SetActive(false);
-        if (toyScorePopup) toyScorePopup.SetActive(false);
-        if (plasticBottleScorePopup) plasticBottleScorePopup.SetActive(false);
+        plantScorePopup?.SetActive(false);
+        toyScorePopup?.SetActive(false);
+        plasticBottleScorePopup?.SetActive(false);
         activePopup = null;
     }
 }

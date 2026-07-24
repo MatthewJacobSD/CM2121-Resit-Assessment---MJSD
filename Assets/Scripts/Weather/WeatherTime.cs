@@ -2,50 +2,39 @@
 
 public class WeatherTimer : MonoBehaviour
 {
-    [Header("Duration")]
-    [SerializeField] float timer;
+    [Header("Timing")]
+    [SerializeField] private float[] timePerState = new float[5] { 30f, 25f, 20f, 35f, 15f };
 
-    private int currentStateIndex;
-    public float[] timesForWeatherStates = new float[7];
+    private float timer;
+    private int currentIndex;
 
-    public delegate void TimerExpiredHandler();
-    public event TimerExpiredHandler OnTimerExpired;
-    
+    public event System.Action OnTimerExpired;
+
     private void Start()
     {
-        currentStateIndex = 0;
-        timer = timesForWeatherStates[currentStateIndex];
+        ResetTimer();
     }
 
     private void Update()
     {
-        timer = -Time.deltaTime;
+        timer -= Time.deltaTime;
 
-        if (timer <= 0)
+        if (timer <= 0f)
         {
             CycleTimer();
             OnTimerExpired?.Invoke();
         }
     }
 
-    public void CycleTimer()
+    private void CycleTimer()
     {
-        SetTimer(currentStateIndex + 1);
+        currentIndex = (currentIndex + 1) % timePerState.Length;
+        timer = timePerState[currentIndex];
     }
 
-    public void SetTimer(int nextStateIndex)
+    public void ResetTimer()
     {
-        currentStateIndex = nextStateIndex % timesForWeatherStates.Length;
-        timer = timesForWeatherStates[currentStateIndex];
-    }
-
-    public void SetTimer(float time)
-    {
-        timer = time;
-    }
-
-    public float GetCurrentTime()
-    {
-        return timer;
+        currentIndex = 0;
+        timer = timePerState[0];
     }
 }

@@ -6,7 +6,7 @@ public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
 
-    [Header("Score Settings")]
+    [Header("UI References")]
     [SerializeField] private TMP_Text scoreText;
     [SerializeField] private TMP_Text highScoreText;
 
@@ -26,6 +26,7 @@ public class ScoreManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
         Instance = this;
         LoadHighScore();
     }

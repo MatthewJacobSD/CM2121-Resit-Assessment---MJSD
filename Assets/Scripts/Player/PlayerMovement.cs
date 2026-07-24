@@ -36,8 +36,13 @@ public class PlayerMovement : MonoBehaviour
     private bool isGrounded;
     private bool sprinting;
 
+    private float speedModifier = 1f;
+
     public bool IsSprinting => sprinting;
     public bool IsMoving => moveInput.sqrMagnitude > 0.01f;
+    public float SpeedModifier => speedModifier;
+    public float CurrentWalkSpeed => walkSpeed * speedModifier;
+    public float CurrentSprintSpeed => sprintSpeed * speedModifier;
 
     private void Awake()
     {
@@ -72,6 +77,11 @@ public class PlayerMovement : MonoBehaviour
         MovePlayer();
     }
 
+    public void SetSpeedModifier(float modifier)
+    {
+        speedModifier = Mathf.Clamp(modifier, 0.1f, 2f);
+    }
+
     private void ReadInput()
     {
         moveInput = moveAction.ReadValue<Vector2>();
@@ -89,7 +99,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void MovePlayer()
     {
-        float targetSpeed = (sprinting && isGrounded) ? sprintSpeed : walkSpeed;
+        float targetSpeed = (sprinting && isGrounded) ? sprintSpeed * speedModifier : walkSpeed * speedModifier;
 
         Vector3 inputDirection = (transform.forward * moveInput.y + transform.right * moveInput.x).normalized;
 

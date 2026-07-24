@@ -1,36 +1,35 @@
 ﻿using UnityEngine;
-[RequireComponent(typeof(AudioSource))]
+using System.Collections;
 
+[RequireComponent(typeof(AudioSource))]
 [RequireComponent(typeof(CharacterController))]
 public class PlayerFootstepAudio : MonoBehaviour
 {
-    public enum SurfaceType
-    {
-        DryGrass,
-        WetGrass
-    }
-
     [Header("References")]
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private CharacterController characterController;
+    [SerializeField] private WeatherState weatherState;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
 
-    [SerializeField] private AudioClip[] dryFootsteps;
-    [SerializeField] private AudioClip[] wetFootsteps;
+    [Header("Walking (dry)")]
+    [SerializeField] private AudioClip[] dryWalkFootsteps;
+
+    [Header("Running (same clips regardless of weather)")]
     [SerializeField] private AudioClip[] runningFootsteps;
+
+    [Header("Wet Walking")]
+    [SerializeField] private AudioClip[] wetWalkFootsteps;
 
     [Header("Splash Effects")]
     [SerializeField] private SplashSpawner splashSpawner;
     [SerializeField] private SplashData wetGrassSplash;
 
-
     [Header("Settings")]
     [SerializeField] private float walkStepInterval = 0.5f;
     [SerializeField] private float sprintStepInterval = 0.35f;
 
-    private SurfaceType currentSurface = SurfaceType.DryGrass;
     private float stepTimer;
 
     private void Awake()
@@ -49,86 +48,61 @@ public class PlayerFootstepAudio : MonoBehaviour
 
     private void HandleFootsteps()
     {
-        if (characterController == null)
-            return;
-
-        // Don't play footsteps while airborne.
-        if (!characterController.isGrounded)
+        if (characterController == null || !characterController.isGrounded)
         {
             stepTimer = 0f;
             return;
         }
 
-        // Only play footsteps when the player is moving.
-        if (!playerMovement.IsMoving)
+        if (playerMovement == null || !playerMovement.IsMoving)
         {
             stepTimer = 0f;
             return;
         }
 
-        // Use a shorter interval when sprinting.
-        float interval = playerMovement != null && playerMovement.IsSprinting
-            ? sprintStepInterval
-            : walkStepInterval;
+        bool sprinting = playerMovement.IsSprinting;
+
+        float interval = sprinting ? sprintStepInterval : walkStepInterval;
 
         stepTimer += Time.deltaTime;
 
         if (stepTimer >= interval)
         {
-            PlayFootstep();
+            PlayFootstep(sprinting);
             stepTimer = 0f;
         }
     }
 
-    private void PlayFootstep()
+    private void PlayFootstep(bool sprinting)
     {
         AudioClip[] clips;
 
-        // Select footstep sounds depending on surface and movement speed.
-        if (currentSurface == SurfaceType.DryGrass)
+        if (sprinting)
         {
-            clips = playerMovement.IsSprinting
-                ? runningFootsteps
-                : dryFootsteps;
+            clips = runningFootsteps;
         }
         else
         {
-            clips = wetFootsteps;
+            bool isWet = IsWetWeather();
+            clips = isWet ? wetWalkFootsteps : dryWalkFootsteps;
         }
 
-
-        // Play footstep audio if clips exist.
         if (clips != null && clips.Length > 0)
         {
-            AudioClip clip =
-                clips[Random.Range(0, clips.Length)];
-
+            AudioClip clip = clips[Random.Range(0, clips.Length)];
             audioSource.PlayOneShot(clip);
         }
 
-
-        // Spawn water splash when walking on wet grass.
-        if (currentSurface == SurfaceType.WetGrass &&
-            splashSpawner != null &&
-            wetGrassSplash != null)
+        if (!sprinting && IsWetWeather() && splashSpawner != null && wetGrassSplash != null)
         {
-            splashSpawner.SpawnSplash(
-                transform.position,
-                wetGrassSplash
-            );
+            splashSpawner.SpawnSplash(transform.position, wetGrassSplash);
         }
     }
 
-    /// <summary>
-    /// Called by the weather system.
-    /// </summary>
-    public void SetSurface(SurfaceType surface)
+    private bool IsWetWeather()
     {
-        currentSurface = surface;
-    }
-
-    public SurfaceType GetCurrentSurface()
-    {
-        return currentSurface;
+        if (weatherState == null) return false;
+        WeatherState.State state = weatherState.GetCurrentState();
+        return state == WeatherState.State.Rainy || state == WeatherState.State.Stormy;
     }
 }

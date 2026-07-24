@@ -5,36 +5,31 @@ public class WeatherState : MonoBehaviour
     public enum State
     {
         Sunny,
-        Cloudy,
-        Windy,
         Rainy,
         Stormy
     }
 
-    [Header("Weather Cycle")]
-    [SerializeField]
-    private State[] weatherOrder =
-    {
-        State.Sunny, State.Cloudy, State.Windy, State.Rainy, State.Stormy
-    };
+    [SerializeField] private State startingWeather = State.Sunny;
 
-    private int currentIndex = 0;
     public State CurrentWeather { get; private set; }
 
     public event System.Action<State> OnWeatherChanged;
 
     private void Start()
     {
-        CurrentWeather = weatherOrder[0];
+        CurrentWeather = startingWeather;
     }
 
-    public void CycleWeather()
+    public void SetWeather(State newState)
     {
-        currentIndex = (currentIndex + 1) % weatherOrder.Length;
-        CurrentWeather = weatherOrder[currentIndex];
-
+        if (newState == CurrentWeather) return;
+        CurrentWeather = newState;
         OnWeatherChanged?.Invoke(CurrentWeather);
     }
+
+    public void SetSunny() => SetWeather(State.Sunny);
+    public void SetRainy() => SetWeather(State.Rainy);
+    public void SetStormy() => SetWeather(State.Stormy);
 
     public State GetCurrentState() => CurrentWeather;
 }

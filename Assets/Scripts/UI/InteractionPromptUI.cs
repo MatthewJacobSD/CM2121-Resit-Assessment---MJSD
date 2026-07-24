@@ -15,7 +15,9 @@ public class InteractionPromptUI : MonoBehaviour
 
     private void Awake()
     {
-        interaction = GetComponentInParent<PlayerInteraction>() ?? FindAnyObjectByType<PlayerInteraction>();
+        interaction = GetComponentInParent<PlayerInteraction>() != null 
+            ? GetComponentInParent<PlayerInteraction>() 
+            : FindAnyObjectByType<PlayerInteraction>();
     }
 
     private void Start()

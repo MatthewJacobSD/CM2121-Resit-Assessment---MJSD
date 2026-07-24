@@ -16,7 +16,7 @@
 | Component | Weight | Word/Page Limit | Status |
 |-----------|--------|-----------------|--------|
 | Design | 20% | 10 pages (penalty applies) | ✅ docs/DESIGN_DOCUMENT.md |
-| Implementation | 50% | — | ✅ 28 scripts, 8 models, full game loop |
+| Implementation | 50% | — | ✅ 31 scripts, 8 models, full game loop |
 | User Testing | 10% | 2 pages (penalty applies) | ✅ docs/USER_TESTING.md (templates ready) |
 | Demonstration | 20% | 2 min max (penalty applies) | ✅ docs/DEMO_VIDEO_SCRIPT.md |
 
@@ -43,8 +43,9 @@
 
 5. **SFX and VFX** — Audio and visual effects for immersion
    - ✅ 19 audio clips with ambient crossfade and SFX
-   - ✅ Weather VFX (rain, clouds, lightning, wind, sun rays)
-   - ✅ Ambient sounds (weather-based crossfade)
+   - ✅ Weather VFX (rain, clouds, lightning, wind, storm overlay)
+   - ✅ Movement effects (sunny speed boost, rainy slowdown, storm heavy slowdown)
+   - ✅ WindZone and wind particles per weather state
 
 6. **Proper Crediting** — IP regulations for free resources
    - ✅ Audio from freesound.org (CC0 license)
@@ -74,7 +75,8 @@
 | Environment Scan | Multiple objects scanned and brought into Unity | ✅ 8 models |
 | Interactive Mechanics | Pickup, sort, recycle gameplay | ✅ Full game loop |
 | SFX | Sound effects for actions | ✅ 19 clips wired |
-| VFX | Visual effects (weather, particles) | ✅ 5 weather states |
+| VFX | Visual effects (weather, particles) | ✅ 4 weather states with proximity detection |
+| Movement | Weather-based speed modifiers | ✅ Sunny/rainy/stormy speed effects |
 | Narrative/Tasks | Clear objectives for players | ✅ 5min timer, 5 lives, chain bonus |
 
 ### Grade Criteria (Implementation)
@@ -171,7 +173,7 @@
 | Item | Format | Status |
 |------|--------|--------|
 | Design Document | 10 pages max | ✅ docs/DESIGN_DOCUMENT.md |
-| Implementation | Unity project (zip) | ✅ 28 scripts, 8 models, full game |
+| Implementation | Unity project (zip) | ✅ 31 scripts, 8 models, full game |
 | User Testing | 2 pages max | ✅ docs/USER_TESTING.md |
 | Demo Video | 2 min max | 🔲 Record on 24 Jul |
 | Gen AI Acknowledgement | Included in docs | ✅ In all 3 documents |

@@ -1,130 +1,174 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 public class WeatherEffects : MonoBehaviour
 {
-    [Header("Weather Parameters")]
-    [SerializeField] private WeatherEffectParameters sunnyParameters;
-    [SerializeField] private WeatherEffectParameters cloudyParameters;
-    [SerializeField] private WeatherEffectParameters windyParameters;
-    [SerializeField] private WeatherEffectParameters rainyParameters;
-    [SerializeField] private WeatherEffectParameters stormyParameters;
-
-    [Header("Effects")]
+    [Header("Visual Effects")]
     [SerializeField] private SunnyEffect sunnyEffect;
     [SerializeField] private CloudEffect cloudEffect;
     [SerializeField] private WindEffect windEffect;
     [SerializeField] private RainEffect rainEffect;
     [SerializeField] private LightingEffect lightingEffect;
 
-    [Header("Player References")]
-    [SerializeField] private PlayerMovement playerMovement;
-    [SerializeField] private PlayerFootstepAudio footstepAudio;
+    [Header("Weather Parameters")]
+    [SerializeField] private WeatherEffectParameters sunnyParameters;
+    [SerializeField] private WeatherEffectParameters rainyParameters;
+    [SerializeField] private WeatherEffectParameters stormyParameters;
 
     [Header("Ambient Audio")]
     [SerializeField] private AudioClip sunnyAmbient;
-    [SerializeField] private AudioClip cloudyAmbient;
-    [SerializeField] private AudioClip windyAmbient;
     [SerializeField] private AudioClip rainyAmbient;
     [SerializeField] private AudioClip stormyAmbient;
 
-    private WeatherEffectParameters currentParameters;
-    private WeatherEffectParameters targetParameters;
+    [Header("Storm Overlay")]
+    [SerializeField] private GameObject stormOverlay;
+    [SerializeField] private CanvasGroup stormOverlayAlpha;
 
-    private void Awake()
-    {
-        currentParameters = new WeatherEffectParameters(sunnyParameters);
-        targetParameters = new WeatherEffectParameters();
-    }
+    [Header("Transition")]
+    [SerializeField] private float transitionDuration = 2f;
+
+    [Header("Storm Intensity Ranges")]
+    [SerializeField] private float rainMinIntensity = 200f;
+    [SerializeField] private float rainMaxIntensity = 800f;
+    [SerializeField] private float stormOverlayMaxAlpha = 0.35f;
+    [SerializeField] private float lightningActivationThreshold = 0.6f;
+
+    private WeatherState.State currentState;
+    private Coroutine transitionRoutine;
+    private float currentStormIntensity;
 
     public void SetWeather(WeatherState.State state)
     {
-        // Set target parameters based on weather state
-        targetParameters = state switch
-        {
-            WeatherState.State.Sunny => sunnyParameters,
-            WeatherState.State.Cloudy => cloudyParameters,
-            WeatherState.State.Windy => windyParameters,
-            WeatherState.State.Rainy => rainyParameters,
-            WeatherState.State.Stormy => stormyParameters,
-            _ => sunnyParameters
-        };
+        currentState = state;
 
-        // Update visual effects immediately
+        if (transitionRoutine != null)
+            StopCoroutine(transitionRoutine);
+
+        transitionRoutine = StartCoroutine(TransitionWeather(state));
+
         ApplyImmediateEffects(state);
+        PlayAmbientAudio(state);
+    }
 
-        // Start smooth transition
-        StartCoroutine(TransitionToWeather());
+    public void SetStormIntensity(float intensity)
+    {
+        currentStormIntensity = Mathf.Clamp01(intensity);
+
+        if (currentState != WeatherState.State.Stormy && currentStormIntensity > 0f)
+        {
+            ApplyImmediateEffects(WeatherState.State.Stormy);
+            PlayAmbientAudio(WeatherState.State.Stormy);
+        }
+
+        if (rainEffect != null)
+        {
+            float rainIntensity = Mathf.Lerp(rainMinIntensity, rainMaxIntensity, currentStormIntensity);
+            rainEffect.SetIntensity(rainIntensity);
+        }
+
+        if (lightingEffect != null)
+            lightingEffect.SetActive(currentStormIntensity >= lightningActivationThreshold);
+
+        SetStormOverlay(currentStormIntensity);
     }
 
     private void ApplyImmediateEffects(WeatherState.State state)
     {
-        // Footsteps
-        bool isWet = state == WeatherState.State.Rainy || state == WeatherState.State.Stormy;
-        if (footstepAudio != null)
-            footstepAudio.SetSurface(isWet ? PlayerFootstepAudio.SurfaceType.WetGrass : PlayerFootstepAudio.SurfaceType.DryGrass);
+        switch (state)
+        {
+            case WeatherState.State.Sunny:
+                sunnyEffect?.SetActive(true);
+                cloudEffect?.SetCloudy(false);
+                rainEffect?.SetActive(false);
+                rainEffect?.SetIntensity(0f);
+                lightingEffect?.SetActive(false);
+                SetStormOverlay(0f);
+                break;
 
-        // Ambient audio crossfade
-        AudioClip ambientClip = state switch
+            case WeatherState.State.Rainy:
+                sunnyEffect?.SetActive(false);
+                cloudEffect?.SetCloudy(true);
+                rainEffect?.SetActive(true);
+                rainEffect?.SetIntensity(rainMinIntensity);
+                lightingEffect?.SetActive(false);
+                SetStormOverlay(0f);
+                break;
+
+            case WeatherState.State.Stormy:
+                sunnyEffect?.SetActive(false);
+                cloudEffect?.SetCloudy(true);
+                rainEffect?.SetActive(true);
+                rainEffect?.SetIntensity(Mathf.Lerp(rainMinIntensity, rainMaxIntensity, currentStormIntensity));
+                lightingEffect?.SetActive(currentStormIntensity >= lightningActivationThreshold);
+                SetStormOverlay(currentStormIntensity);
+                break;
+        }
+    }
+
+    private IEnumerator TransitionWeather(WeatherState.State state)
+    {
+        WeatherEffectParameters target = GetParametersForState(state);
+        if (target == null) yield break;
+
+        float elapsed = 0f;
+        while (elapsed < transitionDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / transitionDuration);
+
+            if (cloudEffect != null)
+            {
+                Color targetColor = target.cloudColor;
+                cloudEffect.SetCloudColor(Color.Lerp(Color.grey, targetColor, t));
+                cloudEffect.SetEmissionRate(Mathf.Lerp(100f, target.cloudEmissionRate, t));
+            }
+
+            if (windEffect != null)
+                windEffect.SetWindSpeed(Mathf.Lerp(2f, target.windSpeed, t));
+
+            yield return null;
+        }
+    }
+
+    private void SetStormOverlay(float intensity)
+    {
+        if (stormOverlay == null) return;
+
+        if (intensity > 0f)
+        {
+            stormOverlay.SetActive(true);
+            if (stormOverlayAlpha != null)
+                stormOverlayAlpha.alpha = Mathf.Lerp(0f, stormOverlayMaxAlpha, intensity);
+        }
+        else
+        {
+            if (stormOverlayAlpha != null)
+                stormOverlayAlpha.alpha = 0f;
+            stormOverlay.SetActive(false);
+        }
+    }
+
+    private void PlayAmbientAudio(WeatherState.State state)
+    {
+        AudioClip clip = state switch
         {
             WeatherState.State.Sunny => sunnyAmbient,
-            WeatherState.State.Cloudy => cloudyAmbient,
-            WeatherState.State.Windy => windyAmbient,
             WeatherState.State.Rainy => rainyAmbient,
             WeatherState.State.Stormy => stormyAmbient,
             _ => sunnyAmbient
         };
-        if (ambientClip != null)
-            AudioManager.Instance?.CrossfadeAmbient(ambientClip);
-
-        // Special effects
-        lightingEffect?.SetActive(state == WeatherState.State.Stormy);
-        sunnyEffect?.SetActive(state == WeatherState.State.Sunny);
+        if (clip != null)
+            AudioManager.Instance?.CrossfadeAmbient(clip);
     }
 
-    private System.Collections.IEnumerator TransitionToWeather()
+    private WeatherEffectParameters GetParametersForState(WeatherState.State state)
     {
-        float transitionTime = 2.5f;
-        float elapsed = 0f;
-
-        WeatherEffectParameters startParams = new WeatherEffectParameters(currentParameters);
-
-        while (elapsed < transitionTime)
+        return state switch
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / transitionTime;
-
-            currentParameters = LerpParameters(startParams, targetParameters, t);
-            ApplyParameters(currentParameters);
-
-            yield return null;
-        }
-
-        currentParameters = new WeatherEffectParameters(targetParameters);
-        ApplyParameters(currentParameters);
-    }
-
-    private WeatherEffectParameters LerpParameters(WeatherEffectParameters a, WeatherEffectParameters b, float t)
-    {
-        return new WeatherEffectParameters
-        {
-            cloudColor = Color.Lerp(a.cloudColor, b.cloudColor, t),
-            cloudEmissionRate = Mathf.Lerp(a.cloudEmissionRate, b.cloudEmissionRate, t),
-            rainEmissionRate = Mathf.Lerp(a.rainEmissionRate, b.rainEmissionRate, t),
-            windSpeed = Mathf.Lerp(a.windSpeed, b.windSpeed, t),
-            lightingActive = b.lightingActive,
-            sunRaysActive = b.sunRaysActive
+            WeatherState.State.Sunny => sunnyParameters,
+            WeatherState.State.Rainy => rainyParameters,
+            WeatherState.State.Stormy => stormyParameters,
+            _ => sunnyParameters
         };
-    }
-
-    private void ApplyParameters(WeatherEffectParameters p)
-    {
-        if (cloudEffect != null)
-        {
-            cloudEffect.SetCloudColor(p.cloudColor);
-            // You can add cloudEmissionRate support in CloudEffect if needed
-        }
-
-        rainEffect?.SetIntensity(p.rainEmissionRate);
-        windEffect?.SetWindSpeed(p.windSpeed);
     }
 }

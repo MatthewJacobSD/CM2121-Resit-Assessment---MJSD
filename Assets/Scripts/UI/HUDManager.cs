@@ -4,9 +4,13 @@ using TMPro;
 public class HUDManager : MonoBehaviour
 {
     [Header("Stats")]
-    [SerializeField] private TMP_Text collectedText;
+    [SerializeField] private TMP_Text collectedText;      // Plants
+    [SerializeField] private TMP_Text toysText;
+    [SerializeField] private TMP_Text bottlesText;
     [SerializeField] private TMP_Text livesText;
     [SerializeField] private TMP_Text timerText;
+    [SerializeField] private TMP_Text scoreText;
+    [SerializeField] private TMP_Text highScoreText;
 
     [Header("Announcement")]
     [SerializeField] private TMP_Text announcementText;
@@ -36,7 +40,10 @@ public class HUDManager : MonoBehaviour
         }
 
         if (ScoreManager.Instance)
+        {
             ScoreManager.Instance.OnScoreChanged += OnScoreChanged;
+            ScoreManager.Instance.OnHighScoreChanged += OnHighScoreChanged;
+        }
     }
 
     private void OnDisable()
@@ -51,7 +58,64 @@ public class HUDManager : MonoBehaviour
         }
 
         if (ScoreManager.Instance)
+        {
             ScoreManager.Instance.OnScoreChanged -= OnScoreChanged;
+            ScoreManager.Instance.OnHighScoreChanged -= OnHighScoreChanged;
+        }
+    }
+
+    private void Start()
+    {
+        CreateFallbackTextsIfMissing();
+        UpdateStats();
+    }
+
+    private void CreateFallbackTextsIfMissing()
+    {
+        if (announcementText == null)
+            announcementText = CreateText("Announcement Text", new Vector2(0, 200), 28, Color.yellow);
+
+        if (scoreText == null)
+            scoreText = CreateText("Score Text", new Vector2(-300, 400), 24);
+
+        if (highScoreText == null)
+            highScoreText = CreateText("High Score Text", new Vector2(300, 400), 24);
+
+        if (collectedText == null)
+            collectedText = CreateText("Plants: 0", new Vector2(-400, 350), 22);
+
+        if (toysText == null)
+            toysText = CreateText("Toys: 0", new Vector2(-400, 300), 22);
+
+        if (bottlesText == null)
+            bottlesText = CreateText("Bottles: 0", new Vector2(-400, 250), 22);
+
+        if (livesText == null)
+            livesText = CreateText("Lives Text", new Vector2(400, 350), 22);
+
+        if (timerText == null)
+            timerText = CreateText("Timer Text", new Vector2(0, 450), 26, Color.white);
+    }
+
+    private TMP_Text CreateText(string defaultText, Vector2 anchoredPosition, int fontSize = 24, Color? color = null)
+    {
+        GameObject go = new GameObject(defaultText);
+        go.transform.SetParent(transform, false);
+
+        RectTransform rect = go.AddComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = anchoredPosition;
+        rect.sizeDelta = new Vector2(600, 60);
+
+        TMP_Text text = go.AddComponent<TextMeshProUGUI>();
+        text.text = defaultText;
+        text.fontSize = fontSize;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = color ?? Color.white;
+        text.fontStyle = FontStyles.Bold;
+
+        return text;
     }
 
     private void Update()
@@ -84,7 +148,14 @@ public class HUDManager : MonoBehaviour
 
     private void OnScoreChanged(int newScore)
     {
-        UpdateStats();
+        if (scoreText != null)
+            scoreText.text = $"Score: {newScore}";
+    }
+
+    private void OnHighScoreChanged(int newHighScore)
+    {
+        if (highScoreText != null)
+            highScoreText.text = $"Best: {newHighScore}";
     }
 
     private void OnLivesChanged(int lives, int maxLives)
@@ -112,10 +183,22 @@ public class HUDManager : MonoBehaviour
 
     private void UpdateStats()
     {
-        if (!GameManager.Instance) return;
+        if (GameManager.Instance == null) return;
 
         if (collectedText != null)
             collectedText.text = $"Plants: {GameManager.Instance.PlantsRecycled}";
+
+        if (toysText != null)
+            toysText.text = $"Toys: {GameManager.Instance.ToysRecycled}";
+
+        if (bottlesText != null)
+            bottlesText.text = $"Bottles: {GameManager.Instance.BottlesRecycled}";
+
+        if (scoreText != null && ScoreManager.Instance != null)
+            scoreText.text = $"Score: {ScoreManager.Instance.CurrentScore}";
+
+        if (highScoreText != null && ScoreManager.Instance != null)
+            highScoreText.text = $"Best: {ScoreManager.Instance.HighScore}";
     }
 
     private void ShowAnnouncement(string message)
@@ -131,14 +214,14 @@ public class HUDManager : MonoBehaviour
     {
         HideAllPopups();
 
-        if (itemName.Contains("Vase") || itemName.Contains("Bonsai"))
+        if (itemName.Contains("Vase") || itemName.Contains("Bonsai") || itemName.Contains("Plant"))
             activePopup = plantScorePopup;
-        else if (itemName.Contains("DogPlushie"))
+        else if (itemName.Contains("DogPlushie") || itemName.Contains("Plushie"))
             activePopup = toyScorePopup;
-        else if (itemName.Contains("PlasticBottle"))
+        else if (itemName.Contains("PlasticBottle") || itemName.Contains("Bottle"))
             activePopup = plasticBottleScorePopup;
 
-        if (activePopup)
+        if (activePopup != null)
         {
             activePopup.SetActive(true);
             popupTimer = popupDuration;
@@ -147,9 +230,9 @@ public class HUDManager : MonoBehaviour
 
     private void HideAllPopups()
     {
-        plantScorePopup?.SetActive(false);
-        toyScorePopup?.SetActive(false);
-        plasticBottleScorePopup?.SetActive(false);
+        if (plantScorePopup) plantScorePopup.SetActive(false);
+        if (toyScorePopup) toyScorePopup.SetActive(false);
+        if (plasticBottleScorePopup) plasticBottleScorePopup.SetActive(false);
         activePopup = null;
     }
 }

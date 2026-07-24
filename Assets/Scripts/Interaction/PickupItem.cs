@@ -9,8 +9,8 @@ public class PickupItem : MonoBehaviour
     [SerializeField] private ItemType itemType = ItemType.Plant;
     [SerializeField] private string itemName = "Item";
 
-    [Header("Scoring")]
-    [SerializeField] private int scoreValue = 10;
+    [Header("Base Scoring")]
+    [SerializeField] private int baseScore = 10;
 
     [Header("Physics")]
     [SerializeField] private float dropVelocityDamping = 0.85f;
@@ -23,8 +23,8 @@ public class PickupItem : MonoBehaviour
 
     public bool IsBeingHeld => isBeingHeld;
     public ItemType ItemType => itemType;
-    public int ScoreValue => scoreValue;
     public string ItemName => itemName;
+    public int BaseScore => baseScore;
 
     private void Awake()
     {

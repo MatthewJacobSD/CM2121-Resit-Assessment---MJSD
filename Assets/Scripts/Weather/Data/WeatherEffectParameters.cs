@@ -19,13 +19,9 @@ public class WeatherEffectParameters : MonoBehaviour
     public bool lightingActive = false;
     public bool sunRaysActive = false;
 
-    // Optional: Constructor for easy default values
-    public WeatherEffectParameters() { }
-
-    public WeatherEffectParameters(WeatherEffectParameters other)
+    public void CopyFrom(WeatherEffectParameters other)
     {
         if (other == null) return;
-
         cloudColor = other.cloudColor;
         cloudEmissionRate = other.cloudEmissionRate;
         rainEmissionRate = other.rainEmissionRate;

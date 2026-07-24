@@ -72,12 +72,6 @@ public class WeatherFeedbackSystem : MonoBehaviour
             return;
         }
 
-        if (heldItem.ItemType == ItemType.Plant)
-        {
-            EnsureState(WeatherState.State.Sunny);
-            return;
-        }
-
         EvaluateBinProximity();
     }
 
@@ -157,13 +151,8 @@ public class WeatherFeedbackSystem : MonoBehaviour
     private void OnPickedUp(PickupItem item)
     {
         heldItem = item;
-
-        if (item.ItemType != ItemType.Plant)
-        {
-            weatherState.SetSunny();
-            weatherEffects?.SetWeather(WeatherState.State.Rainy);
-            windEffect?.SetWeatherState(WeatherState.State.Rainy);
-        }
+        EnsureState(WeatherState.State.Rainy);
+        ApplyStormIntensity(0f);
     }
 
     private void OnDropped()

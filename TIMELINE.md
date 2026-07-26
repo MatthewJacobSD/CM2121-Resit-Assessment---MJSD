@@ -13,16 +13,17 @@
 ## Old Project — Prototype (resit-assessment)
 
 **Purpose:** General idea of how the final product would look and play.
+**Repository:** `MatthewJacobSD/resit-assessment` on GitHub
 
-| Date | Day | Time | Commits | Work Done |
-|------|-----|------|---------|-----------|
-| 3 Jul | Fri | 15:38–23:08 | 4 | Initial check-in + full game implementation (rules, Input System, SFX, scene tooling) |
-| 4 Jul | Sat | 00:03–00:29 | 2 | Scene rebuild, Input System fixes, Burst cache, documentation |
-| 6 Jul | Mon | 22:39–23:46 | 4 | Polish pass, lives, forest environment, textures, layout v7–v8 |
-| 7 Jul | Tue | 00:09–04:47 | 6 | Visual v9–v14, environment patches, rocks, trees, weather (6 commits in 4.5hrs) |
-| 15 Jul | Wed | 14:03 | 1 | Script audit documentation |
+| Date | Day | Commits | Work Done |
+|------|-----|---------|-----------|
+| 3 Jul (Thu) | Day 1 | 3 | Initial check-in, full game implementation (rules, Input System, SFX, scene tooling, Resources folder) |
+| 4 Jul (Fri) | Day 2 | 2 | Scene rebuild, Input System fixes, Burst cache, documentation, scene size fix |
+| 6 Jul (Sun) | Day 3 | 5 | Polish pass, ground snap, touch pickup, throw/drop, lives, forest env, textures, cursor confinement, layout v7–v8, Input System error fixes |
+| 7 Jul (Mon) | Day 4 | 7 | Visual v9 (motion blur, 16:9, collisions, boundaries), mouse sensitivity, tree/rock scaling v10–v11, rock Y boost, environment patch v13 (wind, rain, grass), v14 (3x3 ground field, zone collectibles, announcements) |
+| 15 Jul (Tue) | Day 5 | 1 | Script audit documentation for rebuild reference |
 
-**Prototype total:** 4 active days, 18 commits, full game from zero
+**Prototype total:** 5 active days, 18 commits, full game from zero to polished prototype
 
 ---
 
@@ -30,53 +31,46 @@
 
 **Purpose:** Final version submitted for assessment.
 
-| Day | Date | Phase | Tasks | Deliverable | Status |
-|-----|------|-------|-------|-------------|--------|
-| — | 15 Jul (Wed) | Init | Initial check-in, starting status | Project created | ✅ |
-| — | 16 Jul (Thu) | Init | Basic player movement, camera, jump | Player controller working | ✅ |
-| 1 | 19 Jul (Sun) | Setup | Folder restructure, migrate 3 audio files, .gitignore, commit | Clean project structure | ✅ |
-| 2 | 20 Jul (Mon) | Core | Pickup/drop mechanics, scoring system, lives counter, game manager | Core game loop | 🔲 |
-| 3 | 21 Jul (Tue) | Core | Recycling bin logic, zone-based sorting, collectible types, win/lose | Playable game | 🔲 |
-| 4 | 22 Jul (Wed) | Env | Terrain, trees, rocks, weather VFX, skybox, lighting, audio | Full environment | 🔲 |
-| 5 | 23 Jul (Thu) | Polish | HUD, UI cards, announcements, SFX integration, boundaries, cursor lock | Polished game | 🔲 |
-| 6 | 24 Jul (Fri) | Final | User testing (solo), generate docs, record demo video, submit by 1pm | **SUBMISSION** | 🔲 |
+| Date | Day | Commits | Phase | Work Done | Status |
+|------|-----|---------|-------|-----------|--------|
+| 15 Jul (Wed) | Day 1 | 2 | Init | Initial check-in, starting project status | Done |
+| 16 Jul (Thu) | Day 2 | 1 | Core | Basic player movement, camera, jump functionality | Done |
+| 19 Jul (Sun) | Day 3 | 2 | Setup | Folder restructure, migrate audio/models, add scanned models, .gitignore, assessment docs, timeline | Done |
+| 20 Jul (Mon) | Day 4 | 2 | Core | Pickup/drop/throw rewrite with smooth follow, layer/tag refactor, single-item hold, UI prompts and warnings, pre-layer backup | Done |
+| 21 Jul (Tue) | Day 5 | 1 | Core | Recycling system, score tracking, chain bonuses, UI integration | Done |
+| 22 Jul (Wed) | Day 6 | 1 | Core | UI logic integration, UI + Unity assets connected, score logic functional | Done |
+| 23 Jul (Thu) | Day 7 | 1 | Polish | Callback work, saving before test and debugs | Done |
+| 24 Jul (Fri) | Day 8 | 4 | Polish | Callback 2: folder/UI structure update, proximity-based weather system, WeatherFeedbackSystem rewrite, bug fixes | Done |
+| 26 Jul (Sun) | Day 9 | 1 | Polish | Surface-based footstep audio (water/soil detection, 5s drying timer), deleted RockScatterer, trimmed TerrainDemoScene_URP (4GB→2.3MB), deleted Rocks and Boulders 2 (386MB), updated docs | Done |
 
----
-
-## Day 6 — Submission Day (Fri 24 Jul)
-
-| Time | Task |
-|------|------|
-| 08:00–09:00 | Final bug fixes, test run-through |
-| 09:00–10:00 | User testing (solo) — document results |
-| 10:00–11:00 | Generate design doc, user testing doc, demo script |
-| 11:00–12:00 | Record demo video (2 min max) |
-| 12:00–12:45 | Final review, package submission |
-| **13:00** | **DEADLINE** |
+**New project total:** 9 active days, 15 commits, complete game with weather system, surface audio, and documentation
 
 ---
 
 ## Feature Comparison — Old vs New Project
 
-| Feature | Old Project (4 days) | New Project (5 days) | Status |
-|---------|---------------------|---------------------|--------|
-| Player movement | ✅ Day 1 | ✅ Already done | — |
-| Camera look | ✅ Day 1 | ✅ Already done | — |
-| Jump/sprint | ✅ Day 1 | ✅ Already done | — |
-| Pickup/drop | ✅ Day 1 | 🔲 Day 2 | — |
-| Scoring | ✅ Day 1 | 🔲 Day 2 | — |
-| Lives system | ✅ Day 3 | 🔲 Day 2 | — |
-| Game manager | ✅ Day 1 | 🔲 Day 2 | — |
-| Recycling bins | ✅ Day 1 | 🔲 Day 3 | — |
-| Zone logic | ✅ Day 4 | 🔲 Day 3 | — |
-| Collectibles | ✅ Day 1 | 🔲 Day 3 | — |
-| Terrain/trees | ✅ Day 4 | 🔲 Day 4 | — |
-| Weather VFX | ✅ Day 4 | 🔲 Day 4 | — |
-| Audio | ✅ Day 1 | 🔲 Day 4 | — |
-| HUD/UI | ✅ Day 3 | 🔲 Day 5 | — |
-| Design doc | ✅ Day 5 | 🔲 Day 6 | — |
-| User testing | — | 🔲 Day 6 | — |
-| Demo video | — | 🔲 Day 6 | — |
+| Feature | Old Project (Prototype) | New Project (Final) | Status |
+|---------|------------------------|---------------------|--------|
+| Player movement | Walk/sprint/crouch/slide/dash/trip | Walk/sprint/jump with speed modifier API | Done |
+| Camera look | Smoothing, FOV lerp, head bob, trip tilt | Sensitivity, vertical clamping | Done |
+| Pickup/drop/throw | Basic | Smooth follow, single-item hold, E/Q/right-click | Done |
+| Recycling bins | 9 bins, no type checking | 3 bins with acceptance matrix | Done |
+| Scoring | Hardcoded on GameManager | Separate ScoreManager, events, chain bonus | Done |
+| Lives | 5, 0.5 loss | 5, full loss | Done |
+| Weather | Binary sunny/rainy via string | 3-state (Sunny/Rainy/Stormy) with storm intensity | Done |
+| Weather trigger | Pick up item → binary | Proximity-based (OverlapSphere + AcceptsItem) | Done |
+| Movement effects | GetSpeedMultiplier() 1.2x/0.7x | SetSpeedModifier() 1.2x/0.75x/0.45–0.75x | Done |
+| Footsteps | Not implemented | Surface-based: water=splashing, soil=sunny drying | Done |
+| Wind | WeatherWindController lerp | WindEffect: WindZone + particles, continuous intensity | Done |
+| VFX | Light/fog/skybox lerp, rain toggle | Per-state VFX, storm overlay, ambient crossfade | Done |
+| HUD | Legacy UI.Text | TextMesh Pro, event-driven | Done |
+| Menu flow | None (starts immediately) | Welcome→Instructions→Play→End | Done |
+| Input system | GameInput static facade | Direct InputActionAsset, map switching | Done |
+| Audio | Single-source swap | Dual-source crossfade + context footsteps | Done |
+| Terrain | Procedurally generated | Pre-built with trees/vegetation/rocks | Done |
+| Photogrammetry | Runtime material applier | Pre-configured URP materials | Done |
+| Scripts | 25 | 29 | — |
+| Zones | 9 zones | Open world (3 bin types) | — |
 
 ---
 
@@ -84,12 +78,14 @@
 
 | Aspect | Old Project | New Project |
 |--------|-------------|-------------|
-| Zone system | 9 zones | 3 zones |
-| Prefabs | 64 | 10–15 |
-| Scripts | 25 | 8–10 |
+| Zone system | 9 zones (3x3 grid) | Open world with 3 bin types |
 | Collectible types | 3 (bottle, plant, toy) | 3 (bottle, plant, toy) |
-| Weather | Complex (rain, wind, grass) | Basic (rain + ambient) |
-| HUD | Code-based | UI card system (TMP) |
+| Weather states | 2 (sunny, rainy) | 3 (sunny, rainy, stormy) with intensity |
+| Footstep audio | None | Surface-based with drying effect |
+| Scripts | 25 | 29 |
+| Scene setup | Procedural (GameDemoSceneSetup.cs) | Pre-built Unity scene |
+| HUD | Legacy Text | TextMesh Pro |
+| Menu flow | None | Full card-based UI flow |
 
 ---
 
@@ -97,8 +93,8 @@
 
 | Risk | Impact | Mitigation |
 |------|--------|------------|
-| Friday morning bugs | High | Test thoroughly Thursday night |
-| Doc generation takes too long | Medium | Script pre-written, just run it |
-| Demo video recording issues | Medium | Record Thursday night as backup |
-| Scope creep | High | Stick to 3 zones, 4 collectible types, basic weather |
-| Testing alone | Medium | Systematic checklist, test each feature |
+| Demo video not recorded | High | Submit code + docs first, record video when build is ready |
+| Terrain needs Unity Editor work | Medium | Trees/rocks/vegetation already placed in scene |
+| User testing solo only | Medium | Systematic checklist, test each feature |
+| Doc generation | Low | Script pre-written, just run it |
+| Scope creep | High | Stuck to 29 scripts, core mechanics only |

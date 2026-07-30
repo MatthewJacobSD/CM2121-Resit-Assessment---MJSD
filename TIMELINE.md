@@ -6,7 +6,7 @@
 - **Student:** Matthew Jacob SD
 - **SDG:** Goal 12 — Responsible Consumption & Production (Recycling)
 - **Engine:** Unity 6 URP (6000.3.18f1)
-- **Deadline:** Friday 24 July 2026 @ 1pm
+- **Deadline (Extension):** Thursday 6 August 2026 @ 1pm
 
 ---
 
@@ -42,8 +42,19 @@
 | 23 Jul (Thu) | Day 7 | 1 | Polish | Callback work, saving before test and debugs | Done |
 | 24 Jul (Fri) | Day 8 | 4 | Polish | Callback 2: folder/UI structure update, proximity-based weather system, WeatherFeedbackSystem rewrite, bug fixes | Done |
 | 26 Jul (Sun) | Day 9 | 1 | Polish | Surface-based footstep audio (water/soil detection, 5s drying timer), deleted RockScatterer, trimmed TerrainDemoScene_URP (4GB→2.3MB), deleted Rocks and Boulders 2 (386MB), updated docs | Done |
+| 27 Jul (Mon) | Day 10 | 4 | UI | Created ChainFragrance scene for PauseMenu prototyping, built full PauseMenu hierarchy (PausePanel, SettingsPanel, ConfirmationModal, SaveProgressModal), created PauseMenuManager script | Done |
+| 28 Jul (Tue) | Day 11 | 5 | UI | Rewrote UIManager.cs with pause support, added PauseGame/ResumeGame to GameManager, created AutoSetupPauseMenu Editor tool, migrated PauseMenu structure into Florance scene | Done |
+| 29 Jul (Wed) | Day 12 | 3 | Polish | Documentation update, user testing logs written, final project verification, script audit, scene cleanup | Done |
+| 30 Jul (Thu) | Day 13 | — | Submission | Project evolution documentation, final review, project ready for submission | Active |
 
-**New project total:** 9 active days, 15 commits, complete game with weather system, surface audio, and documentation
+**New project total:** 13 active days, full game with pause menu, weather system, surface audio, and documentation
+
+---
+
+## Submission Deadline
+
+**Original:** Friday 24 July 2026 @ 1pm  
+**Extension granted:** Thursday 6 August 2026 @ 1pm
 
 ---
 
@@ -68,8 +79,8 @@
 | Input system | GameInput static facade | Direct InputActionAsset, map switching | Done |
 | Audio | Single-source swap | Dual-source crossfade + context footsteps | Done |
 | Terrain | Procedurally generated | Pre-built with trees/vegetation/rocks | Done |
-| Photogrammetry | Runtime material applier | Pre-configured URP materials | Done |
-| Scripts | 25 | 29 | — |
+| Photogrammetry | Pre-configured URP materials | Pre-configured URP materials | Done |
+| Scripts | 25 | 30 | — |
 | Zones | 9 zones | Open world (3 bin types) | — |
 
 ---
@@ -97,4 +108,4 @@
 | Terrain needs Unity Editor work | Medium | Trees/rocks/vegetation already placed in scene |
 | User testing solo only | Medium | Systematic checklist, test each feature |
 | Doc generation | Low | Script pre-written, just run it |
-| Scope creep | High | Stuck to 29 scripts, core mechanics only |
+| Scope creep | High | Stuck to 30 scripts, core mechanics only |

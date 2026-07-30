@@ -18,20 +18,28 @@ public class UIManager : MonoBehaviour
     [SerializeField] private GameObject defaultCondition;
     [SerializeField] private GameObject failureCondition;
 
+    [Header("Pause")]
+    [SerializeField] private GameObject pauseMenuPanel;
+
     [Header("Input")]
     [SerializeField] private InputActionAsset playerControls;
 
     private InputAction continueAction;
     private InputAction cancelAction;
+    private InputAction pauseAction;
+    private InputActionMap cachedPlayerMap;
+    private InputActionMap cachedUIMap;
 
     private enum PanelState { Welcome, Instructions, Playing, Ended }
     private PanelState currentState;
 
     private void Awake()
     {
-        var uiMap = playerControls.FindActionMap("UI", true);
-        continueAction = uiMap.FindAction("Continue", true);
-        cancelAction = uiMap.FindAction("Cancel", true);
+        cachedUIMap = playerControls.FindActionMap("UI", true);
+        cachedPlayerMap = playerControls.FindActionMap("Player", true);
+        continueAction = cachedUIMap.FindAction("Continue", true);
+        cancelAction = cachedUIMap.FindAction("Cancel", true);
+        pauseAction = cachedUIMap.FindAction("Pause", true);
     }
 
     private void Start()
@@ -50,6 +58,11 @@ public class UIManager : MonoBehaviour
             cancelAction.performed += OnCancel;
         }
 
+        if (pauseAction != null)
+        {
+            pauseAction.performed += OnPause;
+        }
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.OnGameWon += OnGameWon;
@@ -66,6 +79,12 @@ public class UIManager : MonoBehaviour
         {
             cancelAction.performed -= OnCancel;
             cancelAction.Disable();
+        }
+
+        if (pauseAction != null)
+        {
+            pauseAction.performed -= OnPause;
+            pauseAction.Disable();
         }
 
         if (GameManager.Instance != null)
@@ -97,25 +116,25 @@ public class UIManager : MonoBehaviour
 
     private void SwitchInputMap(PanelState state)
     {
-        InputActionMap playerMap = playerControls.FindActionMap("Player", true);
-        InputActionMap uiMap = playerControls.FindActionMap("UI", true);
-
         switch (state)
         {
             case PanelState.Welcome:
             case PanelState.Instructions:
-                playerMap.Disable();
-                uiMap.Enable();
+                cachedPlayerMap.Disable();
+                cachedUIMap.Enable();
+                if (pauseAction != null) pauseAction.Disable();
                 break;
 
             case PanelState.Playing:
-                uiMap.Disable();
-                playerMap.Enable();
+                cachedUIMap.Disable();
+                cachedPlayerMap.Enable();
+                if (pauseAction != null) pauseAction.Enable();
                 break;
 
             case PanelState.Ended:
-                playerMap.Disable();
-                uiMap.Enable();
+                cachedPlayerMap.Disable();
+                cachedUIMap.Enable();
+                if (pauseAction != null) pauseAction.Disable();
                 break;
         }
     }
@@ -169,5 +188,37 @@ public class UIManager : MonoBehaviour
     public void OnRestart()
     {
         GameManager.Instance.RestartGame();
+    }
+
+    private void OnPause(InputAction.CallbackContext ctx)
+    {
+        if (currentState == PanelState.Playing)
+            ShowPauseMenu();
+    }
+
+    public void ShowPauseMenu()
+    {
+        if (pauseMenuPanel != null)
+            pauseMenuPanel.SetActive(true);
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        cachedPlayerMap.Disable();
+        cachedUIMap.Enable();
+        if (pauseAction != null) pauseAction.Disable();
+    }
+
+    public void ReturnFromPause()
+    {
+        if (pauseMenuPanel != null)
+            pauseMenuPanel.SetActive(false);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        cachedUIMap.Disable();
+        cachedPlayerMap.Enable();
+        if (pauseAction != null) pauseAction.Enable();
     }
 }

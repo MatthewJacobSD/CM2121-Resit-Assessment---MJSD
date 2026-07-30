@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &5239120065954534620
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_Name
+      value: Plastic Recycling
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_TagString
+      value: RecyclingBin
+      objectReference: {fileID: 0}
+    - target: {fileID: 8164078558771037576, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4107140390355206758}
+  m_SourcePrefab: {fileID: 100100000, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+--- !u!1 &4932706171117791629 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+  m_PrefabInstance: {fileID: 5239120065954534620}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4107140390355206758
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4932706171117791629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RecycleBinInteractable
+  binType: 0
+  successVFX: {fileID: 0}
+  errorVFX: {fileID: 0}
+  successClip: {fileID: 8300000, guid: 135591913192546499ea71ae5b6a86b9, type: 3}
+  errorClip: {fileID: 8300000, guid: a2403926a81898e428479959d005eafe, type: 3}
+  OnCorrectRecycle:
+    m_PersistentCalls:
+      m_Calls: []
+  OnIncorrectRecycle:
+    m_PersistentCalls:
+      m_Calls: []

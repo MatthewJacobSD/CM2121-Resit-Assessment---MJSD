@@ -9,5 +9,5 @@ EditorBuildSettings:
     path: Assets/Scenes/Florance.unity
     guid: 95ab0607329aaa54190cc15d844a6148
   m_configObjects:
-    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 52db62050ed44ed4d92e9e787498aee4, type: 3}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: e8794d9b3fba38746937503e7bab5d4d, type: 3}
   m_UseUCBPForAssetBundles: 0

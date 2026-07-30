@@ -7,7 +7,7 @@
 - **Academic Year:** 2025-2026
 - **Semester:** 2
 - **Module Coordinator:** Verda Munir
-- **Deadline:** Friday 24 July 2026 @ 1pm
+- **Deadline (Extension):** Thursday 6 August 2026 @ 1pm
 
 ---
 
@@ -16,7 +16,7 @@
 | Component | Weight | Word/Page Limit | Status |
 |-----------|--------|-----------------|--------|
 | Design | 20% | 10 pages (penalty applies) | ✅ docs/DESIGN_DOCUMENT.md |
-| Implementation | 50% | — | ✅ 31 scripts, 8 models, full game loop |
+| Implementation | 50% | — | ✅ 30 scripts, 8 models, full game loop, pause menu, settings |
 | User Testing | 10% | 2 pages (penalty applies) | ✅ docs/USER_TESTING.md (templates ready) |
 | Demonstration | 20% | 2 min max (penalty applies) | ✅ docs/DEMO_VIDEO_SCRIPT.md |
 
@@ -173,7 +173,7 @@
 | Item | Format | Status |
 |------|--------|--------|
 | Design Document | 10 pages max | ✅ docs/DESIGN_DOCUMENT.md |
-| Implementation | Unity project (zip) | ✅ 31 scripts, 8 models, full game |
+| Implementation | Unity project (zip) | ✅ 29 scripts, 8 models, full game |
 | User Testing | 2 pages max | ✅ docs/USER_TESTING.md |
 | Demo Video | 2 min max | 🔲 Record on 24 Jul |
 | Gen AI Acknowledgement | Included in docs | ✅ In all 3 documents |

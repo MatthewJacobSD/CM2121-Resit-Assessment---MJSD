@@ -162,8 +162,20 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    public void PauseGame()
+    {
+        if (!isPlaying) return;
+        isPlaying = false;
+    }
+
+    public void ResumeGame()
+    {
+        isPlaying = true;
+    }
+
     public void RestartGame()
     {
+        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

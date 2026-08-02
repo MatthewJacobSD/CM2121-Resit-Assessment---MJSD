@@ -1,11 +1,22 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
-using TMPro;
 
+/// <summary>
+/// Owns the in-game pause menu: pausing/resuming, settings (username and volume),
+/// a two-step exit confirmation, and score persistence on quit.
+/// </summary>
 public class PauseMenuManager : MonoBehaviour
 {
+    #region Constants
+
+    private const string UsernameKey = "Username";
+    private const string VolumeKey = "Volume";
+
+    #endregion
+
+    #region Serialized Fields
+
     [Header("Panels")]
     [SerializeField] private GameObject pausePanel;
     [SerializeField] private GameObject settingsPanel;
@@ -17,14 +28,19 @@ public class PauseMenuManager : MonoBehaviour
     [SerializeField] private Slider volumeSlider;
 
     [Header("Pause Display")]
+    [Tooltip("Optional label showing the current score on the pause screen.")]
     [SerializeField] private TMP_Text currentScoreText;
+
+    #endregion
+
+    #region Private Fields
 
     private UIManager uiManagers;
     private bool isPaused;
-    private bool isGameSaved;
 
-    private const string UsernameKey = "Username";
-    private const string VolumeKey = "Volume";
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Start()
     {
@@ -46,8 +62,11 @@ public class PauseMenuManager : MonoBehaviour
             volumeSlider.onValueChanged.RemoveListener(OnVolumeChanged);
     }
 
+    #endregion
+
     #region Pause / Resume
 
+    /// <summary>Pauses gameplay, freezes time and shows the pause panel.</summary>
     public void Pause()
     {
         if (isPaused) return;
@@ -66,6 +85,7 @@ public class PauseMenuManager : MonoBehaviour
             uiManagers.ShowPauseMenu();
     }
 
+    /// <summary>Resumes gameplay, unfreezes time and hides the pause panel.</summary>
     public void Resume()
     {
         if (!isPaused) return;
@@ -168,26 +188,21 @@ public class PauseMenuManager : MonoBehaviour
         BackToPauseMenu();
     }
 
+    /// <summary>Saves the high score, then quits back to the title screen.</summary>
     public void SaveAndQuit()
     {
         if (ScoreManager.Instance != null)
             ScoreManager.Instance.SaveHighScore();
 
-        isGameSaved = true;
         PlayerPrefs.Save();
 
-        isPaused = false;
-        Time.timeScale = 1f;
-        GameManager.Instance.ResumeGame();
-        GameManager.Instance.RestartGame();
+        ExitToTitle();
     }
 
+    /// <summary>Quits to the title screen without persisting the current score.</summary>
     public void QuitWithoutSaving()
     {
-        isPaused = false;
-        Time.timeScale = 1f;
-        GameManager.Instance.ResumeGame();
-        GameManager.Instance.RestartGame();
+        ExitToTitle();
     }
 
     public void SaveProgress_Cancel()
@@ -198,6 +213,16 @@ public class PauseMenuManager : MonoBehaviour
     #endregion
 
     #region Utility
+
+    // Restarting the scene acts as "quit to title" because the game starts on the
+    // welcome screen and the score was already persisted above when required.
+    private void ExitToTitle()
+    {
+        isPaused = false;
+        Time.timeScale = 1f;
+        GameManager.Instance.ResumeGame();
+        GameManager.Instance.RestartGame();
+    }
 
     private void HideAll()
     {

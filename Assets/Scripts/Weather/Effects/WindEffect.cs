@@ -1,7 +1,15 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Drives the wind zone and wind particles, with per-weather-state speeds and
+/// a storm intensity that scales wind from calm to maximum strength.
+/// </summary>
 public class WindEffect : MonoBehaviour
 {
+    #region Serialized Fields
+
+    [Header("References")]
+    [Tooltip("Wind zone that pushes objects. Falls back to the component's own WindZone.")]
     [SerializeField] private WindZone windZone;
     [SerializeField] private ParticleSystem windParticles;
 
@@ -13,7 +21,15 @@ public class WindEffect : MonoBehaviour
 
     [SerializeField] private float maxWindSpeed = 25f;
 
+    #endregion
+
+    #region Private Fields
+
     private float currentStormIntensity;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -21,6 +37,11 @@ public class WindEffect : MonoBehaviour
             windZone = GetComponent<WindZone>();
     }
 
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Applies the wind speed configured for the given weather state.</summary>
     public void SetWeatherState(WeatherState.State state)
     {
         float speed = state switch
@@ -34,6 +55,7 @@ public class WindEffect : MonoBehaviour
         SetWindSpeed(speed);
     }
 
+    /// <summary>Scales storm wind strength in [0, 1].</summary>
     public void SetStormIntensity(float intensity)
     {
         currentStormIntensity = Mathf.Clamp01(intensity);
@@ -42,12 +64,14 @@ public class WindEffect : MonoBehaviour
         SetWindSpeed(speed);
     }
 
+    /// <summary>Turns the wind on (12) or off (0).</summary>
     public void SetActive(bool active)
     {
         float speed = active ? 12f : 0f;
         SetWindSpeed(speed);
     }
 
+    /// <summary>Applies a wind speed to the zone and particle emission/velocity.</summary>
     public void SetWindSpeed(float speed)
     {
         float clamped = Mathf.Clamp(speed, 0f, maxWindSpeed);
@@ -57,11 +81,13 @@ public class WindEffect : MonoBehaviour
 
         if (windParticles != null)
         {
-            var em = windParticles.emission;
+            ParticleSystem.EmissionModule em = windParticles.emission;
             em.rateOverTime = clamped * 4f;
 
-            var main = windParticles.main;
+            ParticleSystem.MainModule main = windParticles.main;
             main.startSpeed = clamped * 0.5f;
         }
     }
+
+    #endregion
 }

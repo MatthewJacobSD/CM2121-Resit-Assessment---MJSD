@@ -1,10 +1,17 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Drives the main menu flow (welcome, instructions, gameplay, end screen),
+/// switches input maps between UI and gameplay, and coordinates the pause menu.
+/// </summary>
 public class UIManager : MonoBehaviour
 {
+    #region Serialized Fields
+
     [Header("Screen Panels")]
+    [Tooltip("First screen shown; pressing continue advances to the instructions.")]
     [SerializeField] private GameObject welcomePanel;
     [SerializeField] private GameObject instructionPanel;
     [SerializeField] private GameObject hudPanel;
@@ -14,15 +21,23 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text congratulationText;
     [SerializeField] private TMP_Text finalScoreText;
     [SerializeField] private TMP_Text endMessageText;
+    [Tooltip("Shown when the cleanup was excellent (high score, lives remaining).")]
     [SerializeField] private GameObject perfectCondition;
+    [Tooltip("Shown for a moderate result.")]
     [SerializeField] private GameObject defaultCondition;
+    [Tooltip("Shown when the player scored nothing.")]
     [SerializeField] private GameObject failureCondition;
 
     [Header("Pause")]
     [SerializeField] private GameObject pauseMenuPanel;
 
     [Header("Input")]
+    [Tooltip("Input Action Asset containing the Player and UI action maps.")]
     [SerializeField] private InputActionAsset playerControls;
+
+    #endregion
+
+    #region Private Fields
 
     private InputAction continueAction;
     private InputAction cancelAction;
@@ -32,6 +47,10 @@ public class UIManager : MonoBehaviour
 
     private enum PanelState { Welcome, Instructions, Playing, Ended }
     private PanelState currentState;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -94,6 +113,48 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Restarts the game by reloading the active scene.</summary>
+    public void OnRestart()
+    {
+        GameManager.Instance.RestartGame();
+    }
+
+    /// <summary>Shows the pause menu and switches to UI input, hiding gameplay controls.</summary>
+    public void ShowPauseMenu()
+    {
+        if (pauseMenuPanel != null)
+            pauseMenuPanel.SetActive(true);
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        cachedPlayerMap.Disable();
+        cachedUIMap.Enable();
+        if (pauseAction != null) pauseAction.Disable();
+    }
+
+    /// <summary>Hides the pause menu and returns to full gameplay input.</summary>
+    public void ReturnFromPause()
+    {
+        if (pauseMenuPanel != null)
+            pauseMenuPanel.SetActive(false);
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        cachedUIMap.Disable();
+        cachedPlayerMap.Enable();
+        if (pauseAction != null) pauseAction.Enable();
+    }
+
+    #endregion
+
+    #region Panel Navigation
+
     private void ShowPanel(PanelState state)
     {
         currentState = state;
@@ -122,6 +183,7 @@ public class UIManager : MonoBehaviour
             case PanelState.Instructions:
                 cachedPlayerMap.Disable();
                 cachedUIMap.Enable();
+                // Pause is not available outside of gameplay.
                 if (pauseAction != null) pauseAction.Disable();
                 break;
 
@@ -139,22 +201,9 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    private void OnContinue(InputAction.CallbackContext ctx)
-    {
-        if (currentState == PanelState.Welcome)
-            ShowPanel(PanelState.Instructions);
-        else if (currentState == PanelState.Instructions)
-        {
-            ShowPanel(PanelState.Playing);
-            GameManager.Instance.StartGame();
-        }
-    }
+    #endregion
 
-    private void OnCancel(InputAction.CallbackContext ctx)
-    {
-        if (currentState == PanelState.Instructions)
-            ShowPanel(PanelState.Welcome);
-    }
+    #region End Screen
 
     private void OnGameWon()
     {
@@ -185,9 +234,25 @@ public class UIManager : MonoBehaviour
         failureCondition.SetActive(score <= 0);
     }
 
-    public void OnRestart()
+    #endregion
+
+    #region Input Handlers
+
+    private void OnContinue(InputAction.CallbackContext ctx)
     {
-        GameManager.Instance.RestartGame();
+        if (currentState == PanelState.Welcome)
+            ShowPanel(PanelState.Instructions);
+        else if (currentState == PanelState.Instructions)
+        {
+            ShowPanel(PanelState.Playing);
+            GameManager.Instance.StartGame();
+        }
+    }
+
+    private void OnCancel(InputAction.CallbackContext ctx)
+    {
+        if (currentState == PanelState.Instructions)
+            ShowPanel(PanelState.Welcome);
     }
 
     private void OnPause(InputAction.CallbackContext ctx)
@@ -196,29 +261,5 @@ public class UIManager : MonoBehaviour
             ShowPauseMenu();
     }
 
-    public void ShowPauseMenu()
-    {
-        if (pauseMenuPanel != null)
-            pauseMenuPanel.SetActive(true);
-
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-
-        cachedPlayerMap.Disable();
-        cachedUIMap.Enable();
-        if (pauseAction != null) pauseAction.Disable();
-    }
-
-    public void ReturnFromPause()
-    {
-        if (pauseMenuPanel != null)
-            pauseMenuPanel.SetActive(false);
-
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-
-        cachedUIMap.Disable();
-        cachedPlayerMap.Enable();
-        if (pauseAction != null) pauseAction.Enable();
-    }
+    #endregion
 }

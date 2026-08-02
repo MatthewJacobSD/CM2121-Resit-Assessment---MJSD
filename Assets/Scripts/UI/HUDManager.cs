@@ -1,8 +1,15 @@
-using UnityEngine;
 using TMPro;
+using UnityEngine;
 
+/// <summary>
+/// Renders the in-game HUD: recycled-item counts, lives, timer, score, high
+/// score, announcements and score popups. Auto-generates fallback texts when
+/// serialized references are missing.
+/// </summary>
 public class HUDManager : MonoBehaviour
 {
+    #region Serialized Fields
+
     [Header("Stats")]
     [SerializeField] private TMP_Text collectedText;      // Plants
     [SerializeField] private TMP_Text toysText;
@@ -24,9 +31,17 @@ public class HUDManager : MonoBehaviour
     [Header("Popup Settings")]
     [SerializeField] private float popupDuration = 1.5f;
 
+    #endregion
+
+    #region Private Fields
+
     private float popupTimer;
     private float announcementTimer;
     private GameObject activePopup;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void OnEnable()
     {
@@ -69,6 +84,26 @@ public class HUDManager : MonoBehaviour
         CreateFallbackTextsIfMissing();
         UpdateStats();
     }
+
+    private void Update()
+    {
+        if (popupTimer > 0)
+        {
+            popupTimer -= Time.deltaTime;
+            if (popupTimer <= 0) HideAllPopups();
+        }
+
+        if (announcementTimer > 0)
+        {
+            announcementTimer -= Time.deltaTime;
+            if (announcementTimer <= 0 && announcementText != null)
+                announcementText.gameObject.SetActive(false);
+        }
+    }
+
+    #endregion
+
+    #region Fallback Text Creation
 
     private void CreateFallbackTextsIfMissing()
     {
@@ -118,21 +153,9 @@ public class HUDManager : MonoBehaviour
         return text;
     }
 
-    private void Update()
-    {
-        if (popupTimer > 0)
-        {
-            popupTimer -= Time.deltaTime;
-            if (popupTimer <= 0) HideAllPopups();
-        }
+    #endregion
 
-        if (announcementTimer > 0)
-        {
-            announcementTimer -= Time.deltaTime;
-            if (announcementTimer <= 0 && announcementText != null)
-                announcementText.gameObject.SetActive(false);
-        }
-    }
+    #region Event Handlers
 
     private void OnGameStarted()
     {
@@ -172,6 +195,7 @@ public class HUDManager : MonoBehaviour
             int seconds = Mathf.FloorToInt(timeRemaining % 60f);
             timerText.text = $"Time: {minutes:00}:{seconds:00}";
 
+            // Colour-cue the player as time runs low.
             if (timeRemaining <= 30f)
                 timerText.color = Color.red;
             else if (timeRemaining <= 60f)
@@ -180,6 +204,10 @@ public class HUDManager : MonoBehaviour
                 timerText.color = Color.white;
         }
     }
+
+    #endregion
+
+    #region Stats Updates
 
     private void UpdateStats()
     {
@@ -201,6 +229,10 @@ public class HUDManager : MonoBehaviour
             highScoreText.text = $"Best: {ScoreManager.Instance.HighScore}";
     }
 
+    #endregion
+
+    #region Announcements & Popups
+
     private void ShowAnnouncement(string message)
     {
         if (announcementText == null) return;
@@ -214,6 +246,7 @@ public class HUDManager : MonoBehaviour
     {
         HideAllPopups();
 
+        // Pick the popup that matches the recycled item type by its name.
         if (itemName.Contains("Vase") || itemName.Contains("Bonsai") || itemName.Contains("Plant"))
             activePopup = plantScorePopup;
         else if (itemName.Contains("DogPlushie") || itemName.Contains("Plushie"))
@@ -235,4 +268,6 @@ public class HUDManager : MonoBehaviour
         if (plasticBottleScorePopup) plasticBottleScorePopup.SetActive(false);
         activePopup = null;
     }
+
+    #endregion
 }

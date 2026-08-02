@@ -1,8 +1,14 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Configurable per-weather-state values used when transitioning visual effects.
+/// Public fields are required so they are serialized in the Inspector.
+/// </summary>
 [System.Serializable]
 public class WeatherEffectParameters : MonoBehaviour
 {
+    #region Serialized Fields
+
     [Header("Cloud Settings")]
     public Color cloudColor = new(0.5f, 0.5f, 0.5f, 0.8f);
 
@@ -19,6 +25,11 @@ public class WeatherEffectParameters : MonoBehaviour
     public bool lightingActive = false;
     public bool sunRaysActive = false;
 
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Copies all values from another parameters asset.</summary>
     public void CopyFrom(WeatherEffectParameters other)
     {
         if (other == null) return;
@@ -29,4 +40,6 @@ public class WeatherEffectParameters : MonoBehaviour
         lightingActive = other.lightingActive;
         sunRaysActive = other.sunRaysActive;
     }
+
+    #endregion
 }

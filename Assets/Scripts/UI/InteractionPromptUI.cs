@@ -1,8 +1,14 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Shows contextual interaction prompts ("Press E to Pick Up", drop/warning
+/// messages) by listening to events raised by the player's interaction system.
+/// </summary>
 public class InteractionPromptUI : MonoBehaviour
 {
+    #region Serialized Fields
+
     [Header("References")]
     [SerializeField] private Text promptText;
     [SerializeField] private Text warningText;
@@ -10,14 +16,22 @@ public class InteractionPromptUI : MonoBehaviour
     [Header("Settings")]
     [SerializeField] private float warningDuration = 2.5f;
 
+    #endregion
+
+    #region Private Fields
+
     private PlayerInteraction interaction;
     private float warningTimer;
 
+    #endregion
+
+    #region Unity Lifecycle
+
     private void Awake()
     {
-        interaction = GetComponentInParent<PlayerInteraction>() != null 
-            ? GetComponentInParent<PlayerInteraction>() 
-            : FindAnyObjectByType<PlayerInteraction>();
+        interaction = GetComponentInParent<PlayerInteraction>();
+        if (interaction == null)
+            interaction = FindAnyObjectByType<PlayerInteraction>();
     }
 
     private void Start()
@@ -58,6 +72,10 @@ public class InteractionPromptUI : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Prompt Display
+
     private void ShowPickupPrompt(PickupItem obj)
     {
         promptText.text = "Press [E] to Pick Up";
@@ -86,4 +104,6 @@ public class InteractionPromptUI : MonoBehaviour
         warningText.gameObject.SetActive(true);
         warningTimer = warningDuration;
     }
+
+    #endregion
 }

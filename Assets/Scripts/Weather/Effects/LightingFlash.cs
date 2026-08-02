@@ -1,18 +1,32 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using UnityEngine;
 
+/// <summary>
+/// Randomly flashes a light at irregular intervals while active, simulating
+/// lightning in the sky.
+/// </summary>
 [RequireComponent(typeof(Light))]
 public class LightingFlash : MonoBehaviour
 {
-    private Light flashLight;
-    private float defaultIntensity;
+    #region Serialized Fields
 
+    [Header("Flash Settings")]
     [SerializeField] private float flashIntensity = 5f;
     [SerializeField] private float flashDuration = 0.1f;
     [SerializeField] private float minInterval = 5f;
     [SerializeField] private float maxInterval = 15f;
 
+    #endregion
+
+    #region Private Fields
+
+    private Light flashLight;
+    private float defaultIntensity;
     private Coroutine flashRoutine;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -21,12 +35,18 @@ public class LightingFlash : MonoBehaviour
         flashLight.enabled = false;
     }
 
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Begins the random flash loop.</summary>
     public void StartFlashing()
     {
         if (flashRoutine == null)
             flashRoutine = StartCoroutine(FlashRoutine());
     }
 
+    /// <summary>Stops the flash loop and disables the light.</summary>
     public void StopFlashing()
     {
         if (flashRoutine != null)
@@ -36,6 +56,10 @@ public class LightingFlash : MonoBehaviour
         }
         flashLight.enabled = false;
     }
+
+    #endregion
+
+    #region Private Methods
 
     private IEnumerator FlashRoutine()
     {
@@ -54,4 +78,6 @@ public class LightingFlash : MonoBehaviour
         flashLight.intensity = defaultIntensity;
         flashLight.enabled = false;
     }
+
+    #endregion
 }

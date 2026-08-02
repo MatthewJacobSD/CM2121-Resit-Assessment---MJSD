@@ -1,17 +1,33 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Handles player interactions: raycast targeting of pickups, smooth carry of a
+/// held item, and drop/aim/throw actions. Emits events for UI feedback.
+/// </summary>
 public class PlayerInteraction : MonoBehaviour
 {
+    #region Constants
+
+    private const float ThrowChargeRate = 15f;
+    private const float DropUpwardNudge = 0.5f;
+
+    #endregion
+
+    #region Serialized Fields
+
     [Header("Input")]
+    [Tooltip("Input Action Asset containing the Player action map.")]
     [SerializeField] private InputActionAsset playerControls;
 
     [Header("Raycast")]
+    [Tooltip("Transform the interaction ray is cast from (usually the camera).")]
     [SerializeField] private Transform rayOrigin;
     [SerializeField] private float interactDistance = 3.5f;
     [SerializeField] private LayerMask interactLayer;
 
     [Header("Holding")]
+    [Tooltip("Position the held item smoothly follows while carried.")]
     [SerializeField] private Transform holdPosition;
     [SerializeField] private float holdFollowSpeed = 15f;
     [SerializeField] private float holdRotationSpeed = 12f;
@@ -20,8 +36,13 @@ public class PlayerInteraction : MonoBehaviour
     [Header("Throw")]
     [SerializeField] private float throwForce = 12f;
     [SerializeField] private float maxThrowForce = 20f;
+    [Tooltip("Offsets the held item forward/up while aiming to avoid the camera.")]
     [SerializeField] private float aimForwardOffset = 0.5f;
     [SerializeField] private float aimDownOffset = 0.15f;
+
+    #endregion
+
+    #region Private Fields
 
     private InputAction interactAction;
     private InputAction dropAction;
@@ -34,8 +55,19 @@ public class PlayerInteraction : MonoBehaviour
     private bool isAiming;
     private float currentThrowForce;
 
+    #endregion
+
+    #region Public Properties
+
+    /// <summary>The item currently carried by the player, or null.</summary>
     public PickupItem CurrentHeldObject => currentHeldObject;
+
+    /// <summary>The pickup currently under the interaction crosshair, or null.</summary>
     public PickupItem CurrentTarget => currentTarget;
+
+    #endregion
+
+    #region Events
 
     public event System.Action<PickupItem> OnTargetFound;
     public event System.Action OnTargetLost;
@@ -43,9 +75,13 @@ public class PlayerInteraction : MonoBehaviour
     public event System.Action OnObjectDropped;
     public event System.Action<string> OnWarningShown;
 
+    #endregion
+
+    #region Unity Lifecycle
+
     private void Awake()
     {
-        var playerMap = playerControls.FindActionMap("Player", true);
+        InputActionMap playerMap = playerControls.FindActionMap("Player", true);
 
         interactAction = playerMap.FindAction("Interact", true);
         dropAction = playerMap.FindAction("Drop", true);
@@ -88,14 +124,20 @@ public class PlayerInteraction : MonoBehaviour
         CheckTarget();
         FollowHoldPosition();
 
+        // Holding aim + throw builds up throw power until released.
         if (isAiming && currentHeldObject != null && throwAction.IsPressed())
         {
-            currentThrowForce = Mathf.Clamp(currentThrowForce + 15f * Time.deltaTime, throwForce, maxThrowForce);
+            currentThrowForce = Mathf.Clamp(currentThrowForce + ThrowChargeRate * Time.deltaTime, throwForce, maxThrowForce);
         }
     }
 
+    #endregion
+
+    #region Interaction Logic
+
     private void CheckTarget()
     {
+        // No targeting while an item is being carried.
         if (currentHeldObject != null)
         {
             if (currentTarget != null)
@@ -133,6 +175,7 @@ public class PlayerInteraction : MonoBehaviour
         Transform objTransform = currentHeldObject.transform;
         Vector3 targetPos = holdPosition.position;
 
+        // Move the item slightly forward/down while aiming so it clears the camera.
         if (isAiming)
         {
             targetPos += rayOrigin.forward * aimForwardOffset + Vector3.down * aimDownOffset;
@@ -143,6 +186,10 @@ public class PlayerInteraction : MonoBehaviour
             Quaternion.Slerp(objTransform.rotation, holdPosition.rotation, holdRotationSpeed * Time.deltaTime)
         );
     }
+
+    #endregion
+
+    #region Input Handlers
 
     private void OnInteract(InputAction.CallbackContext ctx)
     {
@@ -175,8 +222,9 @@ public class PlayerInteraction : MonoBehaviour
 
         if (dropped.TryGetComponent(out Rigidbody rb))
         {
+            // Cancel leftover velocity so the item falls straight down with a nudge.
             rb.linearVelocity = Vector3.zero;
-            rb.AddForce(rayOrigin.forward * dropForwardForce + Vector3.up * 0.5f, ForceMode.Impulse);
+            rb.AddForce(rayOrigin.forward * dropForwardForce + Vector3.up * DropUpwardNudge, ForceMode.Impulse);
         }
 
         currentHeldObject = null;
@@ -208,4 +256,6 @@ public class PlayerInteraction : MonoBehaviour
     {
         isAiming = false;
     }
+
+    #endregion
 }

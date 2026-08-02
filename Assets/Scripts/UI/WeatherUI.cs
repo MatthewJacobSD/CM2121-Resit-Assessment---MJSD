@@ -1,9 +1,15 @@
-﻿using UnityEngine;
-using TMPro;
+﻿using TMPro;
+using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Displays the current weather state as text and an icon, falling back to an
+/// emoji glyph when no icon sprites are assigned.
+/// </summary>
 public class WeatherUI : MonoBehaviour
 {
+    #region Serialized Fields
+
     [Header("UI Elements")]
     [SerializeField] private TextMeshProUGUI weatherStatusText;
     [SerializeField] private Image weatherIcon;
@@ -14,6 +20,7 @@ public class WeatherUI : MonoBehaviour
     [SerializeField] private Sprite stormyIcon;
 
     [Header("Emoji Fallback")]
+    [Tooltip("Uses emoji glyphs when no weather icons are assigned.")]
     [SerializeField] private bool useEmojiFallback = true;
     [SerializeField] private float emojiFontSize = 52f;
     [SerializeField] private Color emojiColor = Color.white;
@@ -21,7 +28,15 @@ public class WeatherUI : MonoBehaviour
     [Header("References")]
     [SerializeField] private WeatherState weatherState;
 
+    #endregion
+
+    #region Private Fields
+
     private TextMeshProUGUI emojiText;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void OnEnable()
     {
@@ -41,6 +56,11 @@ public class WeatherUI : MonoBehaviour
             UpdateWeatherUI(weatherState.GetCurrentState());
     }
 
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Updates the weather status label and icon for the given state.</summary>
     public void UpdateWeatherUI(WeatherState.State currentState)
     {
         if (weatherStatusText != null)
@@ -74,6 +94,10 @@ public class WeatherUI : MonoBehaviour
             }
         }
     }
+
+    #endregion
+
+    #region Emoji Fallback
 
     private void ShowEmoji(WeatherState.State state)
     {
@@ -117,4 +141,6 @@ public class WeatherUI : MonoBehaviour
 
         return tmp;
     }
+
+    #endregion
 }

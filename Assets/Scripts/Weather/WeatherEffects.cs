@@ -1,8 +1,21 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿using System.Collections;
+using UnityEngine;
 
+/// <summary>
+/// Drives weather visuals and audio: applies per-state effect settings, lerps
+/// transitions, controls the storm overlay and crossfades ambient audio.
+/// </summary>
 public class WeatherEffects : MonoBehaviour
 {
+    #region Constants
+
+    private const float DefaultCloudEmissionRate = 100f;
+    private const float DefaultWindSpeed = 2f;
+
+    #endregion
+
+    #region Serialized Fields
+
     [Header("Visual Effects")]
     [SerializeField] private SunnyEffect sunnyEffect;
     [SerializeField] private CloudEffect cloudEffect;
@@ -33,10 +46,19 @@ public class WeatherEffects : MonoBehaviour
     [SerializeField] private float stormOverlayMaxAlpha = 0.35f;
     [SerializeField] private float lightningActivationThreshold = 0.6f;
 
+    #endregion
+
+    #region Private Fields
+
     private WeatherState.State currentState;
     private Coroutine transitionRoutine;
     private float currentStormIntensity;
 
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Applies the visual effects and ambient audio for a weather state.</summary>
     public void SetWeather(WeatherState.State state)
     {
         currentState = state;
@@ -50,10 +72,15 @@ public class WeatherEffects : MonoBehaviour
         PlayAmbientAudio(state);
     }
 
+    /// <summary>
+    /// Adjusts storm strength (0-1), updating rain, lightning and the overlay
+    /// without triggering a full weather-state transition.
+    /// </summary>
     public void SetStormIntensity(float intensity)
     {
         currentStormIntensity = Mathf.Clamp01(intensity);
 
+        // A storm that begins via proximity needs the stormy effects enabled.
         if (currentState != WeatherState.State.Stormy && currentStormIntensity > 0f)
         {
             ApplyImmediateEffects(WeatherState.State.Stormy);
@@ -71,6 +98,40 @@ public class WeatherEffects : MonoBehaviour
 
         SetStormOverlay(currentStormIntensity);
     }
+
+    #endregion
+
+    #region Weather Transitions
+
+    private IEnumerator TransitionWeather(WeatherState.State state)
+    {
+        WeatherEffectParameters target = GetParametersForState(state);
+        if (target == null) yield break;
+
+        // Lerp clouds and wind from neutral defaults to the target state values.
+        float elapsed = 0f;
+        while (elapsed < transitionDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / transitionDuration);
+
+            if (cloudEffect != null)
+            {
+                Color targetColor = target.cloudColor;
+                cloudEffect.SetCloudColor(Color.Lerp(Color.grey, targetColor, t));
+                cloudEffect.SetEmissionRate(Mathf.Lerp(DefaultCloudEmissionRate, target.cloudEmissionRate, t));
+            }
+
+            if (windEffect != null)
+                windEffect.SetWindSpeed(Mathf.Lerp(DefaultWindSpeed, target.windSpeed, t));
+
+            yield return null;
+        }
+    }
+
+    #endregion
+
+    #region Effect State
 
     private void ApplyImmediateEffects(WeatherState.State state)
     {
@@ -105,31 +166,6 @@ public class WeatherEffects : MonoBehaviour
         }
     }
 
-    private IEnumerator TransitionWeather(WeatherState.State state)
-    {
-        WeatherEffectParameters target = GetParametersForState(state);
-        if (target == null) yield break;
-
-        float elapsed = 0f;
-        while (elapsed < transitionDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / transitionDuration);
-
-            if (cloudEffect != null)
-            {
-                Color targetColor = target.cloudColor;
-                cloudEffect.SetCloudColor(Color.Lerp(Color.grey, targetColor, t));
-                cloudEffect.SetEmissionRate(Mathf.Lerp(100f, target.cloudEmissionRate, t));
-            }
-
-            if (windEffect != null)
-                windEffect.SetWindSpeed(Mathf.Lerp(2f, target.windSpeed, t));
-
-            yield return null;
-        }
-    }
-
     private void SetStormOverlay(float intensity)
     {
         if (stormOverlay == null) return;
@@ -148,6 +184,10 @@ public class WeatherEffects : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Ambient Audio
+
     private void PlayAmbientAudio(WeatherState.State state)
     {
         AudioClip clip = state switch
@@ -161,6 +201,10 @@ public class WeatherEffects : MonoBehaviour
             AudioManager.Instance?.CrossfadeAmbient(clip);
     }
 
+    #endregion
+
+    #region Utility
+
     private WeatherEffectParameters GetParametersForState(WeatherState.State state)
     {
         return state switch
@@ -171,4 +215,6 @@ public class WeatherEffects : MonoBehaviour
             _ => sunnyParameters
         };
     }
+
+    #endregion
 }

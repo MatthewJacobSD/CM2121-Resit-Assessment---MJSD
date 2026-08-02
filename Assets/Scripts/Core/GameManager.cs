@@ -2,18 +2,34 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>
+/// Central game state manager: owns the timer, lives and win/lose conditions,
+/// and exposes events that the rest of the game listens to.
+/// </summary>
 public class GameManager : MonoBehaviour
 {
-    public static GameManager Instance { get; private set; }
+    #region Serialized Fields
 
     [Header("Game Settings")]
+    [Tooltip("Number of lives the player starts with. A wrong-bin recycle costs one life.")]
     [SerializeField] private int maxLives = 5;
+
+    [Tooltip("Length of a single game in seconds.")]
     [SerializeField] private float gameDuration = 300f;
+
+    [Tooltip("Plants that must be recycled to win the level.")]
     [SerializeField] private int plantsRequired = 6;
 
     [Header("Chain Bonus")]
+    [Tooltip("Bonus score awarded when plants are recycled consecutively.")]
     [SerializeField] private int chainBonus = 40;
+
+    [Tooltip("Consecutive plants required to trigger the chain bonus.")]
     [SerializeField] private int chainThreshold = 2;
+
+    #endregion
+
+    #region Private Fields
 
     private int lives;
     private float timeRemaining;
@@ -24,6 +40,12 @@ public class GameManager : MonoBehaviour
     private int consecutivePlants;
     private bool isPlaying;
 
+    #endregion
+
+    #region Public Properties
+
+    public static GameManager Instance { get; private set; }
+
     public int Lives => lives;
     public int MaxLives => maxLives;
     public float TimeRemaining => timeRemaining;
@@ -33,6 +55,10 @@ public class GameManager : MonoBehaviour
     public int BottlesRecycled => bottlesRecycled;
     public bool IsPlaying => isPlaying;
 
+    #endregion
+
+    #region Events
+
     public event Action OnGameStarted;
     public event Action OnGameOver;
     public event Action OnGameWon;
@@ -41,6 +67,11 @@ public class GameManager : MonoBehaviour
     public event Action<int, string> OnItemRecycled;
     public event Action<string> OnAnnouncement;
 
+    #endregion
+
+    #region Unity Lifecycle
+
+    // Singleton pattern: keep one persistent instance across scene reloads.
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -67,6 +98,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Resets all counters and starts a new game.</summary>
     public void StartGame()
     {
         isPlaying = true;
@@ -86,6 +122,12 @@ public class GameManager : MonoBehaviour
         OnAnnouncement?.Invoke("Collect plants and recycle them correctly!");
     }
 
+    /// <summary>
+    /// Registers a recycled item, applies scoring/lives effects and checks
+    /// whether the game has been won or lost.
+    /// </summary>
+    /// <param name="item">The recycled item's GameObject.</param>
+    /// <param name="scoreValue">Score granted for the recycled item.</param>
     public void ReportRecycled(GameObject item, int scoreValue)
     {
         if (!isPlaying) return;
@@ -134,6 +176,30 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    /// <summary>Pauses gameplay updates while leaving the scene loaded.</summary>
+    public void PauseGame()
+    {
+        if (!isPlaying) return;
+        isPlaying = false;
+    }
+
+    /// <summary>Resumes gameplay updates after a pause.</summary>
+    public void ResumeGame()
+    {
+        isPlaying = true;
+    }
+
+    /// <summary>Reloads the active scene to restart the game from scratch.</summary>
+    public void RestartGame()
+    {
+        Time.timeScale = 1f;
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    #endregion
+
+    #region Private Methods
+
     private void CheckWinCondition()
     {
         if (!isPlaying) return;
@@ -162,20 +228,5 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void PauseGame()
-    {
-        if (!isPlaying) return;
-        isPlaying = false;
-    }
-
-    public void ResumeGame()
-    {
-        isPlaying = true;
-    }
-
-    public void RestartGame()
-    {
-        Time.timeScale = 1f;
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-    }
+    #endregion
 }

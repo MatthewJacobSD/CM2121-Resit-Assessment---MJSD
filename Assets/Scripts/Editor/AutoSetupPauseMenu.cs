@@ -1,12 +1,19 @@
-using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.SceneManagement;
+using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
-using TMPro;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
+/// <summary>
+/// Editor tool that builds the full UI hierarchy (canvas, panels, pause menu,
+/// buttons, input wiring) in the active scene with one menu click.
+/// </summary>
 public static class AutoSetupPauseMenu
 {
+    #region Public Methods
+
+    /// <summary>Menu entry: sets up the complete UI in the currently open scene.</summary>
     [MenuItem("Tools/Setup UI in Current Scene")]
     public static void Setup()
     {
@@ -41,6 +48,10 @@ public static class AutoSetupPauseMenu
             "2. Add VolumeSlider to SettingsPanel\n" +
             "3. Wire volumeSlider to PauseMenuManager", "OK");
     }
+
+    #endregion
+
+    #region Setup Steps
 
     private static void SetupCanvasStructure()
     {
@@ -320,6 +331,10 @@ public static class AutoSetupPauseMenu
         }
     }
 
+    #endregion
+
+    #region Utility
+
     private static void WireButton(Button button, PauseMenuManager target, string methodName)
     {
         SerializedObject so = new SerializedObject(button);
@@ -348,4 +363,6 @@ public static class AutoSetupPauseMenu
         }
         return null;
     }
+
+    #endregion
 }

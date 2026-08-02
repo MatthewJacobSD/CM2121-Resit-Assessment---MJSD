@@ -1,7 +1,13 @@
 using UnityEngine;
 
+/// <summary>
+/// Reacts to gameplay (carrying items near the wrong bin) by shifting the
+/// weather to rain or storm, simulating environmental consequences.
+/// </summary>
 public class WeatherFeedbackSystem : MonoBehaviour
 {
+    #region Serialized Fields
+
     [Header("References")]
     [SerializeField] private WeatherState weatherState;
     [SerializeField] private WeatherEffects weatherEffects;
@@ -11,18 +17,34 @@ public class WeatherFeedbackSystem : MonoBehaviour
     [SerializeField] private Transform player;
 
     [Header("Bin Detection")]
+    [Tooltip("Radius in which bins are considered when carrying an item.")]
     [SerializeField] private float binDetectionRadius = 15f;
+    [Tooltip("Distance to a wrong bin that triggers a full storm.")]
     [SerializeField] private float stormActivationRadius = 8f;
     [SerializeField] private LayerMask binLayer;
 
     [Header("Transition")]
+    [Tooltip("Cooldown between weather changes to avoid rapid flickering.")]
     [SerializeField] private float stormCooldown = 0.5f;
+
+    #endregion
+
+    #region Private Fields
 
     private float cooldownTimer;
     private float currentStormIntensity;
     private PickupItem heldItem;
 
+    #endregion
+
+    #region Public Properties
+
+    /// <summary>Current storm strength in [0, 1], driven by wrong-bin proximity.</summary>
     public float StormIntensity => currentStormIntensity;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void OnEnable()
     {
@@ -32,7 +54,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
             playerInteraction.OnObjectDropped += OnDropped;
         }
 
-        foreach (var bin in FindObjectsByType<RecycleBinInteractable>(FindObjectsSortMode.None))
+        foreach (RecycleBinInteractable bin in FindObjectsByType<RecycleBinInteractable>(FindObjectsSortMode.None))
         {
             bin.OnItemProcessed += OnItemProcessed;
         }
@@ -46,7 +68,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
             playerInteraction.OnObjectDropped -= OnDropped;
         }
 
-        foreach (var bin in FindObjectsByType<RecycleBinInteractable>(FindObjectsSortMode.None))
+        foreach (RecycleBinInteractable bin in FindObjectsByType<RecycleBinInteractable>(FindObjectsSortMode.None))
         {
             bin.OnItemProcessed -= OnItemProcessed;
         }
@@ -60,6 +82,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
             return;
         }
 
+        // No item held (or not playing): calm the storm back to zero.
         if (heldItem == null || !GameManager.Instance.IsPlaying)
         {
             if (currentStormIntensity > 0f)
@@ -75,6 +98,10 @@ public class WeatherFeedbackSystem : MonoBehaviour
         EvaluateBinProximity();
     }
 
+    #endregion
+
+    #region Storm Proximity Logic
+
     private void EvaluateBinProximity()
     {
         if (player == null || heldItem == null) return;
@@ -85,7 +112,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
 
         Collider[] nearby = Physics.OverlapSphere(player.position, binDetectionRadius, binLayer);
 
-        foreach (var col in nearby)
+        foreach (Collider col in nearby)
         {
             RecycleBinInteractable bin = col.GetComponentInParent<RecycleBinInteractable>();
             if (bin == null) continue;
@@ -107,6 +134,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
             }
         }
 
+        // No wrong bins around: mild rain while carrying an item.
         if (!foundAnyBin)
         {
             EnsureState(WeatherState.State.Rainy);
@@ -115,6 +143,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
             return;
         }
 
+        // Storm strength scales with how close the nearest wrong bin is.
         if (nearestWrongBinDistance <= stormActivationRadius)
         {
             float normalizedDistance = 1f - (nearestWrongBinDistance / stormActivationRadius);
@@ -148,6 +177,10 @@ public class WeatherFeedbackSystem : MonoBehaviour
         weatherMovementEffect?.SetStormIntensity(intensity);
     }
 
+    #endregion
+
+    #region Event Handlers
+
     private void OnPickedUp(PickupItem item)
     {
         heldItem = item;
@@ -178,4 +211,6 @@ public class WeatherFeedbackSystem : MonoBehaviour
             windEffect?.SetWeatherState(WeatherState.State.Sunny);
         }
     }
+
+    #endregion
 }

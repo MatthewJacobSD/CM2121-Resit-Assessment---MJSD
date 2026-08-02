@@ -1,11 +1,18 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
-using System;
 
+/// <summary>Bin categories an item can be recycled into.</summary>
 public enum BinType { NatureRecycling, PlasticRecycling, GeneralWaste }
 
+/// <summary>
+/// A recycling bin: accepts thrown items, checks whether they belong in this
+/// bin, plays success/error feedback and reports the result to the game.
+/// </summary>
 public class RecycleBinInteractable : MonoBehaviour
 {
+    #region Serialized Fields
+
     [Header("Bin Settings")]
     [SerializeField] private BinType binType = BinType.NatureRecycling;
 
@@ -15,18 +22,37 @@ public class RecycleBinInteractable : MonoBehaviour
     [SerializeField] private AudioClip successClip;
     [SerializeField] private AudioClip errorClip;
 
-    [Header("Events")]
-    public UnityEvent OnCorrectRecycle;
-    public UnityEvent OnIncorrectRecycle;
+    #endregion
 
-    public event Action<bool> OnItemProcessed;
-    public BinType BinType => binType;
+    #region Private Fields
 
     private AudioSource audioSource;
 
+    #endregion
+
+    #region Public Properties
+
+    /// <summary>Which kind of waste this bin accepts.</summary>
+    public BinType BinType => binType;
+
+    #endregion
+
+    #region Events
+
+    public UnityEvent OnCorrectRecycle;
+    public UnityEvent OnIncorrectRecycle;
+
+    /// <summary>Invoked with true/false when an item was processed correctly or not.</summary>
+    public event Action<bool> OnItemProcessed;
+
+    #endregion
+
+    #region Unity Lifecycle
+
     private void Awake()
     {
-        var col = GetComponent<Collider>();
+        // Bins are trigger volumes so items pass through and trigger processing.
+        Collider col = GetComponent<Collider>();
         if (col != null && !col.isTrigger)
             col.isTrigger = true;
 
@@ -39,11 +65,25 @@ public class RecycleBinInteractable : MonoBehaviour
     {
         if (!GameManager.Instance.IsPlaying) return;
 
-        var item = other.GetComponentInParent<PickupItem>();
+        PickupItem item = other.GetComponentInParent<PickupItem>();
         if (item == null || item.IsBeingHeld) return;
 
         ProcessItem(item);
     }
+
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Returns whether the given item type belongs in this bin.</summary>
+    public bool AcceptsItem(ItemType itemType)
+    {
+        return CalculateScore(itemType, binType) > 0;
+    }
+
+    #endregion
+
+    #region Private Methods
 
     private void ProcessItem(PickupItem item)
     {
@@ -67,11 +107,7 @@ public class RecycleBinInteractable : MonoBehaviour
         Destroy(item.gameObject);
     }
 
-    public bool AcceptsItem(ItemType itemType)
-    {
-        return CalculateScore(itemType, binType) > 0;
-    }
-
+    // Scoring matrix: positive values are correct matches, negative are penalties.
     private int CalculateScore(ItemType itemType, BinType bin)
     {
         return (itemType, bin) switch
@@ -91,4 +127,6 @@ public class RecycleBinInteractable : MonoBehaviour
             _ => -10
         };
     }
+
+    #endregion
 }

@@ -1,8 +1,14 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Data asset describing how a water splash should look and animate, shared by
+/// splash effects. Public fields are required for Inspector serialization.
+/// </summary>
 [CreateAssetMenu(menuName = "Weather/Splash Data", fileName = "New Splash Data")]
 public class SplashData : ScriptableObject
 {
+    #region Serialized Fields
+
     [Header("Visuals")]
     public Sprite[] splashSprites;
     public Material splashMaterial;
@@ -14,4 +20,6 @@ public class SplashData : ScriptableObject
 
     [Header("Color")]
     public Color mainColor = Color.white;
+
+    #endregion
 }

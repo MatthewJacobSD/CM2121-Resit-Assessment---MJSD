@@ -1,9 +1,22 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// Plays surface-aware footstep audio: dry/rainy clips by weather state, and
+/// splash effects when the player walks through water or recently wet ground.
+/// </summary>
 [RequireComponent(typeof(AudioSource))]
 [RequireComponent(typeof(CharacterController))]
 public class PlayerFootstepAudio : MonoBehaviour
 {
+    #region Constants
+
+    private const float SurfaceRayHeightOffset = 0.1f;
+    private const float SurfaceRayExtraDistance = 0.5f;
+
+    #endregion
+
+    #region Serialized Fields
+
     [Header("References")]
     [SerializeField] private PlayerMovement playerMovement;
     [SerializeField] private CharacterController characterController;
@@ -30,15 +43,24 @@ public class PlayerFootstepAudio : MonoBehaviour
     [SerializeField] private float groundCheckDistance = 0.3f;
 
     [Header("Wetness Drying")]
+    [Tooltip("Seconds after leaving rain/water before the ground is considered dry.")]
     [SerializeField] private float wetnessDuration = 5f;
 
     [Header("Settings")]
     [SerializeField] private float walkStepInterval = 0.5f;
     [SerializeField] private float sprintStepInterval = 0.35f;
 
+    #endregion
+
+    #region Private Fields
+
     private float stepTimer;
     private float wetnessTimer;
     private bool onWater;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -54,8 +76,13 @@ public class PlayerFootstepAudio : MonoBehaviour
         HandleFootsteps();
     }
 
+    #endregion
+
+    #region Footstep Logic
+
     private void HandleFootsteps()
     {
+        // Reset the timer while airborne or stationary so the next step lands cleanly.
         if (characterController == null || !characterController.isGrounded)
         {
             stepTimer = 0f;
@@ -81,42 +108,6 @@ public class PlayerFootstepAudio : MonoBehaviour
             PlayFootstep(sprinting);
             stepTimer = 0f;
         }
-    }
-
-    private void DetectSurface()
-    {
-        Vector3 origin = transform.position + Vector3.up * 0.1f;
-        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, groundCheckDistance + 0.5f, groundMask, QueryTriggerInteraction.Ignore))
-        {
-            int layer = hit.collider.gameObject.layer;
-            bool wasOnWater = onWater;
-            onWater = layer == LayerMask.NameToLayer("Water");
-
-            if (onWater)
-            {
-                wetnessTimer = 0f;
-            }
-            else if (wasOnWater && !onWater)
-            {
-                wetnessTimer = 0f;
-            }
-        }
-        else
-        {
-            onWater = false;
-        }
-
-        if (!onWater && IsGroundDry())
-        {
-            wetnessTimer += Time.deltaTime;
-        }
-    }
-
-    private bool IsGroundDry()
-    {
-        if (weatherState == null) return true;
-        WeatherState.State state = weatherState.GetCurrentState();
-        return state == WeatherState.State.Sunny;
     }
 
     private void PlayFootstep(bool sprinting)
@@ -149,6 +140,47 @@ public class PlayerFootstepAudio : MonoBehaviour
         }
     }
 
+    #endregion
+
+    #region Surface Detection
+
+    private void DetectSurface()
+    {
+        Vector3 origin = transform.position + Vector3.up * SurfaceRayHeightOffset;
+        if (Physics.Raycast(origin, Vector3.down, out RaycastHit hit, groundCheckDistance + SurfaceRayExtraDistance, groundMask, QueryTriggerInteraction.Ignore))
+        {
+            int layer = hit.collider.gameObject.layer;
+            bool wasOnWater = onWater;
+            onWater = layer == LayerMask.NameToLayer("Water");
+
+            if (onWater)
+            {
+                wetnessTimer = 0f;
+            }
+            else if (wasOnWater && !onWater)
+            {
+                // Walking off water restarts the wetness countdown for the drying timer.
+                wetnessTimer = 0f;
+            }
+        }
+        else
+        {
+            onWater = false;
+        }
+
+        if (!onWater && IsGroundDry())
+        {
+            wetnessTimer += Time.deltaTime;
+        }
+    }
+
+    private bool IsGroundDry()
+    {
+        if (weatherState == null) return true;
+        WeatherState.State state = weatherState.GetCurrentState();
+        return state == WeatherState.State.Sunny;
+    }
+
     private bool IsSurfaceWet()
     {
         if (onWater) return true;
@@ -165,4 +197,6 @@ public class PlayerFootstepAudio : MonoBehaviour
 
         return false;
     }
+
+    #endregion
 }

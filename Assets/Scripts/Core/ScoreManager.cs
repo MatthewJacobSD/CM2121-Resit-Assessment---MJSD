@@ -1,19 +1,44 @@
 ﻿using System;
 using UnityEngine;
 
+/// <summary>
+/// Tracks the current score and the persistent high score, persisting the
+/// high score with PlayerPrefs and notifying listeners of changes.
+/// </summary>
 public class ScoreManager : MonoBehaviour
 {
-    public static ScoreManager Instance { get; private set; }
+    #region Constants
+
+    private const string HighScoreKey = "HighScore_Recycling";
+
+    #endregion
+
+    #region Private Fields
 
     private int currentScore;
     private int highScore;
 
+    #endregion
+
+    #region Public Properties
+
+    public static ScoreManager Instance { get; private set; }
+
     public int CurrentScore => currentScore;
     public int HighScore => highScore;
+
+    #endregion
+
+    #region Events
 
     public event Action<int> OnScoreChanged;
     public event Action<int> OnHighScoreChanged;
 
+    #endregion
+
+    #region Unity Lifecycle
+
+    // Singleton pattern: keep one persistent instance across scene reloads.
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -26,6 +51,11 @@ public class ScoreManager : MonoBehaviour
         LoadHighScore();
     }
 
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Adds points to the score and updates the high score if beaten.</summary>
     public void AddScore(int points)
     {
         currentScore += points;
@@ -38,6 +68,7 @@ public class ScoreManager : MonoBehaviour
         }
     }
 
+    /// <summary>Subtracts points (penalty) without allowing the score to go negative.</summary>
     public void AddPenalty(int points)
     {
         currentScore -= points;
@@ -45,20 +76,28 @@ public class ScoreManager : MonoBehaviour
         OnScoreChanged?.Invoke(currentScore);
     }
 
+    /// <summary>Resets the current score to zero at the start of a game.</summary>
     public void ResetScore()
     {
         currentScore = 0;
         OnScoreChanged?.Invoke(currentScore);
     }
 
+    /// <summary>Persists the current high score to PlayerPrefs.</summary>
     public void SaveHighScore()
     {
-        PlayerPrefs.SetInt("HighScore_Recycling", highScore);
+        PlayerPrefs.SetInt(HighScoreKey, highScore);
         PlayerPrefs.Save();
     }
 
+    #endregion
+
+    #region Private Methods
+
     private void LoadHighScore()
     {
-        highScore = PlayerPrefs.GetInt("HighScore_Recycling", 0);
+        highScore = PlayerPrefs.GetInt(HighScoreKey, 0);
     }
+
+    #endregion
 }

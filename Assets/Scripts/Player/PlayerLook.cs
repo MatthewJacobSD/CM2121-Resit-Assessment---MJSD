@@ -1,12 +1,20 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Controls mouse-look for the player: rotates the body horizontally and the
+/// camera vertically, clamped to prevent flipping over.
+/// </summary>
 public class PlayerLook : MonoBehaviour
 {
+    #region Serialized Fields
+
     [Header("Input")]
+    [Tooltip("Input Action Asset containing the Player action map.")]
     [SerializeField] private InputActionAsset playerControls;
 
     [Header("References")]
+    [Tooltip("Camera that is rotated vertically. Falls back to Camera.main.")]
     [SerializeField] private Transform cameraTransform;
 
     [Header("Settings")]
@@ -17,9 +25,17 @@ public class PlayerLook : MonoBehaviour
     [SerializeField] private float minVerticalAngle = -85f;
     [SerializeField] private float maxVerticalAngle = 85f;
 
+    #endregion
+
+    #region Private Fields
+
     private InputAction lookAction;
     private Vector2 lookInput;
     private float verticalRotation = 0f;
+
+    #endregion
+
+    #region Unity Lifecycle
 
     private void Awake()
     {
@@ -43,6 +59,10 @@ public class PlayerLook : MonoBehaviour
         RotatePlayer();
     }
 
+    #endregion
+
+    #region Private Methods
+
     private void RotatePlayer()
     {
         lookInput = lookAction.ReadValue<Vector2>();
@@ -50,6 +70,7 @@ public class PlayerLook : MonoBehaviour
         float mouseX = lookInput.x * sensitivityX * Time.deltaTime * 100f;
         float mouseY = lookInput.y * sensitivityY * Time.deltaTime * 100f * (invertY ? -1 : 1);
 
+        // Rotate the body around Y (yaw) and the camera around X (pitch).
         transform.Rotate(Vector3.up * mouseX);
 
         verticalRotation -= mouseY;
@@ -57,4 +78,6 @@ public class PlayerLook : MonoBehaviour
 
         cameraTransform.localRotation = Quaternion.Euler(verticalRotation, 0f, 0f);
     }
+
+    #endregion
 }

@@ -281,5 +281,16 @@ public class UIManager : MonoBehaviour
             pauseMenu.Pause();
     }
 
+    /// <summary>
+    /// Returns to the main menu from the end screen. Resets game state,
+    /// restores the Welcome panel, and prepares for a new game.
+    /// Wire this to a "Return to Menu" button on the end screen.
+    /// </summary>
+    public void ReturnToMenu()
+    {
+        Time.timeScale = 1f;
+        ShowPanel(PanelState.Welcome);
+    }
+
     #endregion
 }

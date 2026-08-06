@@ -32,9 +32,6 @@ public class WaterAmbienceZone : MonoBehaviour
 
     private Transform player;
     private float currentVolume;
-    private bool isFadingIn;
-    private bool isFadingOut;
-    private bool isActive;
 
     #endregion
 
@@ -62,18 +59,7 @@ public class WaterAmbienceZone : MonoBehaviour
             targetVolume = 1f - ((distance - fadeEndDistance) / (fadeStartDistance - fadeEndDistance));
 
         // Smoothly interpolate current volume toward target.
-        if (currentVolume < targetVolume)
-        {
-            currentVolume = Mathf.MoveTowards(currentVolume, targetVolume, fadeSpeed * Time.deltaTime);
-            isFadingIn = true;
-            isFadingOut = false;
-        }
-        else if (currentVolume > targetVolume)
-        {
-            currentVolume = Mathf.MoveTowards(currentVolume, targetVolume, fadeSpeed * Time.deltaTime);
-            isFadingIn = false;
-            isFadingOut = true;
-        }
+        currentVolume = Mathf.MoveTowards(currentVolume, targetVolume, fadeSpeed * Time.deltaTime);
 
         // Apply volume to a dedicated water AudioSource (managed here, not via crossfade).
         ApplyWaterVolume(currentVolume);

@@ -34,12 +34,15 @@ public class WeatherFeedbackSystem : MonoBehaviour
     [Header("Transition")]
     [Tooltip("Cooldown between weather changes to avoid rapid flickering.")]
     [SerializeField] private float stormCooldown = 0.5f;
+    [Tooltip("How long the storm persists after a wrong recycle before calming.")]
+    [SerializeField] private float wrongRecycleStormDuration = 2f;
 
     #endregion
 
     #region Private Fields
 
     private float cooldownTimer;
+    private float wrongRecycleStormTimer;
     private float currentStormIntensity;
     private Vector3 currentWindPush;
     private PickupItem heldItem;
@@ -95,6 +98,26 @@ public class WeatherFeedbackSystem : MonoBehaviour
         if (cooldownTimer > 0f)
         {
             cooldownTimer -= Time.deltaTime;
+            return;
+        }
+
+        // Wrong recycle storm cooldown: keep weather stormy briefly after a wrong recycle.
+        if (wrongRecycleStormTimer > 0f)
+        {
+            wrongRecycleStormTimer -= Time.deltaTime;
+            if (wrongRecycleStormTimer <= 0f)
+            {
+                // Storm cooldown expired — calm to rainy if no item held.
+                if (heldItem == null)
+                {
+                    currentStormIntensity = 0f;
+                    ApplyStormIntensity(0f);
+                    weatherState.SetSunny();
+                    weatherEffects?.SetWeather(WeatherState.State.Sunny);
+                    windEffect?.SetWeatherState(WeatherState.State.Sunny);
+                }
+            }
+            RampWindPush(Vector3.zero);
             return;
         }
 
@@ -265,6 +288,11 @@ public class WeatherFeedbackSystem : MonoBehaviour
             weatherState.SetSunny();
             weatherEffects?.SetWeather(WeatherState.State.Sunny);
             windEffect?.SetWeatherState(WeatherState.State.Sunny);
+        }
+        else
+        {
+            // Wrong recycle: keep storm active briefly as environmental feedback.
+            wrongRecycleStormTimer = wrongRecycleStormDuration;
         }
     }
 

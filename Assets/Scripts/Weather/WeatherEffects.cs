@@ -53,6 +53,17 @@ public class WeatherEffects : MonoBehaviour
     private WeatherState.State currentState;
     private Coroutine transitionRoutine;
     private float currentStormIntensity;
+    private Color currentCloudColor = Color.grey;
+    private float currentCloudEmission = DefaultCloudEmissionRate;
+    private float currentWindSpeed = DefaultWindSpeed;
+
+    #endregion
+
+    #region Private Fields
+
+    private WeatherState.State currentState;
+    private Coroutine transitionRoutine;
+    private float currentStormIntensity;
 
     #endregion
 
@@ -108,25 +119,39 @@ public class WeatherEffects : MonoBehaviour
         WeatherEffectParameters target = GetParametersForState(state);
         if (target == null) yield break;
 
-        // Lerp clouds and wind from neutral defaults to the target state values.
+        // Capture starting values for smooth lerp from current state.
+        Color startColor = currentCloudColor;
+        float startEmission = currentCloudEmission;
+        float startWind = currentWindSpeed;
+
         float elapsed = 0f;
         while (elapsed < transitionDuration)
         {
-            elapsed += Time.deltaTime;
+            elapsed += Time.unscaledDeltaTime;
             float t = Mathf.Clamp01(elapsed / transitionDuration);
 
             if (cloudEffect != null)
             {
                 Color targetColor = target.cloudColor;
-                cloudEffect.SetCloudColor(Color.Lerp(Color.grey, targetColor, t));
-                cloudEffect.SetEmissionRate(Mathf.Lerp(DefaultCloudEmissionRate, target.cloudEmissionRate, t));
+                currentCloudColor = Color.Lerp(startColor, targetColor, t);
+                cloudEffect.SetCloudColor(currentCloudColor);
+                currentCloudEmission = Mathf.Lerp(startEmission, target.cloudEmissionRate, t);
+                cloudEffect.SetEmissionRate(currentCloudEmission);
             }
 
             if (windEffect != null)
-                windEffect.SetWindSpeed(Mathf.Lerp(DefaultWindSpeed, target.windSpeed, t));
+            {
+                currentWindSpeed = Mathf.Lerp(startWind, target.windSpeed, t);
+                windEffect.SetWindSpeed(currentWindSpeed);
+            }
 
             yield return null;
         }
+
+        // Snap to final values.
+        currentCloudColor = target.cloudColor;
+        currentCloudEmission = target.cloudEmissionRate;
+        currentWindSpeed = target.windSpeed;
     }
 
     #endregion

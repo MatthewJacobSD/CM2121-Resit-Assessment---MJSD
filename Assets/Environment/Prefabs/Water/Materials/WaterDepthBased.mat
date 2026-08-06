@@ -24,7 +24,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: WaterDepthBased
-  m_Shader: {fileID: -6465566751694194690, guid: dfd4dcd41b27bb44498bfa407660802f, type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: e577e26c87ebde54ba60a3f8895327f8, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords:
@@ -53,39 +53,39 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Normal_Map:
-        m_Texture: {fileID: 2800000, guid: e1401fe0724c9c94381b897844907e4e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 43edaf3e89214b247a860bace04407d3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Rim_Albedo:
-        m_Texture: {fileID: 2800000, guid: 9cb1644a840e1be49b7dcbd2be19ca01, type: 3}
+        m_Texture: {fileID: 2800000, guid: e44036f03575c194a8f4724248832ed5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Rim_Normal:
-        m_Texture: {fileID: 2800000, guid: 29988b36784a2f840a5ce2f8704e5c98, type: 3}
+        m_Texture: {fileID: 2800000, guid: ec8875f6e5aa87045859872a27761d75, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_21ad79f4432b449d962782cd6fde9bc3_Texture_1:
-        m_Texture: {fileID: 2800000, guid: e1401fe0724c9c94381b897844907e4e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 43edaf3e89214b247a860bace04407d3, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_489eb875f94145638707926756960d2c_Texture_1:
-        m_Texture: {fileID: 2800000, guid: 3d0465da28334da439cc37c5a3ac88fe, type: 3}
+        m_Texture: {fileID: 2800000, guid: 218a532857fa4242a2b8c7c83b53dc29, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_489eb875f94145638707926756960d2c_Texture_1_Texture2D:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 218a532857fa4242a2b8c7c83b53dc29, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SampleTexture2D_58efab3a72ce490984457d9a1288b610_Texture_1:
-        m_Texture: {fileID: 2800000, guid: c0b8d62cf93b06342a8e23d31a75367e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 6433d64126aa45942ada0e83108aaac5, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Texture2D:
-        m_Texture: {fileID: 2800000, guid: 29988b36784a2f840a5ce2f8704e5c98, type: 3}
+        m_Texture: {fileID: 2800000, guid: ec8875f6e5aa87045859872a27761d75, type: 3}
         m_Scale: {x: 50, y: 50}
         m_Offset: {x: 0, y: 0}
     - _normal:
-        m_Texture: {fileID: 2800000, guid: e1401fe0724c9c94381b897844907e4e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 43edaf3e89214b247a860bace04407d3, type: 3}
         m_Scale: {x: 1000, y: 1000}
         m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:

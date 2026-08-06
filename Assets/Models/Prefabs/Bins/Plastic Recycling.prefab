@@ -71,6 +71,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3a193a32609df714992eee0de01afd85, type: 3}
       insertIndex: -1
       addedObject: {fileID: 4107140390355206758}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3a193a32609df714992eee0de01afd85, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3164132080299241829}
   m_SourcePrefab: {fileID: 100100000, guid: 3a193a32609df714992eee0de01afd85, type: 3}
 --- !u!1 &4932706171117791629 stripped
 GameObject:
@@ -89,14 +92,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RecycleBinInteractable
-  binType: 0
+  binType: 1
   successVFX: {fileID: 0}
   errorVFX: {fileID: 0}
-  successClip: {fileID: 8300000, guid: 135591913192546499ea71ae5b6a86b9, type: 3}
-  errorClip: {fileID: 8300000, guid: a2403926a81898e428479959d005eafe, type: 3}
+  successClip: {fileID: 8300000, guid: 1f75364b7a817a243971dd72d268c9a8, type: 3}
+  errorClip: {fileID: 8300000, guid: e587a08b1000a9d448976421b9ab15c7, type: 3}
   OnCorrectRecycle:
     m_PersistentCalls:
       m_Calls: []
   OnIncorrectRecycle:
     m_PersistentCalls:
       m_Calls: []
+--- !u!65 &3164132080299241829
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4932706171117791629}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.2782471, y: 1.885587, z: 1.19694}
+  m_Center: {x: -0.07852447, y: 1.0025295, z: 0.232723}

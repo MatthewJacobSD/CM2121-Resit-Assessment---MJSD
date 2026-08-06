@@ -21,11 +21,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text congratulationText;
     [SerializeField] private TMP_Text finalScoreText;
     [SerializeField] private TMP_Text endMessageText;
-    [Tooltip("Shown when the cleanup was excellent (high score, lives remaining).")]
+    [Tooltip("Shown when every category's required count was recycled correctly.")]
     [SerializeField] private GameObject perfectCondition;
-    [Tooltip("Shown for a moderate result.")]
+    [Tooltip("Shown when the game ended with a positive score but not perfect.")]
     [SerializeField] private GameObject defaultCondition;
-    [Tooltip("Shown when the player scored nothing.")]
+    [Tooltip("Shown when the player failed (no lives, no score, or negative score).")]
     [SerializeField] private GameObject failureCondition;
 
     [Header("Pause")]
@@ -41,9 +41,10 @@ public class UIManager : MonoBehaviour
 
     private InputAction continueAction;
     private InputAction cancelAction;
-    private InputAction pauseAction;
+    private InputAction playerPauseAction;
     private InputActionMap cachedPlayerMap;
     private InputActionMap cachedUIMap;
+    private PauseMenuManager pauseMenu;
 
     private enum PanelState { Welcome, Instructions, Playing, Ended }
     private PanelState currentState;
@@ -58,7 +59,11 @@ public class UIManager : MonoBehaviour
         cachedPlayerMap = playerControls.FindActionMap("Player", true);
         continueAction = cachedUIMap.FindAction("Continue", true);
         cancelAction = cachedUIMap.FindAction("Cancel", true);
-        pauseAction = cachedUIMap.FindAction("Pause", true);
+
+        // Pause lives on the Player map so Escape is reachable during gameplay.
+        playerPauseAction = cachedPlayerMap.FindAction("Pause");
+
+        pauseMenu = FindFirstObjectByType<PauseMenuManager>();
     }
 
     private void Start()
@@ -77,15 +82,14 @@ public class UIManager : MonoBehaviour
             cancelAction.performed += OnCancel;
         }
 
-        if (pauseAction != null)
+        if (playerPauseAction != null)
         {
-            pauseAction.performed += OnPause;
+            playerPauseAction.performed += OnPause;
         }
 
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.OnGameWon += OnGameWon;
-            GameManager.Instance.OnGameOver += OnGameOver;
+            GameManager.Instance.OnGameEnded += OnGameEnded;
         }
     }
 
@@ -100,16 +104,14 @@ public class UIManager : MonoBehaviour
             cancelAction.Disable();
         }
 
-        if (pauseAction != null)
+        if (playerPauseAction != null)
         {
-            pauseAction.performed -= OnPause;
-            pauseAction.Disable();
+            playerPauseAction.performed -= OnPause;
         }
 
         if (GameManager.Instance != null)
         {
-            GameManager.Instance.OnGameWon -= OnGameWon;
-            GameManager.Instance.OnGameOver -= OnGameOver;
+            GameManager.Instance.OnGameEnded -= OnGameEnded;
         }
     }
 
@@ -134,7 +136,6 @@ public class UIManager : MonoBehaviour
 
         cachedPlayerMap.Disable();
         cachedUIMap.Enable();
-        if (pauseAction != null) pauseAction.Disable();
     }
 
     /// <summary>Hides the pause menu and returns to full gameplay input.</summary>
@@ -148,7 +149,6 @@ public class UIManager : MonoBehaviour
 
         cachedUIMap.Disable();
         cachedPlayerMap.Enable();
-        if (pauseAction != null) pauseAction.Enable();
     }
 
     #endregion
@@ -183,20 +183,16 @@ public class UIManager : MonoBehaviour
             case PanelState.Instructions:
                 cachedPlayerMap.Disable();
                 cachedUIMap.Enable();
-                // Pause is not available outside of gameplay.
-                if (pauseAction != null) pauseAction.Disable();
                 break;
 
             case PanelState.Playing:
                 cachedUIMap.Disable();
                 cachedPlayerMap.Enable();
-                if (pauseAction != null) pauseAction.Enable();
                 break;
 
             case PanelState.Ended:
                 cachedPlayerMap.Disable();
                 cachedUIMap.Enable();
-                if (pauseAction != null) pauseAction.Disable();
                 break;
         }
     }
@@ -205,33 +201,56 @@ public class UIManager : MonoBehaviour
 
     #region End Screen
 
-    private void OnGameWon()
+    private void OnGameEnded(GameResult result)
     {
-        AudioManager.Instance.PlayAchievementSFX();
-        ShowEndScreen("Perfect Cleanup!", "You recycled all the plants and saved the environment!");
+        ShowEndScreen(result);
     }
 
-    private void OnGameOver()
-    {
-        ShowEndScreen("Game Over", "Time ran out or you lost all your lives. Try again!");
-    }
-
-    private void ShowEndScreen(string title, string message)
+    private void ShowEndScreen(GameResult result)
     {
         ShowPanel(PanelState.Ended);
 
         int score = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
         int lives = GameManager.Instance != null ? GameManager.Instance.Lives : 0;
 
-        finalScoreText.text = $"Final Score: {score}";
-        congratulationText.text = title;
+        if (finalScoreText != null)
+            finalScoreText.text = $"Final Score: {score}";
 
+        switch (result)
+        {
+            case GameResult.Perfect:
+                congratulationText.text = "Perfect Cleanup!";
+                SetEndMessage("You recycled all the plants, toys and bottles correctly. The park is saved!");
+                SetConditions(true, false, false);
+                break;
+
+            case GameResult.Default:
+                congratulationText.text = "Level Complete!";
+                SetEndMessage("Good job! You kept the park clean before time ran out.");
+                SetConditions(false, true, false);
+                break;
+
+            case GameResult.Failure:
+                congratulationText.text = "Game Over";
+                SetEndMessage(lives <= 0
+                    ? "You ran out of lives. Try again!"
+                    : "Time ran out or your score dropped below zero. Try again!");
+                SetConditions(false, false, true);
+                break;
+        }
+    }
+
+    private void SetEndMessage(string message)
+    {
         if (endMessageText != null)
             endMessageText.text = message;
+    }
 
-        perfectCondition.SetActive(score >= 30 && lives > 0);
-        defaultCondition.SetActive(score > 0 && score < 30);
-        failureCondition.SetActive(score <= 0);
+    private void SetConditions(bool perfect, bool moderate, bool failure)
+    {
+        if (perfectCondition != null) perfectCondition.SetActive(perfect);
+        if (defaultCondition != null) defaultCondition.SetActive(moderate);
+        if (failureCondition != null) failureCondition.SetActive(failure);
     }
 
     #endregion
@@ -257,8 +276,9 @@ public class UIManager : MonoBehaviour
 
     private void OnPause(InputAction.CallbackContext ctx)
     {
-        if (currentState == PanelState.Playing)
-            ShowPauseMenu();
+        if (currentState != PanelState.Playing) return;
+        if (pauseMenu != null)
+            pauseMenu.Pause();
     }
 
     #endregion

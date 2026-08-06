@@ -2,6 +2,7 @@ using TMPro;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -31,6 +32,7 @@ public static class AutoSetupPauseMenu
         SetupPauseMenuManager();
         SetupButtons();
         SetupHUDManager();
+        SetupInteractionPrompt();
 
         EditorSceneManager.MarkSceneDirty(scene);
         Undo.CollapseUndoOperations(group);
@@ -42,18 +44,19 @@ public static class AutoSetupPauseMenu
             "- PauseMenu hierarchy created\n" +
             "- PauseMenuManager added with references\n" +
             "- Buttons rewired\n" +
+            "- HUD stats and interaction prompt texts created/wired\n" +
+            "- Volume slider and username input wired\n" +
             "- Input System references updated\n\n" +
             "Still needed:\n" +
             "1. Check HUDManager references in Inspector\n" +
-            "2. Add VolumeSlider to SettingsPanel\n" +
-            "3. Wire volumeSlider to PauseMenuManager", "OK");
+            "2. Delete the duplicate PauseMenuManager if present", "OK");
     }
 
     #endregion
 
     #region Setup Steps
 
-    private static void SetupCanvasStructure()
+    public static void SetupCanvasStructure()
     {
         // Find or create the Canvas
         Canvas canvas = Object.FindFirstObjectByType<Canvas>();
@@ -68,17 +71,16 @@ public static class AutoSetupPauseMenu
             scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
             scaler.referenceResolution = new Vector2(1280, 720);
         }
-
         // Find or create EventSystem
         if (Object.FindFirstObjectByType<UnityEngine.EventSystems.EventSystem>() == null)
         {
             GameObject esGO = new GameObject("EventSystem", typeof(UnityEngine.EventSystems.EventSystem),
-                typeof(InputSystem.UI.InputSystemUIInputModule));
+                typeof(UnityEngine.InputSystem.UI.InputSystemUIInputModule));
             Undo.RegisterCreatedObjectUndo(esGO, "Create EventSystem");
         }
 
         // Find PanelUI or create it
-        GameObject panelUI = GameObject.Find("PanelUI");
+        GameObject panelUI = FindGameObjectIncludingInactive("PanelUI");
         if (panelUI == null)
         {
             panelUI = new GameObject("PanelUI", typeof(RectTransform));
@@ -110,7 +112,7 @@ public static class AutoSetupPauseMenu
         panel.SetActive(false);
     }
 
-    private static void SetupUIManager()
+    public static void SetupUIManager()
     {
         UIManager uiMgrs = Object.FindFirstObjectByType<UIManager>();
         if (uiMgrs == null)
@@ -123,7 +125,7 @@ public static class AutoSetupPauseMenu
         SerializedObject so = new SerializedObject(uiMgrs);
 
         // Find panels by name
-        Transform panelUI = GameObject.Find("PanelUI")?.transform;
+        Transform panelUI = FindTransformIncludingInactive("PanelUI");
         if (panelUI != null)
         {
             so.FindProperty("welcomePanel").objectReferenceValue = FindChildRecursive(panelUI, "WelcomeScreen")?.gameObject;
@@ -148,11 +150,11 @@ public static class AutoSetupPauseMenu
         so.ApplyModifiedProperties();
     }
 
-    private static void SetupPauseMenuManager()
+    public static void SetupPauseMenuManager()
     {
         // Find Canvas and PanelUI
         Transform canvas = Object.FindFirstObjectByType<Canvas>()?.transform;
-        Transform panelUI = GameObject.Find("PanelUI")?.transform;
+        Transform panelUI = FindTransformIncludingInactive("PanelUI");
         if (canvas == null || panelUI == null) return;
 
         // Find or create PauseMenu as sibling of PanelUI (under Canvas)
@@ -169,7 +171,7 @@ public static class AutoSetupPauseMenu
             pauseMenuGO.SetActive(false);
         }
 
-        PauseMenuManager mgr = Object.FindFirstObjectByType<PauseMenuManager>();
+        PauseMenuManager mgr = FindBestPauseMenuManager();
         if (mgr == null)
         {
             GameObject mgrGO = new GameObject("PauseMenuManager");
@@ -211,13 +213,31 @@ public static class AutoSetupPauseMenu
                 so.FindProperty("usernameInput").objectReferenceValue = inputField;
         }
 
+        // Try to find the volume slider in settings
+        if (settingsPanel != null)
+        {
+            Slider slider = settingsPanel.GetComponentInChildren<Slider>(true);
+            if (slider != null)
+                so.FindProperty("volumeSlider").objectReferenceValue = slider;
+        }
+
         so.ApplyModifiedProperties();
+
+        // Wire the whole PauseMenu into UIManager so it can show/hide it
+        UIManager uiMgr = Object.FindFirstObjectByType<UIManager>();
+        if (uiMgr != null)
+        {
+            SerializedObject uiSo = new SerializedObject(uiMgr);
+            if (uiSo.FindProperty("pauseMenuPanel").objectReferenceValue == null)
+                uiSo.FindProperty("pauseMenuPanel").objectReferenceValue = pauseMenuGO;
+            uiSo.ApplyModifiedProperties();
+        }
 
         // Set PauseMenu as inactive by default
         pauseMenuGO.SetActive(false);
     }
 
-    private static Transform CreateUIPanel(Transform parent, string name, Vector2 size)
+    public static Transform CreateUIPanel(Transform parent, string name, Vector2 size)
     {
         GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
         Undo.RegisterCreatedObjectUndo(go, "Create " + name);
@@ -255,7 +275,7 @@ public static class AutoSetupPauseMenu
         return go.transform;
     }
 
-    private static void SetupHUDManager()
+    public static void SetupHUDManager()
     {
         HUDManager hud = Object.FindFirstObjectByType<HUDManager>();
         if (hud == null) return;
@@ -263,7 +283,7 @@ public static class AutoSetupPauseMenu
         SerializedObject so = new SerializedObject(hud);
 
         // Find TMP texts in the HUDScreen
-        Transform hudScreen = GameObject.Find("HUDScreen")?.transform;
+        Transform hudScreen = FindTransformIncludingInactive("HUDScreen");
         if (hudScreen == null) return;
 
         // Create default text elements if they're missing
@@ -285,12 +305,54 @@ public static class AutoSetupPauseMenu
                 so.FindProperty("collectedText").objectReferenceValue = t;
         }
 
+        // Create any still-missing HUD texts under the HUDScreen canvas so the
+        // stats always display. Anchored in screen space relative to the HUD.
+        if (so.FindProperty("toysText").objectReferenceValue == null)
+            so.FindProperty("toysText").objectReferenceValue = FindOrCreateTMPText(hudScreen, "Toys Text", "Toys: 0", new Vector2(-400, 300), true);
+        if (so.FindProperty("bottlesText").objectReferenceValue == null)
+            so.FindProperty("bottlesText").objectReferenceValue = FindOrCreateTMPText(hudScreen, "Bottles Text", "Bottles: 0", new Vector2(-400, 250), true);
+        if (so.FindProperty("livesText").objectReferenceValue == null)
+            so.FindProperty("livesText").objectReferenceValue = FindOrCreateTMPText(hudScreen, "Lives Text", "Lives: 0/5", new Vector2(400, 350), true);
+        if (so.FindProperty("timerText").objectReferenceValue == null)
+            so.FindProperty("timerText").objectReferenceValue = FindOrCreateTMPText(hudScreen, "Timer Text", "Time: 00:00", new Vector2(0, 450), true);
+        if (so.FindProperty("scoreText").objectReferenceValue == null)
+            so.FindProperty("scoreText").objectReferenceValue = FindOrCreateTMPText(hudScreen, "Score Text", "Score: 0", new Vector2(-300, 400), true);
+        if (so.FindProperty("highScoreText").objectReferenceValue == null)
+            so.FindProperty("highScoreText").objectReferenceValue = FindOrCreateTMPText(hudScreen, "High Score Text", "Best: 0", new Vector2(300, 400), true);
+        if (so.FindProperty("announcementText").objectReferenceValue == null)
+            so.FindProperty("announcementText").objectReferenceValue = FindOrCreateTMPText(hudScreen, "Announcement Text", "", new Vector2(0, 200), true);
+
         so.ApplyModifiedProperties();
     }
 
-    private static void SetupButtons()
+    public static void SetupInteractionPrompt()
     {
-        PauseMenuManager mgr = Object.FindFirstObjectByType<PauseMenuManager>();
+        InteractionPromptUI promptUI = Object.FindFirstObjectByType<InteractionPromptUI>();
+        if (promptUI == null) return;
+
+        Transform hudScreen = FindTransformIncludingInactive("HUDScreen");
+        if (hudScreen == null) return;
+
+        SerializedObject so = new SerializedObject(promptUI);
+
+        if (so.FindProperty("promptText").objectReferenceValue == null)
+        {
+            TMP_Text prompt = FindOrCreateTMPText(hudScreen, "PromptText", "Press [E] to Pick Up", new Vector2(0, -140));
+            so.FindProperty("promptText").objectReferenceValue = prompt;
+        }
+
+        if (so.FindProperty("warningText").objectReferenceValue == null)
+        {
+            TMP_Text warning = FindOrCreateTMPText(hudScreen, "WarningText", "", new Vector2(0, 140));
+            so.FindProperty("warningText").objectReferenceValue = warning;
+        }
+
+        so.ApplyModifiedProperties();
+    }
+
+    public static void SetupButtons()
+    {
+        PauseMenuManager mgr = FindBestPauseMenuManager();
         if (mgr == null) return;
 
         foreach (Button btn in Object.FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None))
@@ -335,16 +397,19 @@ public static class AutoSetupPauseMenu
 
     #region Utility
 
-    private static void WireButton(Button button, PauseMenuManager target, string methodName)
+    public static void WireButton(Button button, PauseMenuManager target, string methodName)
     {
         SerializedObject so = new SerializedObject(button);
         SerializedProperty onClick = so.FindProperty("m_OnClick");
         if (onClick == null) return;
 
-        onClick.ClearArray();
-        onClick.arraySize = 1;
+        SerializedProperty calls = onClick
+            .FindPropertyRelative("m_PersistentCalls")
+            .FindPropertyRelative("m_Calls");
+        calls.ClearArray();
+        calls.arraySize = 1;
 
-        SerializedProperty call = onClick.GetArrayElementAtIndex(0);
+        SerializedProperty call = calls.GetArrayElementAtIndex(0);
         call.FindPropertyRelative("m_Target").objectReferenceValue = target;
         call.FindPropertyRelative("m_MethodName").stringValue = methodName;
         call.FindPropertyRelative("m_CallState").enumValueIndex = 2;
@@ -352,16 +417,85 @@ public static class AutoSetupPauseMenu
         so.ApplyModifiedProperties();
     }
 
-    private static Transform FindChildRecursive(Transform parent, string name)
+    public static Transform FindChildRecursive(Transform parent, string name)
     {
         if (parent == null) return null;
-        foreach (Transform child in parent)
+        for (int i = 0; i < parent.childCount; i++)
         {
+            Transform child = parent.GetChild(i);
             if (child.name == name) return child;
             Transform found = FindChildRecursive(child, name);
             if (found != null) return found;
         }
         return null;
+    }
+
+    public static Transform FindTransformIncludingInactive(string objectName)
+    {
+        foreach (Transform t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            if (t.name == objectName) return t;
+        }
+        return null;
+    }
+
+    public static GameObject FindGameObjectIncludingInactive(string objectName)
+    {
+        Transform t = FindTransformIncludingInactive(objectName);
+        return t != null ? t.gameObject : null;
+    }
+
+    public static PauseMenuManager FindBestPauseMenuManager()
+    {
+        PauseMenuManager[] all = Object.FindObjectsByType<PauseMenuManager>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        if (all.Length == 0) return null;
+        if (all.Length == 1) return all[0];
+
+        // Prefer the instance with the most wired panels (the real one).
+        PauseMenuManager best = all[0];
+        int bestCount = -1;
+        foreach (PauseMenuManager m in all)
+        {
+            SerializedObject so = new SerializedObject(m);
+            int count = 0;
+            if (so.FindProperty("pausePanel").objectReferenceValue != null) count++;
+            if (so.FindProperty("settingsPanel").objectReferenceValue != null) count++;
+            if (so.FindProperty("confirmExitPanel").objectReferenceValue != null) count++;
+            if (so.FindProperty("saveProgressPanel").objectReferenceValue != null) count++;
+            if (count > bestCount) { bestCount = count; best = m; }
+        }
+        return best;
+    }
+
+    public static TMP_Text FindOrCreateTMPText(Transform parent, string name, string defaultText, Vector2 anchoredPosition, bool activeByDefault = false)
+    {
+        Transform existing = FindChildRecursive(parent, name);
+        if (existing != null)
+            return existing.GetComponent<TMP_Text>();
+
+        GameObject go = new GameObject(name, typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        Undo.RegisterCreatedObjectUndo(go, "Create " + name);
+        go.transform.SetParent(parent, false);
+        go.layer = 5;
+
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = anchoredPosition;
+        rect.sizeDelta = new Vector2(700, 50);
+
+        TMP_Text text = go.GetComponent<TextMeshProUGUI>();
+        text.text = defaultText;
+        text.fontSize = 26;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = Color.white;
+        text.fontStyle = FontStyles.Bold;
+
+        // Prompts stay hidden until InteractionPromptUI reveals them; HUD stats
+        // must be active so they render immediately.
+        go.SetActive(activeByDefault);
+
+        return text;
     }
 
     #endregion

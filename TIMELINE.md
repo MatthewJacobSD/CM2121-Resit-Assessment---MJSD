@@ -45,9 +45,12 @@
 | 27 Jul (Mon) | Day 10 | 4 | UI | Created ChainFragrance scene for PauseMenu prototyping, built full PauseMenu hierarchy (PausePanel, SettingsPanel, ConfirmationModal, SaveProgressModal), created PauseMenuManager script | Done |
 | 28 Jul (Tue) | Day 11 | 5 | UI | Rewrote UIManager.cs with pause support, added PauseGame/ResumeGame to GameManager, created AutoSetupPauseMenu Editor tool, migrated PauseMenu structure into Florance scene | Done |
 | 29 Jul (Wed) | Day 12 | 3 | Polish | Documentation update, user testing logs written, final project verification, script audit, scene cleanup | Done |
-| 30 Jul (Thu) | Day 13 | — | Submission | Project evolution documentation, final review, project ready for submission | Active |
+| 30 Jul (Thu) | Day 13 | — | Submission | Project evolution documentation, final review, project ready for submission | Done |
+| 3 Aug (Mon) | Day 14 | — | Resit audit | Full project audit (PROJECT_AUDIT.md), fix pass: colliders/layers, GameManager rewrite, UI rewiring, 21 automated tests, asmdefs | Done |
+| 5 Aug (Wed) | Day 15 | — | Hardening | Water + terrain material chain self-contained (demo folder independent), single terrain migration | Done |
+| 6 Aug (Thu) | Day 16 | — | Final hardening | Player grounding fix, dual-terrain reconciliation, storm wind-push, gameplay audio remap to Optimized clips, bin-type fix, HUD cleanup, demo folder removal, asset audit, batch validation, final commit + build | Done |
 
-**New project total:** 13 active days, full game with pause menu, weather system, surface audio, and documentation
+**New project total:** 16 active days, full game with pause menu, weather system, surface audio, and documentation
 
 ---
 

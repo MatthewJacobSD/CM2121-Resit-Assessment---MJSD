@@ -58,6 +58,9 @@ public class PlayerMovement : MonoBehaviour
 
     private float speedModifier = 1f;
 
+    // Horizontal velocity added by the weather system (storm wind push).
+    private Vector3 windPush;
+
     #endregion
 
     #region Public Properties
@@ -118,6 +121,15 @@ public class PlayerMovement : MonoBehaviour
         speedModifier = Mathf.Clamp(modifier, 0.1f, 2f);
     }
 
+    /// <summary>
+    /// Sets a horizontal wind velocity (m/s) added to player movement, used to
+    /// gradually push the player during storms. Ramps are handled by the caller.
+    /// </summary>
+    public void SetWindPush(Vector3 push)
+    {
+        windPush = push;
+    }
+
     #endregion
 
     #region Private Methods
@@ -150,7 +162,7 @@ public class PlayerMovement : MonoBehaviour
             ? Vector3.MoveTowards(currentMovement, inputDirection, currentAccel * Time.deltaTime)
             : Vector3.MoveTowards(currentMovement, Vector3.zero, deceleration * Time.deltaTime);
 
-        Vector3 finalMovement = currentMovement * targetSpeed + Vector3.up * velocity.y;
+        Vector3 finalMovement = currentMovement * targetSpeed + Vector3.up * velocity.y + windPush;
         controller.Move(finalMovement * Time.deltaTime);
     }
 

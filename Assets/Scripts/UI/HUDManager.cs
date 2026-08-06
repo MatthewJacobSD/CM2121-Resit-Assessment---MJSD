@@ -172,7 +172,7 @@ public class HUDManager : MonoBehaviour
     private void OnScoreChanged(int newScore)
     {
         if (scoreText != null)
-            scoreText.text = $"Score: {newScore}";
+            scoreText.text = $"{newScore}";
     }
 
     private void OnHighScoreChanged(int newHighScore)
@@ -184,7 +184,7 @@ public class HUDManager : MonoBehaviour
     private void OnLivesChanged(int lives, int maxLives)
     {
         if (livesText != null)
-            livesText.text = $"Lives: {lives}/{maxLives}";
+            livesText.text = $"{lives}/{maxLives}";
     }
 
     private void OnTimerTick(float timeRemaining)
@@ -214,16 +214,16 @@ public class HUDManager : MonoBehaviour
         if (GameManager.Instance == null) return;
 
         if (collectedText != null)
-            collectedText.text = $"Plants: {GameManager.Instance.PlantsRecycled}";
+            collectedText.text = $"Plants: {GameManager.Instance.PlantsRecycled}/{GameManager.Instance.PlantsRequired}";
 
         if (toysText != null)
-            toysText.text = $"Toys: {GameManager.Instance.ToysRecycled}";
+            toysText.text = $"Toys: {GameManager.Instance.ToysRecycled}/{GameManager.Instance.ToysRequired}";
 
         if (bottlesText != null)
-            bottlesText.text = $"Bottles: {GameManager.Instance.BottlesRecycled}";
+            bottlesText.text = $"Bottles: {GameManager.Instance.BottlesRecycled}/{GameManager.Instance.BottlesRequired}";
 
         if (scoreText != null && ScoreManager.Instance != null)
-            scoreText.text = $"Score: {ScoreManager.Instance.CurrentScore}";
+            scoreText.text = $"{ScoreManager.Instance.CurrentScore}";
 
         if (highScoreText != null && ScoreManager.Instance != null)
             highScoreText.text = $"Best: {ScoreManager.Instance.HighScore}";

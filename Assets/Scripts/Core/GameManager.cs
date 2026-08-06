@@ -2,9 +2,24 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
+/// <summary>Outcome of a finished game, used to drive the end screen.</summary>
+public enum GameResult
+{
+    /// <summary>Every category's required count was recycled correctly.</summary>
+    Perfect,
+    /// <summary>The game ended (time out) with a positive score.</summary>
+    Default,
+    /// <summary>Lost all lives, ran out of time with no score, or went negative.</summary>
+    Failure
+}
+
 /// <summary>
-/// Central game state manager: owns the timer, lives and win/lose conditions,
-/// and exposes events that the rest of the game listens to.
+/// Central game state manager: owns the timer, lives, category objectives and
+/// win/lose conditions, and exposes events the rest of the game listens to.
+///
+/// Scoring is wired through <see cref="ScoreManager"/> with signed values so a
+/// wrong-bin recycle reduces the score (and can push it negative, which is an
+/// immediate failure). Category progress is only granted for correct recycles.
 /// </summary>
 public class GameManager : MonoBehaviour
 {
@@ -17,14 +32,20 @@ public class GameManager : MonoBehaviour
     [Tooltip("Length of a single game in seconds.")]
     [SerializeField] private float gameDuration = 300f;
 
-    [Tooltip("Plants that must be recycled to win the level.")]
-    [SerializeField] private int plantsRequired = 6;
+    [Tooltip("Plants that must be recycled correctly to win the level.")]
+    [SerializeField] private int plantsRequired = 12;
+
+    [Tooltip("Toys that must be recycled correctly to win the level.")]
+    [SerializeField] private int toysRequired = 8;
+
+    [Tooltip("Bottles that must be recycled correctly to win the level.")]
+    [SerializeField] private int bottlesRequired = 4;
 
     [Header("Chain Bonus")]
-    [Tooltip("Bonus score awarded when plants are recycled consecutively.")]
+    [Tooltip("Bonus score awarded when the plant chain threshold is reached.")]
     [SerializeField] private int chainBonus = 40;
 
-    [Tooltip("Consecutive plants required to trigger the chain bonus.")]
+    [Tooltip("Consecutive correct plants required to trigger the chain bonus.")]
     [SerializeField] private int chainThreshold = 2;
 
     #endregion
@@ -39,6 +60,7 @@ public class GameManager : MonoBehaviour
     private int bottlesRecycled;
     private int consecutivePlants;
     private bool isPlaying;
+    private GameResult result;
 
     #endregion
 
@@ -53,15 +75,23 @@ public class GameManager : MonoBehaviour
     public int PlantsRecycled => plantsRecycled;
     public int ToysRecycled => toysRecycled;
     public int BottlesRecycled => bottlesRecycled;
+
+    /// <summary>Required correct recycles per category (HUD progress exposure).</summary>
+    public int PlantsRequired => plantsRequired;
+    public int ToysRequired => toysRequired;
+    public int BottlesRequired => bottlesRequired;
+
     public bool IsPlaying => isPlaying;
+    public GameResult Result => result;
 
     #endregion
 
     #region Events
 
     public event Action OnGameStarted;
-    public event Action OnGameOver;
-    public event Action OnGameWon;
+    public event Action OnGameOver;      // Failure
+    public event Action OnGameWon;       // Perfect or Default (kept for compatibility)
+    public event Action<GameResult> OnGameEnded;
     public event Action<int, int> OnLivesChanged;
     public event Action<float> OnTimerTick;
     public event Action<int, string> OnItemRecycled;
@@ -72,6 +102,10 @@ public class GameManager : MonoBehaviour
     #region Unity Lifecycle
 
     // Singleton pattern: keep one persistent instance across scene reloads.
+    // DontDestroyOnLoad only accepts root GameObjects. The scene keeps
+    // managers under a "Managers" container, so persistence is skipped there
+    // (each scene load recreates the managers; the high score survives via
+    // ScoreManager's PlayerPrefs). Root-created instances (tests) still persist.
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -81,7 +115,8 @@ public class GameManager : MonoBehaviour
         }
 
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+        if (transform.parent == null)
+            DontDestroyOnLoad(gameObject);
     }
 
     private void Update()
@@ -94,7 +129,7 @@ public class GameManager : MonoBehaviour
         if (timeRemaining <= 0f)
         {
             timeRemaining = 0f;
-            CheckWinCondition();
+            CheckEndCondition();
         }
     }
 
@@ -106,6 +141,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         isPlaying = true;
+        result = GameResult.Failure;
         lives = maxLives;
         timeRemaining = gameDuration;
         itemsRecycled = 0;
@@ -119,61 +155,75 @@ public class GameManager : MonoBehaviour
 
         OnLivesChanged?.Invoke(lives, maxLives);
         OnGameStarted?.Invoke();
-        OnAnnouncement?.Invoke("Collect plants and recycle them correctly!");
+        OnAnnouncement?.Invoke("Recycle all the plants, toys and bottles into the right bins!");
     }
 
     /// <summary>
-    /// Registers a recycled item, applies scoring/lives effects and checks
-    /// whether the game has been won or lost.
+    /// Registers a recycled item. The signed <paramref name="scoreValue"/> comes
+    /// from the bin's scoring matrix: positive = correct, negative = wrong.
+    /// Correct recycles advance the matching category; wrong ones cost a life and
+    /// reduce the score. The game may end Perfect / Default / Failure.
     /// </summary>
     /// <param name="item">The recycled item's GameObject.</param>
-    /// <param name="scoreValue">Score granted for the recycled item.</param>
+    /// <param name="scoreValue">Signed score granted for the recycled item.</param>
     public void ReportRecycled(GameObject item, int scoreValue)
     {
         if (!isPlaying) return;
 
         itemsRecycled++;
 
-        PickupItem pickup = item.GetComponent<PickupItem>();
+        PickupItem pickup = item != null ? item.GetComponent<PickupItem>() : null;
         ItemType type = pickup != null ? pickup.ItemType : ItemType.Plant;
+
+        bool correct = scoreValue > 0;
 
         switch (type)
         {
             case ItemType.Plant:
-                plantsRecycled++;
-                consecutivePlants++;
-
-                if (consecutivePlants >= chainThreshold)
+                if (correct)
                 {
-                    OnAnnouncement?.Invoke($"Plant Chain! +{chainBonus} bonus!");
+                    plantsRecycled++;
+                    HandlePlantChain();
                 }
                 break;
 
             case ItemType.Toy:
-                toysRecycled++;
-                consecutivePlants = 0;
-                lives--;
+                if (correct) toysRecycled++;
                 break;
 
             case ItemType.Bottle:
-                bottlesRecycled++;
-                consecutivePlants = 0;
-                lives--;
+                if (correct) bottlesRecycled++;
                 break;
         }
 
-        OnLivesChanged?.Invoke(lives, maxLives);
-        OnItemRecycled?.Invoke(scoreValue, item.name);
+        // Signed score wiring: correct recycles add, wrong ones subtract.
+        if (ScoreManager.Instance != null)
+            ScoreManager.Instance.AddScore(scoreValue);
+
+        if (!correct)
+        {
+            consecutivePlants = 0;
+            lives--;
+            OnLivesChanged?.Invoke(lives, maxLives);
+        }
+
+        OnItemRecycled?.Invoke(scoreValue, item != null ? item.name : "Item");
 
         if (lives <= 0)
         {
             OnAnnouncement?.Invoke("Game Over - No lives left!");
-            EndGame(false);
+            EndGame(GameResult.Failure);
+            return;
         }
-        else
+
+        if (ScoreManager.Instance != null && ScoreManager.Instance.CurrentScore < 0)
         {
-            CheckWinCondition();
+            OnAnnouncement?.Invoke("Game Over - Score dropped below zero!");
+            EndGame(GameResult.Failure);
+            return;
         }
+
+        CheckEndCondition();
     }
 
     /// <summary>Pauses gameplay updates while leaving the scene loaded.</summary>
@@ -200,32 +250,74 @@ public class GameManager : MonoBehaviour
 
     #region Private Methods
 
-    private void CheckWinCondition()
+    /// <summary>Grants and announces the plant chain bonus on a consecutive streak.</summary>
+    private void HandlePlantChain()
+    {
+        consecutivePlants++;
+
+        if (consecutivePlants == chainThreshold)
+        {
+            if (ScoreManager.Instance != null)
+                ScoreManager.Instance.AddScore(chainBonus);
+
+            OnAnnouncement?.Invoke($"Plant Chain! +{chainBonus} bonus!");
+        }
+    }
+
+    private bool AllCategoriesComplete()
+    {
+        return plantsRecycled >= plantsRequired
+            && toysRecycled >= toysRequired
+            && bottlesRecycled >= bottlesRequired;
+    }
+
+    private GameResult ScoreBasedResult()
+    {
+        int score = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
+        return score > 0 ? GameResult.Default : GameResult.Failure;
+    }
+
+    private void CheckEndCondition()
     {
         if (!isPlaying) return;
 
-        if (plantsRecycled >= plantsRequired)
-            EndGame(true);
+        if (AllCategoriesComplete())
+        {
+            EndGame(GameResult.Perfect);
+        }
         else if (timeRemaining <= 0f)
-            EndGame(false);
+        {
+            EndGame(ScoreBasedResult());
+        }
     }
 
-    private void EndGame(bool won)
+    private void EndGame(GameResult gameResult)
     {
+        if (!isPlaying) return;
         isPlaying = false;
+        result = gameResult;
 
         if (ScoreManager.Instance != null)
             ScoreManager.Instance.SaveHighScore();
 
-        if (won)
+        switch (gameResult)
         {
-            OnAnnouncement?.Invoke("Level Complete! Great Job!");
-            OnGameWon?.Invoke();
+            case GameResult.Perfect:
+                OnAnnouncement?.Invoke("Perfect Cleanup! All items recycled!");
+                OnGameWon?.Invoke();
+                break;
+
+            case GameResult.Default:
+                OnAnnouncement?.Invoke("Level Complete! Good job!");
+                OnGameWon?.Invoke();
+                break;
+
+            case GameResult.Failure:
+                OnGameOver?.Invoke();
+                break;
         }
-        else
-        {
-            OnGameOver?.Invoke();
-        }
+
+        OnGameEnded?.Invoke(gameResult);
     }
 
     #endregion

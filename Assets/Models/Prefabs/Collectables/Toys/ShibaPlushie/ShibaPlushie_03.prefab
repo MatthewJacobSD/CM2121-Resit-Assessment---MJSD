@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 27efea6bd347e044b9388e3991fca5f7, type: 3}
       propertyPath: m_Name
-      value: Dog_Plushie2_03
+      value: ShibaPlushie_03
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 27efea6bd347e044b9388e3991fca5f7, type: 3}
       propertyPath: m_Layer
@@ -74,6 +74,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 27efea6bd347e044b9388e3991fca5f7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2624572520761790782}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 27efea6bd347e044b9388e3991fca5f7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3213610269584364687}
   m_SourcePrefab: {fileID: 100100000, guid: 27efea6bd347e044b9388e3991fca5f7, type: 3}
 --- !u!1 &5507555831638980062 stripped
 GameObject:
@@ -119,8 +122,29 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 389d01a0209ac624eab93e3eaa428398, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupItem
-  itemType: 0
-  itemName: DogPlushie2
+  itemType: 1
+  itemName: Shiba Plushie
   baseScore: 15
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
+--- !u!65 &3213610269584364687
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5507555831638980062}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.579954, y: 0.7315233, z: 1.3003693}
+  m_Center: {x: 0.036661983, y: 0.43654144, z: 0.07823181}

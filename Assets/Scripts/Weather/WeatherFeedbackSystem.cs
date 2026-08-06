@@ -23,6 +23,12 @@ public class WeatherFeedbackSystem : MonoBehaviour
     [SerializeField] private float stormActivationRadius = 8f;
     [SerializeField] private LayerMask binLayer;
 
+    [Header("Wind Push")]
+    [Tooltip("Max horizontal speed (m/s) the storm wind pushes the player away from a wrong bin.")]
+    [SerializeField] private float maxWindPushSpeed = 3f;
+    [Tooltip("How quickly the wind push ramps up/down (m/s per second).")]
+    [SerializeField] private float windPushRampSpeed = 2.5f;
+
     [Header("Transition")]
     [Tooltip("Cooldown between weather changes to avoid rapid flickering.")]
     [SerializeField] private float stormCooldown = 0.5f;
@@ -33,7 +39,9 @@ public class WeatherFeedbackSystem : MonoBehaviour
 
     private float cooldownTimer;
     private float currentStormIntensity;
+    private Vector3 currentWindPush;
     private PickupItem heldItem;
+    private PlayerMovement playerMovement;
 
     #endregion
 
@@ -45,6 +53,12 @@ public class WeatherFeedbackSystem : MonoBehaviour
     #endregion
 
     #region Unity Lifecycle
+
+    private void Awake()
+    {
+        if (player != null)
+            playerMovement = player.GetComponent<PlayerMovement>();
+    }
 
     private void OnEnable()
     {
@@ -92,6 +106,8 @@ public class WeatherFeedbackSystem : MonoBehaviour
                 windEffect?.SetStormIntensity(0f);
                 weatherMovementEffect?.SetStormIntensity(0f);
             }
+
+            RampWindPush(Vector3.zero);
             return;
         }
 
@@ -108,6 +124,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
 
         float nearestWrongBinDistance = float.MaxValue;
         float nearestCorrectBinDistance = float.MaxValue;
+        Vector3 nearestWrongBinPosition = player.position;
         bool foundAnyBin = false;
 
         Collider[] nearby = Physics.OverlapSphere(player.position, binDetectionRadius, binLayer);
@@ -128,7 +145,10 @@ public class WeatherFeedbackSystem : MonoBehaviour
             else
             {
                 if (dist < nearestWrongBinDistance)
+                {
                     nearestWrongBinDistance = dist;
+                    nearestWrongBinPosition = col.transform.position;
+                }
 
                 foundAnyBin = true;
             }
@@ -140,6 +160,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
             EnsureState(WeatherState.State.Rainy);
             currentStormIntensity = 0f;
             ApplyStormIntensity(0f);
+            RampWindPush(Vector3.zero);
             return;
         }
 
@@ -150,12 +171,21 @@ public class WeatherFeedbackSystem : MonoBehaviour
             currentStormIntensity = Mathf.Clamp01(normalizedDistance);
             EnsureState(WeatherState.State.Stormy);
             ApplyStormIntensity(currentStormIntensity);
+
+            // Gradual wind push away from the wrong bin, scaled by storm strength.
+            Vector3 away = player.position - nearestWrongBinPosition;
+            away.y = 0f;
+            if (away.sqrMagnitude > 0.01f)
+                RampWindPush(away.normalized * (maxWindPushSpeed * currentStormIntensity));
+            else
+                RampWindPush(Vector3.zero);
         }
         else
         {
             currentStormIntensity = 0f;
             EnsureState(WeatherState.State.Rainy);
             ApplyStormIntensity(0f);
+            RampWindPush(Vector3.zero);
         }
     }
 
@@ -177,6 +207,17 @@ public class WeatherFeedbackSystem : MonoBehaviour
         weatherMovementEffect?.SetStormIntensity(intensity);
     }
 
+    /// <summary>
+    /// Smoothly ramps the current wind push toward the target so the player is
+    /// nudged gradually by the storm instead of being shoved by a collider.
+    /// </summary>
+    private void RampWindPush(Vector3 target)
+    {
+        currentWindPush = Vector3.MoveTowards(currentWindPush, target, windPushRampSpeed * Time.deltaTime);
+        if (playerMovement != null)
+            playerMovement.SetWindPush(currentWindPush);
+    }
+
     #endregion
 
     #region Event Handlers
@@ -186,6 +227,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
         heldItem = item;
         EnsureState(WeatherState.State.Rainy);
         ApplyStormIntensity(0f);
+        RampWindPush(Vector3.zero);
     }
 
     private void OnDropped()
@@ -196,6 +238,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
         weatherState.SetSunny();
         weatherEffects?.SetWeather(WeatherState.State.Sunny);
         windEffect?.SetWeatherState(WeatherState.State.Sunny);
+        RampWindPush(Vector3.zero);
     }
 
     private void OnItemProcessed(bool isCorrect)
@@ -203,6 +246,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
         heldItem = null;
         currentStormIntensity = 0f;
         ApplyStormIntensity(0f);
+        RampWindPush(Vector3.zero);
 
         if (isCorrect)
         {

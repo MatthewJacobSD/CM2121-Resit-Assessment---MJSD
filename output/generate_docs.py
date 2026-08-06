@@ -234,7 +234,7 @@ def build_project_documentation():
             ("Student:", "Matthew Jacob SD"),
             ("Student ID:", "[ID Placeholder]"),
             ("University:", "[University Name]"),
-            ("Date:", "30 July 2026"),
+            ("Date:", "6 August 2026"),
             ("Extension Deadline:", "6 August 2026"),
         ],
     )
@@ -270,13 +270,13 @@ def build_project_documentation():
         doc,
         ["Mechanic", "Description"],
         [
-            ["Movement", "WASD movement, mouse look, sprint (Shift), jump (Space)"],
+            ["Movement", "WASD movement, mouse look, sprint (Shift), jump (Space), storm wind push"],
             ["Interaction", "E to pick up, Q to drop, Left-click to throw, Right-click to aim"],
-            ["Recycling", "Three bin types (Plant/Plastic/Toy) with acceptance matrix"],
-            ["Scoring", "Points per correct recycle, chain bonus for consecutive plants"],
+            ["Recycling", "Three bin types (Nature/Plastic/General Waste) with acceptance matrix"],
+            ["Scoring", "Points per correct recycle, plant chain bonus, penalties for wrong bin"],
             ["Lives", "5 lives, lost on wrong-bin recycling"],
             ["Timer", "5-minute countdown, ends game when expired"],
-            ["Weather", "3 states (Sunny/Rainy/Stormy) with proximity-based intensity"],
+            ["Weather", "3 states (Sunny/Rainy/Stormy); storm physically pushes player away from wrong bins"],
             ["HUD", "Score, lives, timer, collected items, announcements, score popups"],
             ["Menu", "Welcome → Instructions → Playing → End screen"],
             ["Pause", "ESC to pause, continue/settings/exit with save prompting"],
@@ -299,6 +299,7 @@ def build_project_documentation():
 │   ├── UI/                # 5 scripts
 │   ├── Weather/           # 4 scripts + Data/ + Effects/
 │   └── Editor/            # 1 script
+├── Sounds/Optimized/      # Curated gameplay SFX + ambient clips (6 Aug remap)
 ├── UI/Sprites/            # GlassCard, Hail, Splats
 ├── Settings/              # URP pipeline assets
 ├── TextMesh Pro/          # Fonts, style sheets
@@ -441,6 +442,22 @@ def build_project_documentation():
         "Extension deadline confirmed for 6 August 2026."
     )
 
+    doc.add_heading("2.8 Phase 8: Resit Fix Pass and Final Hardening (3–6 August)", level=2)
+    doc.add_paragraph(
+        "Pre-submission audit pass fixed the broken core loop: colliders/layers on all "
+        "collectibles and bins, GameManager scoring/lives/win-condition rewrite, and full UI "
+        "rewiring via batch editor tools. A 21-test automated suite was added (EditMode + "
+        "PlayMode) behind assembly definitions."
+    )
+    doc.add_paragraph(
+        "Final hardening on 5–6 August made the environment self-contained (water + terrain "
+        "materials moved off the demo folder; the 4.2 GB TerrainDemoScene_URP demo was removed), "
+        "grounded the player on the flat terrain, added a storm wind-push consequence for wrong-bin "
+        "recycling, remapped all gameplay SFX to the curated Optimized clips, corrected the bin "
+        "acceptance types (all three prefabs were serialised as NatureRecycling), and cleaned up "
+        "the HUD. Three batch validation passes completed with exit 0 and clean compilation."
+    )
+
     # =====================================================================
     # 3. ARCHITECTURE EVOLUTION
     # =====================================================================
@@ -554,7 +571,8 @@ def build_project_documentation():
     add_bullet(doc, "Added PauseGame() and ResumeGame() methods to stop/resume timer")
     add_bullet(doc, "RestartGame() now resets Time.timeScale to 1f")
     add_bullet(doc, "All UI communication via C# events (OnGameStarted, OnGameOver, etc.)")
-    doc.add_paragraph("Final: 181 lines. Handles game state, lives, timer, recycling reporting, "
+    add_bullet(doc, "3 Aug rewrite: signed scoring via ReportRecycled, 12/8/4 per-category win objectives, lives only lost on negative scores")
+    doc.add_paragraph("Final: 324 lines. Handles game state, lives, timer, recycling reporting, "
                        "win/loss checks. Event-driven and decoupled from UI.")
 
     doc.add_heading("4.2 UIManager", level=2)
@@ -606,12 +624,13 @@ def build_project_documentation():
     add_bullet(doc, "Speed modifiers hardcoded")
     add_bullet(doc, "No public API for weather effects")
     doc.add_paragraph("Changes made:")
-    add_bullet(doc, "Split into PlayerMovement.cs (133 lines) and PlayerLook.cs (60 lines)")
+    add_bullet(doc, "Split into PlayerMovement.cs (190 lines) and PlayerLook.cs (83 lines)")
     add_bullet(doc, "Removed unused movement modes")
     add_bullet(doc, "Added SetSpeedModifier(float) public API for weather system")
+    add_bullet(doc, "Added SetWindPush(Vector3) — storm wrong-bin push applied via CharacterController")
     doc.add_paragraph(
-        "Final: Clean, focused components. PlayerMovement handles WASD, sprint, and jump. "
-        "PlayerLook handles mouse with sensitivity and invert-Y."
+        "Final: Clean, focused components. PlayerMovement handles WASD, sprint, jump, "
+        "and wind push. PlayerLook handles mouse with sensitivity and invert-Y."
     )
 
     doc.add_heading("4.5 Player Interaction", level=2)
@@ -637,23 +656,26 @@ def build_project_documentation():
     doc.add_paragraph("Problems:")
     add_bullet(doc, "No gameplay consequence for incorrect disposal")
     add_bullet(doc, "9-bin grid confusing for players")
+    add_bullet(doc, "Bin prefab serialised types all set to NatureRecycling (fixed 6 Aug)")
     doc.add_paragraph("Changes made:")
     add_bullet(doc, "PickupItem.cs: Item component with ItemType enum (Plant/Toy/Bottle)")
-    add_bullet(doc, "RecycleBinInteractable.cs: Bin component with BinType enum")
+    add_bullet(doc, "RecycleBinInteractable.cs: Bin component with BinType enum (Nature/Plastic/General)")
     add_bullet(doc, "3x3 acceptance matrix with point rewards and life penalties")
+    add_bullet(doc, "Storm wind-push penalty: wrong-bin recycling pushes the player away")
 
-    doc.add_paragraph("Acceptance Matrix:")
+    doc.add_paragraph("Acceptance Matrix (signed score per recycle; positive = correct):")
     add_table_from_data(
         doc,
-        ["Item / Bin", "Plant Bin", "Plastic Bin", "Toy Bin"],
+        ["Item / Bin", "Nature Recycling", "Plastic Recycling", "General Waste"],
         [
-            ["Plant", "Correct (+20 pts)", "Wrong (- life)", "Wrong (- life)"],
-            ["Toy", "Wrong (- life)", "Wrong (- life)", "Correct (+15 pts)"],
-            ["Bottle", "Wrong (- life)", "Correct (+10 pts)", "Wrong (- life)"],
+            ["Plant", "+20", "-45", "-20"],
+            ["Bottle", "-15", "+20", "+15"],
+            ["Toy", "-25", "-15", "+25"],
         ],
     )
     doc.add_paragraph(
-        "Chain bonus: 3+ consecutive plants = +40 bonus points."
+        "Correct recycles add the (positive) score; wrong recycles subtract it and cost a life. "
+        "Plant chain bonus: 2 consecutive correct plants = +40 bonus points."
     )
 
     doc.add_heading("4.7 Weather System", level=2)
@@ -683,8 +705,9 @@ def build_project_documentation():
         ],
     )
     doc.add_paragraph(
-        "Current issue: Weather transitions are not triggering reliably in all test scenarios. "
-        "This is likely a reference configuration issue in the Inspector."
+        "Weather feedback is triggered by proximity to bins and player recycling behaviour: "
+        "correct recycles calm the weather, wrong recycles escalate to a storm that physically "
+        "pushes the player away from the bin (max 3 m/s, ramped)."
     )
 
     doc.add_heading("4.8 Audio System", level=2)
@@ -693,10 +716,11 @@ def build_project_documentation():
         "No SFX, no footsteps."
     )
     doc.add_paragraph("Changes made:")
-    add_bullet(doc, "AudioManager.cs (116 lines): Dual-source ambient crossfade between sunny, rainy, thunder")
+    add_bullet(doc, "AudioManager.cs (159 lines): Dual-source ambient crossfade between sunny, rainy, thunder")
     add_bullet(doc, "SFX playback method for gameplay sounds")
-    add_bullet(doc, "PlayerFootstepAudio.cs (168 lines): Surface-based detection with 5s drying timer")
+    add_bullet(doc, "PlayerFootstepAudio.cs (202 lines): Surface-based detection with 5s drying timer")
     add_bullet(doc, "Splash ParticleSystem spawning on water surfaces")
+    add_bullet(doc, "6 Aug remap: all gameplay SFX (footsteps + bin success/error) reference the curated Sounds/Optimized clips")
     doc.add_paragraph("Total audio library: 19 clips (3 ambient + 13 SFX + 3 weather-specific)")
 
     doc.add_heading("4.9 HUD", level=2)
@@ -711,7 +735,8 @@ def build_project_documentation():
     add_bullet(doc, "Score popup system (3 popup GameObjects by item type)")
     add_bullet(doc, "Programmatic fallback text creation for missing references")
     add_bullet(doc, "Timer colour coding: white (>60s), yellow (30-60s), red (<30s)")
-    doc.add_paragraph("Final: 238 lines. Modern, event-driven HUD with fallback creation.")
+    add_bullet(doc, "6 Aug: HUD writes bare numeric values matching the static scene header labels")
+    doc.add_paragraph("Final: 273 lines. Modern, event-driven HUD with fallback creation.")
 
     doc.add_heading("4.10 Scene Management", level=2)
     doc.add_paragraph(
@@ -734,36 +759,36 @@ def build_project_documentation():
         doc,
         ["Category", "Script", "Lines", "Purpose"],
         [
-            ["Core", "GameManager", "181", "Game state, lives, timer, recycling"],
-            ["Core", "ScoreManager", "64", "Score tracking, high score"],
-            ["Core", "AudioManager", "116", "Dual-source ambient, SFX"],
-            ["Core", "AutoSpawner", "30", "Safety-net manager spawner"],
-            ["Player", "PlayerMovement", "133", "WASD, sprint, jump, speed API"],
-            ["Player", "PlayerLook", "60", "Mouse look, sensitivity"],
-            ["Player", "PlayerInteraction", "211", "Pickup/drop/throw"],
-            ["Player", "PlayerFootstepAudio", "168", "Surface-based footsteps"],
-            ["Player", "WeatherMovementEffect", "62", "Weather speed modifiers"],
-            ["Interaction", "PickupItem", "83", "Item type, physics"],
-            ["Interaction", "RecycleBinInteractable", "94", "Bin type, recycling trigger"],
-            ["UI", "UIManager", "224", "Panel state machine, input maps"],
-            ["UI", "HUDManager", "238", "Stats, announcements, popups"],
-            ["UI", "PauseMenuManager", "211", "Pause, settings, exit flow"],
-            ["UI", "WeatherUI", "120", "Weather display"],
-            ["UI", "InteractionPromptUI", "89", "Pickup/drop prompts"],
-            ["Weather", "WeatherState", "37", "Weather enum + events"],
-            ["Weather", "WeatherFeedbackSystem", "181", "Proximity detection"],
-            ["Weather", "WeatherEffects", "174", "VFX orchestration"],
-            ["Weather", "WeatherAnchorFollow", "19", "VFX follow player"],
-            ["Weather/Data", "WeatherEffectParameters", "32", "VFX config"],
-            ["Weather/Data", "SplashData", "17", "Splash config"],
-            ["Weather/Effects", "WindEffect", "67", "WindZone + particles"],
-            ["Weather/Effects", "CloudEffect", "34", "Cloud particles"],
-            ["Weather/Effects", "RainEffect", "30", "Rain particles"],
-            ["Weather/Effects", "SunnyEffect", "31", "Sun + god rays"],
-            ["Weather/Effects", "LightingEffect", "22", "Lightning wrapper"],
-            ["Weather/Effects", "LightingFlash", "57", "Random lightning"],
-            ["Weather/Effects", "SplashEffect", "30", "Splash particles"],
-            ["Weather/Effects", "SplashSpawner", "14", "Spawn splash prefabs"],
+            ["Core", "GameManager", "324", "Game state, lives, timer, recycling"],
+            ["Core", "ScoreManager", "103", "Score tracking, high score"],
+            ["Core", "AudioManager", "159", "Dual-source ambient, SFX"],
+            ["Core", "AutoSpawner", "47", "Safety-net manager spawner"],
+            ["Player", "PlayerMovement", "190", "WASD, sprint, jump, speed + wind push API"],
+            ["Player", "PlayerLook", "83", "Mouse look, sensitivity"],
+            ["Player", "PlayerInteraction", "261", "Pickup/drop/throw"],
+            ["Player", "PlayerFootstepAudio", "202", "Surface-based footsteps"],
+            ["Player", "WeatherMovementEffect", "92", "Weather speed modifiers"],
+            ["Interaction", "PickupItem", "125", "Item type, physics"],
+            ["Interaction", "RecycleBinInteractable", "132", "Bin type, recycling trigger"],
+            ["UI", "UIManager", "285", "Panel state machine, input maps"],
+            ["UI", "HUDManager", "273", "Stats, announcements, popups"],
+            ["UI", "PauseMenuManager", "236", "Pause, settings, exit flow"],
+            ["UI", "WeatherUI", "146", "Weather display"],
+            ["UI", "InteractionPromptUI", "116", "Pickup/drop prompts"],
+            ["Weather", "WeatherState", "75", "Weather enum + events"],
+            ["Weather", "WeatherFeedbackSystem", "260", "Proximity detection + storm wind push"],
+            ["Weather", "WeatherEffects", "220", "VFX orchestration"],
+            ["Weather", "WeatherAnchorFollow", "32", "VFX follow player"],
+            ["Weather/Data", "WeatherEffectParameters", "45", "VFX config"],
+            ["Weather/Data", "SplashData", "25", "Splash config"],
+            ["Weather/Effects", "WindEffect", "93", "WindZone + particles"],
+            ["Weather/Effects", "CloudEffect", "53", "Cloud particles"],
+            ["Weather/Effects", "RainEffect", "53", "Rain particles"],
+            ["Weather/Effects", "SunnyEffect", "54", "Sun + god rays"],
+            ["Weather/Effects", "LightingEffect", "40", "Lightning wrapper"],
+            ["Weather/Effects", "LightingFlash", "83", "Random lightning"],
+            ["Weather/Effects", "SplashEffect", "46", "Splash particles"],
+            ["Weather/Effects", "SplashSpawner", "27", "Spawn splash prefabs"],
         ],
     )
 
@@ -832,12 +857,10 @@ def build_project_documentation():
         doc,
         ["Issue", "Impact", "Workaround"],
         [
-            ["Weather transitions unreliable", "Weather VFX may not activate", "Check Inspector references on WeatherFeedbackSystem"],
-            ["HUDManager missing some TMP refs", "Fallback texts auto-generated, may be misplaced", "Wire missing references in Inspector"],
-            ["Jump occasionally non-functional", "Player cannot jump", "Likely ground check timing issue - reinvestigate"],
+            ["8 toy instances + WaterPlane stacked off-world", "Some toys unreachable until repositioned", "Reposition in Unity Editor before final play"],
+            ["Legacy RawAudio originals untracked", "Repo clone lacks raw sources", "Optimized clips are the referenced set; raw kept for provenance"],
             ["Audio volume inconsistent", "Some clips louder than others", "Manual volume adjustment in AudioSource clips"],
             ["Collectables spread wide", "Hard to find all items", "Increase game timer or reposition items"],
-            ["PauseMenu UI needs Editor setup", "Must run AutoSetupPauseMenu tool", "One-time setup per scene"],
             ["No post-processing volume", "Scene lacks aesthetic tuning", "Add URP Volume with bloom, tone mapping"],
         ],
     )
@@ -931,6 +954,46 @@ def build_project_documentation():
          "Assets/Scripts/UI/HUDManager.cs",
          "Crisp text; performance-efficient events; rich feedback; fallback creation.",
          "Some references must be manually wired in Inspector."),
+        ("Player Grounding Fix",
+         "CharacterController center moved from (0,1,0) to (0,0,0); groundMask widened from "
+         "80 to 81 so the ground check hits the terrain layers.",
+         "Player floated above the flat terrain and could not stand on it.",
+         "Assets/Scenes/Florance.unity",
+         "Feet flush with ground; jump and movement work on the play area.",
+         "None."),
+        ("Storm Wind Push",
+         "WeatherFeedbackSystem now ramps a MoveTowards push (max 3 m/s, 2.5 m/s^2) away from "
+         "a bin after a wrong recycle, applied via PlayerMovement.SetWindPush.",
+         "Wrong-bin recycling had no physical consequence; storm was purely visual.",
+         "Assets/Scripts/Weather/WeatherFeedbackSystem.cs, Assets/Scripts/Player/PlayerMovement.cs",
+         "Clear gameplay consequence for wrong disposal; makes storm meaningful.",
+         "Slightly more complex player controller API."),
+        ("Gameplay Audio Remap",
+         "Player footsteps (dry/run/wet) and all bin success/error SFX remapped to the curated "
+         "Sounds/Optimized clips (SFX_DryWalk, SFX_Running, SFX_WetWalk, SFX_Correct, SFX_Buzzer).",
+         "Gameplay SFX referenced legacy RawAudio originals.",
+         "Assets/Scenes/Florance.unity, Assets/Models/Prefabs/Bins/*.prefab",
+         "Consistent curated SFX; zero RawAudio references remain.",
+         "Optimized clips must be delivered with the repo."),
+        ("Bin Type Correction",
+         "All three bin prefabs were serialised as binType 0 (NatureRecycling); corrected to "
+         "GeneralWaste (2) and PlasticRecycling (1).",
+         "Plastic bottles/glass could never score; only plants were accepted anywhere.",
+         "Assets/Models/Prefabs/Bins/*.prefab",
+         "Acceptance matrix works as designed; verified against RecycleBinMatrixTests.",
+         "None."),
+        ("HUD Numeric Cleanup",
+         "HUD score/lives write bare values matching the static scene header labels.",
+         "HUD duplicated its own labels next to scene headers.",
+         "Assets/Scripts/UI/HUDManager.cs",
+         "Clean single label per stat.",
+         "None."),
+        ("Demo Folder Removal",
+         "Removed the 4.2 GB Assets/TerrainDemoScene_URP/ folder (git rm -r).",
+         "Game must build from tracked, self-contained assets only.",
+         "Assets/TerrainDemoScene_URP/** (deleted)",
+         "Zero demo-folder references remain; repository no longer depends on it.",
+         "None."),
     ]
 
     for title, what, why, files, benefits, tradeoffs in changes:
@@ -1063,7 +1126,7 @@ def build_test_log():
             ("Project:", "Eco Rescue FPS — SDG 12 Recycling Game"),
             ("Student:", "Matthew Jacob SD"),
             ("Student ID:", "[ID Placeholder]"),
-            ("Date:", "30 July 2026"),
+            ("Date:", "6 August 2026"),
         ],
     )
 
@@ -1101,6 +1164,12 @@ def build_test_log():
         "audio, UI) was tested individually in the Unity Editor play mode. The Unity "
         "Console was monitored for errors, warnings, and null reference exceptions "
         "during all testing sessions."
+    )
+    doc.add_paragraph(
+        "A 21-test automated suite (EditMode + PlayMode) verifies scoring, lives, win/loss "
+        "conditions, the bin acceptance matrix, and pause behaviour. Final hardening was "
+        "validated with three batch compile passes (exit 0, clean compilation) covering the "
+        "wind-push, audio remap, and HUD/bin-type changes."
     )
 
     doc.add_heading("2.2 Peer Testing", level=2)
@@ -1243,15 +1312,16 @@ def build_test_log():
 
     doc.add_heading("4.3 Weather System", level=2)
     doc.add_paragraph(
-        "Although the weather system has been largely implemented, it does not currently "
-        "operate as intended. Based on testing, the issue appears to be one of the following:"
+        "During early testing the weather system did not transition reliably. Investigation "
+        "found this was an Inspector configuration issue (missing/mis-assigned references in "
+        "WeatherFeedbackSystem). Following the 3 August fix pass the references were wired "
+        "and proximity detection validated in batch mode."
     )
-    add_bullet(doc, "An Inspector configuration problem (missing or mis-assigned references)")
-    add_bullet(doc, "Missing object references in the WeatherFeedbackSystem")
-    add_bullet(doc, "An underlying scripting issue preventing weather transitions from triggering")
     doc.add_paragraph(
-        "Given more development time, resolving the weather system would be the highest "
-        "priority as it represents the most visually impactful feature of the project."
+        "On 6 August the system was extended: wrong-bin recycling during a storm now "
+        "physically pushes the player away from the bin (max 3 m/s, ramped), giving the "
+        "weather state a direct gameplay consequence. Correct recycles calm the weather. "
+        "The system was re-validated across three clean batch compile passes."
     )
 
     doc.add_heading("4.4 Reliable Systems", level=2)
@@ -1306,10 +1376,11 @@ def build_test_log():
         "gameplay polish, environmental design, UI quality, and overall presentation."
     )
     doc.add_paragraph(
-        "Despite following tutorials and researching different implementations, I was "
-        "unable to fully integrate the weather system so that it reacted dynamically to "
-        "player recycling actions. The most successful aspect of the project remains the "
-        "implementation of the player movement and interaction systems."
+        "Following tutorials and researching different implementations, the weather system was "
+        "successfully integrated so that it reacts dynamically to player recycling actions "
+        "(correct recycles calm it, wrong recycles trigger a storm that pushes the player away). "
+        "The most successful aspects of the project remain the implementation of the player "
+        "movement and interaction systems, the recycling loop, and the dynamic weather feedback."
     )
 
     # =====================================================================
@@ -1329,24 +1400,24 @@ def build_test_log():
     add_bullet(doc, "Surface-based footstep audio")
 
     doc.add_heading("5.2 Partially Successful Systems", level=2)
-    add_bullet(doc, "Weather system — implemented but transitions not reliably triggering")
-    add_bullet(doc, "Jump — works in most cases but reported as non-functional by one tester")
-    add_bullet(doc, "Pause menu — scripted and functional but requires Editor tool setup per scene")
+    add_bullet(doc, "Weather system — fully wired on 3 Aug, extended with wind-push consequence on 6 Aug; validated in batch mode")
+    add_bullet(doc, "Jump — ground check fixed on 6 Aug (CharacterController center + groundMask 81)")
+    add_bullet(doc, "Pause menu — scripted and functional; requires Editor tool setup per scene")
 
     doc.add_heading("5.3 Known Bugs", level=2)
-    add_bullet(doc, "Weather transitions do not activate reliably")
-    add_bullet(doc, "Jump occasionally fails (ground check timing issue)")
+    add_bullet(doc, "8 toy instances + WaterPlane stacked off-world — needs repositioning in the Editor")
     add_bullet(doc, "Audio volume inconsistent between clips")
+    add_bullet(doc, "Optimized SFX clips are untracked in git — must be delivered with the submission")
 
     doc.add_heading("5.4 Remaining Limitations", level=2)
-    add_bullet(doc, "HUDManager has some missing TMP references — auto-generated fallbacks may be misplaced")
     add_bullet(doc, "Collectable objects are spread too far for the 5-minute timer")
     add_bullet(doc, "No post-processing volume for visual polish")
     add_bullet(doc, "Pause menu panels are generated programmatically without styled backgrounds")
+    add_bullet(doc, "Legacy RawAudio originals remain on disk (102 MB, untracked) as source provenance")
 
     doc.add_heading("5.5 Recommendations for Future Work", level=2)
     improvements = [
-        "Resolve weather system triggering and transitions as highest priority",
+        "Reposition the 8 stacked toy instances and WaterPlane in the Editor",
         "Improve environmental readability and player guidance",
         "Balance audio levels across all clips",
         "Increase game timer or reduce object spread distance",
@@ -1376,8 +1447,10 @@ def build_test_log():
     )
     doc.add_paragraph(
         "Peer testing identified three key areas requiring attention: weather system "
-        "reliability, audio balancing, and gameplay pacing. These issues have been "
-        "documented as known limitations with clear recommendations for future work."
+        "reliability, audio balancing, and gameplay pacing. The weather system has since "
+        "been fully wired and extended with a wind-push consequence for wrong recycles; "
+        "audio was remapped to a curated clip set; remaining issues are documented as "
+        "known limitations with clear recommendations for future work."
     )
     doc.add_paragraph(
         "Despite the challenges encountered — including equipment limitations, software "

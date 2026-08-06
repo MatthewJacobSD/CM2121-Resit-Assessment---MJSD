@@ -74,6 +74,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b62628e5407e1ad4388e991dc935f086, type: 3}
       insertIndex: -1
       addedObject: {fileID: 726782238567739607}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b62628e5407e1ad4388e991dc935f086, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -7075214230029899605}
   m_SourcePrefab: {fileID: 100100000, guid: b62628e5407e1ad4388e991dc935f086, type: 3}
 --- !u!1 &1866901679146852887 stripped
 GameObject:
@@ -120,7 +123,28 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PickupItem
   itemType: 2
-  itemName: PlasticBott;e
+  itemName: Plastic Bottle
   baseScore: 20
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
+--- !u!65 &-7075214230029899605
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1866901679146852887}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.5975876, y: 1.5658274, z: 0.58691406}
+  m_Center: {x: -0.007923126, y: 0.8223891, z: -0.03489685}

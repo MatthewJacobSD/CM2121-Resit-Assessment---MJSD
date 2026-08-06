@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 72676cc3a85b040438557236d4f13d6d, type: 3}
       propertyPath: m_Name
-      value: Dog_Plushie_03
+      value: WolfPlushie_03
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 72676cc3a85b040438557236d4f13d6d, type: 3}
       propertyPath: m_Layer
@@ -74,6 +74,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 72676cc3a85b040438557236d4f13d6d, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3673819526935203862}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 72676cc3a85b040438557236d4f13d6d, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5095441527707425539}
   m_SourcePrefab: {fileID: 100100000, guid: 72676cc3a85b040438557236d4f13d6d, type: 3}
 --- !u!1 &1671935308035277023 stripped
 GameObject:
@@ -124,3 +127,24 @@ MonoBehaviour:
   baseScore: 15
   dropVelocityDamping: 0.85
   disableColliderWhileHeld: 1
+--- !u!65 &-5095441527707425539
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671935308035277023}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.3747368, y: 0.706392, z: 1.0937}
+  m_Center: {x: 0.15136528, y: 0.39575598, z: -0.089378}

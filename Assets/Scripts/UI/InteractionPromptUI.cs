@@ -1,5 +1,5 @@
+using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// Shows contextual interaction prompts ("Press E to Pick Up", drop/warning
@@ -10,8 +10,8 @@ public class InteractionPromptUI : MonoBehaviour
     #region Serialized Fields
 
     [Header("References")]
-    [SerializeField] private Text promptText;
-    [SerializeField] private Text warningText;
+    [SerializeField] private TextMeshProUGUI promptText;
+    [SerializeField] private TextMeshProUGUI warningText;
 
     [Header("Settings")]
     [SerializeField] private float warningDuration = 2.5f;
@@ -36,8 +36,10 @@ public class InteractionPromptUI : MonoBehaviour
 
     private void Start()
     {
-        promptText.gameObject.SetActive(false);
-        warningText.gameObject.SetActive(false);
+        if (promptText != null)
+            promptText.gameObject.SetActive(false);
+        if (warningText != null)
+            warningText.gameObject.SetActive(false);
     }
 
     private void OnEnable()
@@ -67,7 +69,7 @@ public class InteractionPromptUI : MonoBehaviour
         if (warningTimer > 0)
         {
             warningTimer -= Time.deltaTime;
-            if (warningTimer <= 0)
+            if (warningTimer <= 0 && warningText != null)
                 warningText.gameObject.SetActive(false);
         }
     }
@@ -78,28 +80,33 @@ public class InteractionPromptUI : MonoBehaviour
 
     private void ShowPickupPrompt(PickupItem obj)
     {
+        if (promptText == null) return;
         promptText.text = "Press [E] to Pick Up";
         promptText.gameObject.SetActive(true);
     }
 
     private void HidePickupPrompt()
     {
+        if (promptText == null) return;
         promptText.gameObject.SetActive(false);
     }
 
     private void ShowDropPrompt(PickupItem obj)
     {
+        if (promptText == null) return;
         promptText.text = "Press [Q] to Drop / Hold & Throw";
         promptText.gameObject.SetActive(true);
     }
 
     private void HideDropPrompt()
     {
+        if (promptText == null) return;
         promptText.gameObject.SetActive(false);
     }
 
     private void ShowWarning(string message)
     {
+        if (warningText == null) return;
         warningText.text = message;
         warningText.gameObject.SetActive(true);
         warningTimer = warningDuration;

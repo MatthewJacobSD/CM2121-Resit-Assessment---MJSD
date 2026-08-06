@@ -1,8 +1,8 @@
-# CM2121 Eco Rescue FPS — User Testing Report
+# CM2121 ChainFragrance — User Testing Report
 
-**Project:** Eco Rescue FPS — SDG 12 Recycling Game  
-**Tester:** Matthew Jacob SD  
-**Date:** 30 July 2026
+**Project:** ChainFragrance — SDG 12 Recycling Game  
+**Tester:** Matthew Jacob SD (2506116)  
+**Date:** 6 August 2026 (updated)
 
 ---
 
@@ -104,13 +104,13 @@ The Pause Menu and redesigned HUD were introduced to improve gameplay clarity an
 
 ### Overall Reflection
 
-Although extensive testing and iteration were carried out, progress remained slower than anticipated. I am satisfied that I successfully produced a functional demonstration showcasing the core mechanics of the intended game. However, I am not satisfied with the overall quality of the final design, as it falls short of the original vision.
+After the final implementation pass, the weather system now reacts dynamically to player recycling behaviour with a 4-state progression (Sunny → Rain → Heavy Rain → Storm). The player grounding issue has been resolved, the bin types are correctly configured, and all gameplay audio uses the curated Optimized library.
 
-Development began approximately one month before submission. Given additional development time, the project could have been significantly improved in terms of gameplay polish, environmental design, UI quality and overall presentation.
-
-Despite following tutorials and researching different implementations, I was unable to fully integrate the weather system so that it reacted dynamically to player recycling actions.
-
-The most successful aspect of the project remains the implementation of the player movement and interaction systems.
+The most successful aspects of the project are:
+- Player movement and interaction systems
+- Dynamic weather system with progressive transitions
+- Recycling mechanics with correct acceptance matrix
+- Event-driven UI and HUD system
 
 ---
 
@@ -118,25 +118,15 @@ The most successful aspect of the project remains the implementation of the play
 
 | Issue | Impact | Status |
 |-------|--------|--------|
-| Weather system not triggering | Weather VFX and transitions do not activate | Needs debugging |
-| Jump not functional (some tests) | Player unable to jump in certain scenarios | Needs investigation |
-| Audio balancing inconsistent | Volume levels vary between clips | Needs adjustment |
-| Object placement spread too far | Exploration time exceeds game timer | Needs rebalancing |
-| HUD references incomplete in scene | Some text elements shown as fallback | Inspector wiring needed |
-| Pause Menu requires Editor setup | Must run Setup UI tool before use | One-time setup |
+| HUD scrolling not implemented | Content overflow not handled | Requires Unity Editor setup |
+| Audio volume slider uses global AudioListener | Per-source control not available | Minor UX issue |
+| 8 toy instances may need repositioning | Some items hard to reach | Editor adjustment |
+| Legacy ambient AudioSources on inactive objects | Console warnings only | No gameplay impact |
 
 ## Future Improvements & Recommendations
 
-- Resolve weather system triggering and transitions
-- Improve environmental readability and player guidance
-- Balance audio levels across all clips
-- Add additional environmental feedback
-- Improve objective guidance for players
+- Add HUD scrolling for content overflow
+- Implement per-source audio volume control
+- Add post-processing volume for visual polish
 - Refine UI animations and transitions
-- Increase environmental variety
-- Improve recycling feedback (particle effects, sounds)
-- Optimise object placement density
-- Continue refactoring scripts into a modular architecture
 - Perform broader playtesting with additional users
-- Optimise overall project performance
-- Improve visual polish and gameplay presentation

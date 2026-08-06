@@ -1,9 +1,10 @@
-# CM2121 Eco Rescue FPS — Project Audit
+# CM2121 ChainFragrance — Project Audit
 
-Verified audit of the FloranceOverflow project taken **3 August 2026** ahead of
+Verified audit of the ChainFragrance project taken **3 August 2026** ahead of
 the CM2121 resit submission (due 6 August 2026), with the **6 August final
-submission hardening** pass appended in §11. All facts below were verified
-by reading the actual project files on disk; nothing is assumed.
+submission hardening** and **weather system redesign** passes appended in §11-12.
+All facts below were verified by reading the actual project files on disk;
+nothing is assumed.
 
 ---
 
@@ -244,5 +245,57 @@ apply and verify with the two batch tools (`FixGameplayAssets.Run` /
 - Water shader polish review (visual polish optional).
 - Optional: delete unreferenced `New Terrain.asset` + `New Terrain 1/2/3.asset`
   and `Assets/Models/RawScans/` (all confirmed unreferenced).
-- Deliver the Optimized SFX assets (untracked) or commit them with the final
-  push.
+
+## 12. Weather system redesign (6 August)
+
+### Weather state machine
+
+4 states: `Sunny` → `Rain` → `HeavyRain` → `Storm`
+
+| State | Trigger | Audio | Wind | Player Speed |
+|-------|---------|-------|------|-------------|
+| Sunny | No item held | Silence | 2 m/s | 1.2x |
+| Rain | Near wrong bin (15m) | AMB_Rain.wav | 8 m/s | 0.75x |
+| HeavyRain | Closer to wrong bin (10m) | AMB_StrongRain.wav | 14 m/s | 0.6x |
+| Storm | Very close to wrong bin (6m) | AMB_Storm.wav | 8-20 m/s + push | 0.45-0.75x |
+
+### Key design decisions
+
+1. **No rain on item pickup** — weather stays sunny until player approaches a wrong bin
+2. **Progressive calming** — approaching a correct bin calms weather progressively
+3. **Wrong recycle feedback** — storm persists 2s after wrong recycle, then calms
+4. **Correct recycle** — immediate return to sunny
+5. **Wind push** — only active during storm, max 3 m/s, scales with intensity
+
+### Audio migration
+
+All gameplay audio now uses only the Optimized library:
+- StormyParams AudioSource: ThunderRain.wav → AMB_Storm.wav
+- RainyParams AudioSource: Raining.wav → AMB_Rain.wav
+- AudioManager: removed unused sunnyClip, cloudyClip, windyClip fields
+- AudioManager starts silent (weather system handles crossfade)
+- Crossfade handles null clips (fades to silence for sunny)
+
+### WeatherMovementEffect
+
+Added to Player GameObject and wired to WeatherFeedbackSystem:
+- Sunny: 1.2x speed (faster)
+- Rain: 0.75x speed
+- HeavyRain: 0.6x speed
+- Storm: 0.45-0.75x speed (scales with intensity)
+
+### Weather distances
+
+| Distance | State | Rationale |
+|----------|-------|-----------|
+| 15m | Rain begins | Early warning |
+| 10m | Heavy rain | Clear escalation |
+| 6m | Storm | Urgency, but retreat possible |
+| 5m | Correct bin cancel | Player is at the right place |
+
+### Validation
+
+- All 8 modified scripts compile (brace balance verified)
+- Scene YAML changes verified via GUID scan
+- Zero old RawAudio GUIDs in active gameplay
+- WeatherMovementEffect component added and wired

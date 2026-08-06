@@ -1,8 +1,8 @@
-# CM2121 Eco Rescue FPS — Game Rules
+# CM2121 ChainFragrance — Game Rules
 
 ## Overview
 
-Eco Rescue FPS is a first-person Unity game where the player collects photogrammetry-scanned plants, toys, and bottles, then throws them into a recycling bin within five minutes. Weather and movement speed react to eco-friendly vs polluting choices.
+ChainFragrance is a first-person Unity game where the player collects photogrammetry-scanned plants, toys, and bottles, then throws them into the correct recycling bin within five minutes. Weather and movement speed react dynamically to recycling behaviour.
 
 ---
 
@@ -12,12 +12,37 @@ Eco Rescue FPS is a first-person Unity game where the player collects photogramm
 |------|-------|
 | Time limit | 5 minutes |
 | Lives | 5 max |
-| Plant in bin | +10 points, +0.5 life (capped at 5) |
-| Toy in bin | −20 points, −0.5 life |
-| Bottle in bin | −5 points, −0.5 life |
-| Plant chain CRIT | +40 (pick up 2+ plants in a row without toys/bottles) |
-| Win | All plants in bin + score ≥ 1 + lives > 0 + time remaining |
-| Perfect win | All plants in bin + no toys or bottles in bin |
+| Plant in Nature bin | +20 points |
+| Bottle in Plastic bin | +20 points |
+| Toy in General Waste | +25 points |
+| Wrong recycle | Score penalty + lose 1 life |
+| Plant chain bonus | +40 (2+ consecutive correct plant recycles) |
+| Win | All category objectives met + time remaining |
+| Failure | Lives depleted or score drops below zero |
+
+---
+
+## Bin Acceptance Matrix
+
+| Item | Nature Recycling | Plastic Recycling | General Waste |
+|------|-----------------|-------------------|---------------|
+| Plant | +20 | -45 | -20 |
+| Bottle | -15 | +20 | +15 |
+| Toy | -25 | -15 | +25 |
+
+---
+
+## Weather System
+
+| Condition | Weather | Effect |
+|-----------|---------|--------|
+| No item held | Sunny | Speed 1.2x, no ambient audio |
+| Near wrong bin (15m) | Rain | Speed 0.75x, AMB_Rain.wav |
+| Closer to wrong bin (10m) | Heavy Rain | Speed 0.6x, AMB_StrongRain.wav |
+| Very close to wrong bin (6m) | Storm | Speed 0.45-0.75x, AMB_Storm.wav, wind push |
+| Near correct bin (5m) | Calm | Weather calms progressively |
+| Correct recycle | Sunny | Immediate return to calm |
+| Wrong recycle | Storm | 2s feedback, then calm |
 | Lose | Lives = 0, or time expires before all plants binned |
 
 ---

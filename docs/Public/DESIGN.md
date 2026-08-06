@@ -1,10 +1,11 @@
-# CM2121 Florance — Design Document
+# CM2121 ChainFragrance — Design Document
 
-**Student:** Matthew Jacob SD
+**Student:** Matthew Jacob SD (2506116)
+**University:** Robert Gordon University
 **Module:** CM2121 — 3D Reconstructive Techniques
 **SDG:** Goal 12 — Responsible Consumption & Production
 **Engine:** Unity 6 URP (6000.3.18f1)
-**Date:** 26 July 2026
+**Date:** 6 August 2026 (updated)
 
 ---
 
@@ -144,11 +145,25 @@ Welcome Screen -> Instructions Screen -> Gameplay (5 min)
                                      (Score + Restart button)
 ```
 
-### Proximity Weather Flow
+### Proximity Weather Flow (Redesigned 6 August)
+
 ```
-Not holding anything      -> Sunny (speed boost 1.2x)
-Holding item, no wrong bin nearby -> Rainy (speed 0.75x)
-Holding item near wrong bin -> Storm (heavy slow 0.45-0.75x + intensity)
+No item held → Sunny (no ambient audio, speed 1.2x)
+  ↓
+Item picked up → Stays sunny (no rain on pickup!)
+  ↓
+Approaching wrong bin (15m) → Light rain (AMB_Rain.wav, speed 0.75x)
+  ↓
+Closer to wrong bin (10m) → Heavy rain (AMB_StrongRain.wav, speed 0.6x)
+  ↓
+Very close (6m) → Storm (AMB_Storm.wav, speed 0.45-0.75x, wind push)
+  ↓
+Wrong recycle → Storm feedback (2s) → Heavy rain → Sunny
+  ↓
+Approaching correct bin → Calms progressively
+  ↓
+Correct recycle → Sunny immediately
+```
 ```
 
 ---
@@ -164,10 +179,12 @@ Holding item near wrong bin -> Storm (heavy slow 0.45-0.75x + intensity)
 - [x] Lives system (5 lives, lose on wrong bin)
 - [x] 5-minute countdown timer
 - [x] Game manager with win/lose conditions
-- [x] Proximity-based weather system (3 states, bin proximity detection)
-- [x] Weather VFX (rain particles, clouds, lightning, wind, storm overlay)
-- [x] Movement effects (sunny=1.2x, rainy=0.75x, stormy=0.45-0.75x)
+- [x] Proximity-based weather system (4 states: Sunny, Rain, HeavyRain, Storm)
+- [x] Weather VFX (rain particles, clouds, lightning, wind)
+- [x] Weather audio crossfade (Optimized library only)
 - [x] WindZone and wind particles configured per weather state
+- [x] WeatherMovementEffect (speed modifiers per weather state)
+- [x] Distance-based weather progression (15m/10m/6m thresholds)
 - [x] Footstep audio (surface-based: water=splashing, soil=sunny drying effect)
 - [x] Splash VFX on wet ground while walking
 - [x] AudioManager with ambient crossfade and SFX

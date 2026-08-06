@@ -1,22 +1,28 @@
-# CM2121 Eco Rescue FPS — Game Pitch
+# CM2121 ChainFragrance — Game Pitch
 
 **Module:** CM2121 — 3D Reconstructive Techniques
-**Project:** Eco Rescue FPS (Unity + photogrammetry scans)
-**SDG focus:** SDG 12 (Responsible Consumption), SDG 13 (Climate Action), SDG 15 (Life on Land)
+**Project:** ChainFragrance (Unity + photogrammetry scans)
+**Student:** Matthew Jacob SD (2506116)
+**University:** Robert Gordon University
+**SDG focus:** SDG 12 (Responsible Consumption & Production)
 
 ---
 
 ## Elevator Pitch
 
-The player starts with **0 points** and **no items collected**. Using a first-person controller, they explore a terrain scattered with **photogrammetry-scanned plants, toys, and plastic bottles**, navigating **randomly placed rocks** that cause a stumble or a full fall depending on rock size.
+The player starts with **0 points** and **5 lives**. Using a first-person controller, they explore a terrain scattered with **photogrammetry-scanned plants, toys, and plastic bottles**, navigating an open environment with dynamic weather.
 
-Collecting items changes the **weather**:
-- **Plants** → sunny skies and a **movement speed boost**
-- **Toys or bottles** → rainy weather and a **movement slow effect**
+**Weather reacts to recycling behaviour:**
+- **No item held** → Sunny, calm conditions
+- **Approaching wrong bin** → Rain begins, then heavy rain, then storm
+- **Wrong recycle** → Full storm with wind push away from the bin
+- **Correct recycle** → Sunny, calm restored
 
-The goal is to throw **all plants into a single recycling bin** within **5 minutes**, scoring at least **1 point** to win. Plants award **+10** each. Toys cost **-20** (tracked on the HUD). Bottles cost **-5**. Picking up plants **in sequence** without touching toys or bottles triggers a **+40 CRIT chain bonus**.
+The goal is to sort all items into the correct bins within **5 minutes**, earning points for correct recycles and losing lives for wrong ones. A **plant chain bonus** rewards consecutive correct plant recycling.
 
-The player can **walk, sprint, jump, crouch, slide, and dash** across the level. **Sound effects and visual feedback** (rain particles, weather lighting, UI messages) clarify actions and reinforce the environmental theme.
+**Controls:** WASD movement, mouse look, E to pick up, Q to drop, throw while aiming.
+
+**Technologies:** Unity 6 URP, New Input System, TextMesh Pro, dual-source audio crossfade, 21 automated tests.
 
 This demo teaches that **respecting the environment keeps nature healthy (sunny)**, while **careless waste choices cause pollution (rainy)** — aligning with UN Sustainable Development Goals for responsible consumption and climate awareness.
 

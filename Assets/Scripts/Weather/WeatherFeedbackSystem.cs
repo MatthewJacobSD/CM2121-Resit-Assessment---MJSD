@@ -1,8 +1,14 @@
 using UnityEngine;
 
 /// <summary>
-/// Reacts to gameplay (carrying items near the wrong bin) by shifting the
-/// weather to rain or storm, simulating environmental consequences.
+/// Drives weather transitions based on gameplay:
+/// - Sunny when no item held
+/// - Stays sunny when picking up an item
+/// - Light rain when approaching a wrong bin
+/// - Heavy rain when closer to a wrong bin
+/// - Storm on wrong recycle (with wind push)
+/// - Progressive calming when approaching a correct bin
+/// - Sunny on correct recycle
 /// </summary>
 public class WeatherFeedbackSystem : MonoBehaviour
 {
@@ -19,8 +25,12 @@ public class WeatherFeedbackSystem : MonoBehaviour
     [Header("Bin Detection")]
     [Tooltip("Radius in which bins are considered when carrying an item.")]
     [SerializeField] private float binDetectionRadius = 15f;
-    [Tooltip("Distance to a wrong bin that triggers a full storm.")]
-    [SerializeField] private float stormActivationRadius = 8f;
+    [Tooltip("Distance at which light rain begins.")]
+    [SerializeField] private float rainStartRadius = 15f;
+    [Tooltip("Distance at which heavy rain begins.")]
+    [SerializeField] private float heavyRainRadius = 10f;
+    [Tooltip("Distance at which storm begins.")]
+    [SerializeField] private float stormRadius = 6f;
     [SerializeField] private LayerMask binLayer;
 
     [Header("Wind Push")]
@@ -28,7 +38,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
     [SerializeField] private float maxWindPushSpeed = 3f;
     [Tooltip("How quickly the wind push ramps up/down (m/s per second).")]
     [SerializeField] private float windPushRampSpeed = 2.5f;
-    [Tooltip("If a correct bin is within this distance, cancel wind push entirely (player is at the right place).")]
+    [Tooltip("If a correct bin is within this distance, cancel wind push entirely.")]
     [SerializeField] private float correctBinPushCancelRadius = 5f;
 
     [Header("Transition")]
@@ -109,41 +119,25 @@ public class WeatherFeedbackSystem : MonoBehaviour
             // If player dropped/lost the item during cooldown, calm immediately.
             if (heldItem == null)
             {
-                wrongRecycleStormTimer = 0f;
-                currentStormIntensity = 0f;
-                ApplyStormIntensity(0f);
-                weatherState.SetSunny();
-                weatherEffects?.SetWeather(WeatherState.State.Sunny);
-                windEffect?.SetWeatherState(WeatherState.State.Sunny);
-                RampWindPush(Vector3.zero);
+                CalmToSunny();
                 return;
             }
 
-            // Storm cooldown expired — calm.
+            // Storm cooldown expired — transition to heavy rain, then calm.
             if (wrongRecycleStormTimer <= 0f)
             {
+                EnsureState(WeatherState.State.HeavyRain);
                 currentStormIntensity = 0f;
                 ApplyStormIntensity(0f);
-                weatherState.SetSunny();
-                weatherEffects?.SetWeather(WeatherState.State.Sunny);
-                windEffect?.SetWeatherState(WeatherState.State.Sunny);
             }
             RampWindPush(Vector3.zero);
             return;
         }
 
-        // No item held (or not playing): calm the storm back to zero.
+        // No item held (or not playing): calm back to sunny.
         if (heldItem == null || !GameManager.Instance.IsPlaying)
         {
-            if (currentStormIntensity > 0f)
-            {
-                currentStormIntensity = 0f;
-                weatherEffects?.SetStormIntensity(0f);
-                windEffect?.SetStormIntensity(0f);
-                weatherMovementEffect?.SetStormIntensity(0f);
-            }
-
-            RampWindPush(Vector3.zero);
+            CalmToSunny();
             return;
         }
 
@@ -152,7 +146,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
 
     #endregion
 
-    #region Storm Proximity Logic
+    #region Weather Proximity Logic
 
     private void EvaluateBinProximity()
     {
@@ -185,40 +179,37 @@ public class WeatherFeedbackSystem : MonoBehaviour
                     nearestWrongBinDistance = dist;
                     nearestWrongBinPosition = col.transform.position;
                 }
-
                 foundAnyBin = true;
             }
         }
 
-        // No wrong bins around: mild rain while carrying an item.
+        // No wrong bins around: weather stays sunny while carrying an item.
         if (!foundAnyBin)
         {
-            EnsureState(WeatherState.State.Rainy);
-            currentStormIntensity = 0f;
-            ApplyStormIntensity(0f);
-            RampWindPush(Vector3.zero);
+            CalmToSunny();
             return;
         }
 
-        // If the player is close to a correct bin, cancel all push — they're at the right place.
+        // If the player is close to a correct bin, calm down — they're at the right place.
         if (nearestCorrectBinDistance <= correctBinPushCancelRadius)
         {
-            EnsureState(WeatherState.State.Rainy);
+            EnsureState(WeatherState.State.Sunny);
             currentStormIntensity = 0f;
             ApplyStormIntensity(0f);
             RampWindPush(Vector3.zero);
             return;
         }
 
-        // Storm strength scales with how close the nearest wrong bin is.
-        if (nearestWrongBinDistance <= stormActivationRadius)
+        // Progressive weather based on distance to nearest wrong bin.
+        if (nearestWrongBinDistance <= stormRadius)
         {
-            float normalizedDistance = 1f - (nearestWrongBinDistance / stormActivationRadius);
+            // Close to wrong bin: storm.
+            float normalizedDistance = 1f - (nearestWrongBinDistance / stormRadius);
             currentStormIntensity = Mathf.Clamp01(normalizedDistance);
             EnsureState(WeatherState.State.Stormy);
             ApplyStormIntensity(currentStormIntensity);
 
-            // Gradual wind push away from the wrong bin, scaled by storm strength.
+            // Wind push away from the wrong bin, scaled by storm strength.
             Vector3 away = player.position - nearestWrongBinPosition;
             away.y = 0f;
             if (away.sqrMagnitude > 0.01f)
@@ -226,12 +217,26 @@ public class WeatherFeedbackSystem : MonoBehaviour
             else
                 RampWindPush(Vector3.zero);
         }
-        else
+        else if (nearestWrongBinDistance <= heavyRainRadius)
         {
+            // Medium distance: heavy rain.
+            EnsureState(WeatherState.State.HeavyRain);
             currentStormIntensity = 0f;
-            EnsureState(WeatherState.State.Rainy);
             ApplyStormIntensity(0f);
             RampWindPush(Vector3.zero);
+        }
+        else if (nearestWrongBinDistance <= rainStartRadius)
+        {
+            // Far from wrong bin: light rain.
+            EnsureState(WeatherState.State.Rainy);
+            currentStormIntensity = 0f;
+            ApplyStormIntensity(0f);
+            RampWindPush(Vector3.zero);
+        }
+        else
+        {
+            // Too far from any wrong bin: sunny.
+            CalmToSunny();
         }
     }
 
@@ -244,6 +249,17 @@ public class WeatherFeedbackSystem : MonoBehaviour
             windEffect?.SetWeatherState(target);
             cooldownTimer = stormCooldown;
         }
+    }
+
+    private void CalmToSunny()
+    {
+        if (currentStormIntensity > 0f || weatherState.GetCurrentState() != WeatherState.State.Sunny)
+        {
+            currentStormIntensity = 0f;
+            ApplyStormIntensity(0f);
+            EnsureState(WeatherState.State.Sunny);
+        }
+        RampWindPush(Vector3.zero);
     }
 
     private void ApplyStormIntensity(float intensity)
@@ -271,7 +287,8 @@ public class WeatherFeedbackSystem : MonoBehaviour
     private void OnPickedUp(PickupItem item)
     {
         heldItem = item;
-        EnsureState(WeatherState.State.Rainy);
+        // Weather stays sunny — rain only starts when approaching a wrong bin.
+        currentStormIntensity = 0f;
         ApplyStormIntensity(0f);
         RampWindPush(Vector3.zero);
     }
@@ -279,30 +296,24 @@ public class WeatherFeedbackSystem : MonoBehaviour
     private void OnDropped()
     {
         heldItem = null;
-        currentStormIntensity = 0f;
-        ApplyStormIntensity(0f);
-        weatherState.SetSunny();
-        weatherEffects?.SetWeather(WeatherState.State.Sunny);
-        windEffect?.SetWeatherState(WeatherState.State.Sunny);
-        RampWindPush(Vector3.zero);
+        CalmToSunny();
     }
 
     private void OnItemProcessed(bool isCorrect)
     {
         heldItem = null;
-        currentStormIntensity = 0f;
-        ApplyStormIntensity(0f);
-        RampWindPush(Vector3.zero);
 
         if (isCorrect)
         {
-            weatherState.SetSunny();
-            weatherEffects?.SetWeather(WeatherState.State.Sunny);
-            windEffect?.SetWeatherState(WeatherState.State.Sunny);
+            // Correct recycle: sunny immediately.
+            CalmToSunny();
         }
         else
         {
-            // Wrong recycle: keep storm active briefly as environmental feedback.
+            // Wrong recycle: storm feedback, then calm.
+            currentStormIntensity = 1f;
+            ApplyStormIntensity(1f);
+            EnsureState(WeatherState.State.Stormy);
             wrongRecycleStormTimer = wrongRecycleStormDuration;
         }
     }

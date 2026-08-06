@@ -80,7 +80,7 @@ public class WeatherMovementEffect : MonoBehaviour
         {
             WeatherState.State.Sunny => sunnySpeedMultiplier,
             WeatherState.State.Rainy => rainySpeedMultiplier,
-            // Interpolate storm speed from max (calm) down to min (full strength).
+            WeatherState.State.HeavyRain => Mathf.Lerp(rainySpeedMultiplier, stormySpeedMax, 0.5f),
             WeatherState.State.Stormy => Mathf.Lerp(stormySpeedMax, stormySpeedMin, currentStormIntensity),
             _ => 1.0f
         };

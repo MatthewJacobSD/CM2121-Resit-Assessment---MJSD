@@ -3,7 +3,7 @@ using UnityEngine;
 
 /// <summary>
 /// Drives weather visuals and audio: applies per-state effect settings, lerps
-/// transitions, controls the storm overlay and crossfades ambient audio.
+/// transitions, and crossfades ambient audio between weather states.
 /// </summary>
 public class WeatherEffects : MonoBehaviour
 {
@@ -26,16 +26,15 @@ public class WeatherEffects : MonoBehaviour
     [Header("Weather Parameters")]
     [SerializeField] private WeatherEffectParameters sunnyParameters;
     [SerializeField] private WeatherEffectParameters rainyParameters;
+    [SerializeField] private WeatherEffectParameters heavyRainParameters;
     [SerializeField] private WeatherEffectParameters stormyParameters;
 
     [Header("Ambient Audio")]
+    [Tooltip("No clip assigned — sunny has no ambient weather audio.")]
     [SerializeField] private AudioClip sunnyAmbient;
     [SerializeField] private AudioClip rainyAmbient;
+    [SerializeField] private AudioClip heavyRainAmbient;
     [SerializeField] private AudioClip stormyAmbient;
-
-    [Header("Storm Overlay")]
-    [SerializeField] private GameObject stormOverlay;
-    [SerializeField] private CanvasGroup stormOverlayAlpha;
 
     [Header("Transition")]
     [SerializeField] private float transitionDuration = 2f;
@@ -43,7 +42,6 @@ public class WeatherEffects : MonoBehaviour
     [Header("Storm Intensity Ranges")]
     [SerializeField] private float rainMinIntensity = 200f;
     [SerializeField] private float rainMaxIntensity = 800f;
-    [SerializeField] private float stormOverlayMaxAlpha = 0.35f;
     [SerializeField] private float lightningActivationThreshold = 0.6f;
 
     #endregion
@@ -76,19 +74,12 @@ public class WeatherEffects : MonoBehaviour
     }
 
     /// <summary>
-    /// Adjusts storm strength (0-1), updating rain, lightning and the overlay
+    /// Adjusts storm strength (0-1), updating rain and lightning
     /// without triggering a full weather-state transition.
     /// </summary>
     public void SetStormIntensity(float intensity)
     {
         currentStormIntensity = Mathf.Clamp01(intensity);
-
-        // A storm that begins via proximity needs the stormy effects enabled.
-        if (currentState != WeatherState.State.Stormy && currentStormIntensity > 0f)
-        {
-            ApplyImmediateEffects(WeatherState.State.Stormy);
-            PlayAmbientAudio(WeatherState.State.Stormy);
-        }
 
         if (rainEffect != null)
         {
@@ -98,8 +89,6 @@ public class WeatherEffects : MonoBehaviour
 
         if (lightingEffect != null)
             lightingEffect.SetActive(currentStormIntensity >= lightningActivationThreshold);
-
-        SetStormOverlay(currentStormIntensity);
     }
 
     #endregion
@@ -160,7 +149,6 @@ public class WeatherEffects : MonoBehaviour
                 rainEffect?.SetActive(false);
                 rainEffect?.SetIntensity(0f);
                 lightingEffect?.SetActive(false);
-                SetStormOverlay(0f);
                 break;
 
             case WeatherState.State.Rainy:
@@ -169,7 +157,14 @@ public class WeatherEffects : MonoBehaviour
                 rainEffect?.SetActive(true);
                 rainEffect?.SetIntensity(rainMinIntensity);
                 lightingEffect?.SetActive(false);
-                SetStormOverlay(0f);
+                break;
+
+            case WeatherState.State.HeavyRain:
+                sunnyEffect?.SetActive(false);
+                cloudEffect?.SetCloudy(true);
+                rainEffect?.SetActive(true);
+                rainEffect?.SetIntensity(Mathf.Lerp(rainMinIntensity, rainMaxIntensity, 0.5f));
+                lightingEffect?.SetActive(false);
                 break;
 
             case WeatherState.State.Stormy:
@@ -178,26 +173,7 @@ public class WeatherEffects : MonoBehaviour
                 rainEffect?.SetActive(true);
                 rainEffect?.SetIntensity(Mathf.Lerp(rainMinIntensity, rainMaxIntensity, currentStormIntensity));
                 lightingEffect?.SetActive(currentStormIntensity >= lightningActivationThreshold);
-                SetStormOverlay(currentStormIntensity);
                 break;
-        }
-    }
-
-    private void SetStormOverlay(float intensity)
-    {
-        if (stormOverlay == null) return;
-
-        if (intensity > 0f)
-        {
-            stormOverlay.SetActive(true);
-            if (stormOverlayAlpha != null)
-                stormOverlayAlpha.alpha = Mathf.Lerp(0f, stormOverlayMaxAlpha, intensity);
-        }
-        else
-        {
-            if (stormOverlayAlpha != null)
-                stormOverlayAlpha.alpha = 0f;
-            stormOverlay.SetActive(false);
         }
     }
 
@@ -211,11 +187,16 @@ public class WeatherEffects : MonoBehaviour
         {
             WeatherState.State.Sunny => sunnyAmbient,
             WeatherState.State.Rainy => rainyAmbient,
+            WeatherState.State.HeavyRain => heavyRainAmbient,
             WeatherState.State.Stormy => stormyAmbient,
             _ => sunnyAmbient
         };
+
+        // Sunny has no ambient weather audio — crossfade to silence.
         if (clip != null)
             AudioManager.Instance?.CrossfadeAmbient(clip);
+        else
+            AudioManager.Instance?.CrossfadeAmbient(null);
     }
 
     #endregion
@@ -228,6 +209,7 @@ public class WeatherEffects : MonoBehaviour
         {
             WeatherState.State.Sunny => sunnyParameters,
             WeatherState.State.Rainy => rainyParameters,
+            WeatherState.State.HeavyRain => heavyRainParameters ?? rainyParameters,
             WeatherState.State.Stormy => stormyParameters,
             _ => sunnyParameters
         };

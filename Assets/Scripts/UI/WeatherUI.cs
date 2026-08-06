@@ -72,6 +72,7 @@ public class WeatherUI : MonoBehaviour
             {
                 WeatherState.State.Sunny => sunnyIcon,
                 WeatherState.State.Rainy => rainyIcon,
+                WeatherState.State.HeavyRain => rainyIcon,
                 WeatherState.State.Stormy => stormyIcon,
                 _ => sunnyIcon
             };
@@ -108,6 +109,7 @@ public class WeatherUI : MonoBehaviour
         {
             WeatherState.State.Sunny => "\u2600\uFE0F",
             WeatherState.State.Rainy => "\uD83C\uDF27\uFE0F",
+            WeatherState.State.HeavyRain => "\uD83C\uDF27\uFE0F",
             WeatherState.State.Stormy => "\u26C8\uFE0F",
             _ => "\u2600\uFE0F"
         };

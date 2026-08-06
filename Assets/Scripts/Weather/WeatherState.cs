@@ -12,6 +12,7 @@ public class WeatherState : MonoBehaviour
     {
         Sunny,
         Rainy,
+        HeavyRain,
         Stormy
     }
 
@@ -64,6 +65,9 @@ public class WeatherState : MonoBehaviour
 
     /// <summary>Sets the weather to rainy.</summary>
     public void SetRainy() => SetWeather(State.Rainy);
+
+    /// <summary>Sets the weather to heavy rain.</summary>
+    public void SetHeavyRain() => SetWeather(State.HeavyRain);
 
     /// <summary>Sets the weather to stormy.</summary>
     public void SetStormy() => SetWeather(State.Stormy);

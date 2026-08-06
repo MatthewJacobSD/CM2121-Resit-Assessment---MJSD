@@ -48,6 +48,7 @@ public class WindEffect : MonoBehaviour
         {
             WeatherState.State.Sunny => sunnyWindSpeed,
             WeatherState.State.Rainy => rainyWindSpeed,
+            WeatherState.State.HeavyRain => Mathf.Lerp(rainyWindSpeed, stormyWindSpeedMin, 0.5f),
             WeatherState.State.Stormy => Mathf.Lerp(stormyWindSpeedMin, stormyWindSpeedMax, currentStormIntensity),
             _ => 2f
         };

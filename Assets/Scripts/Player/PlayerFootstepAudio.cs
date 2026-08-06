@@ -188,7 +188,7 @@ public class PlayerFootstepAudio : MonoBehaviour
         if (weatherState != null)
         {
             WeatherState.State state = weatherState.GetCurrentState();
-            if (state == WeatherState.State.Rainy || state == WeatherState.State.Stormy)
+            if (state == WeatherState.State.Rainy || state == WeatherState.State.HeavyRain || state == WeatherState.State.Stormy)
                 return true;
         }
 

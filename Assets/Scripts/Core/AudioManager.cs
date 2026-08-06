@@ -10,9 +10,6 @@ public class AudioManager : MonoBehaviour
     #region Serialized Fields
 
     [Header("Ambient Audio")]
-    [SerializeField] private AudioClip sunnyClip;
-    [SerializeField] private AudioClip cloudyClip;
-    [SerializeField] private AudioClip windyClip;
     [SerializeField] private AudioClip rainyClip;
     [SerializeField] private AudioClip stormyClip;
 
@@ -66,12 +63,7 @@ public class AudioManager : MonoBehaviour
 
     private void Start()
     {
-        if (sunnyClip != null)
-        {
-            ambientSourceA.clip = sunnyClip;
-            ambientSourceA.volume = ambientVolume;
-            ambientSourceA.Play();
-        }
+        // Start with silent ambient — weather system will crossfade to the appropriate clip.
     }
 
     #endregion
@@ -134,19 +126,35 @@ public class AudioManager : MonoBehaviour
 
     private IEnumerator CrossfadeCoroutine(AudioClip newClip)
     {
-        // Fade out the source that is currently playing, fade in the other.
+        // Fade out the source that is currently playing.
         AudioSource fadeOut = ambientSourceA.isPlaying ? ambientSourceA : ambientSourceB;
         AudioSource fadeIn = fadeOut == ambientSourceA ? ambientSourceB : ambientSourceA;
+
+        // If newClip is null (sunny = silence), just fade out.
+        if (newClip == null)
+        {
+            float elapsed = 0f;
+            while (elapsed < crossfadeDuration)
+            {
+                elapsed += Time.deltaTime;
+                float t = elapsed / crossfadeDuration;
+                fadeOut.volume = Mathf.Lerp(ambientVolume, 0f, t);
+                yield return null;
+            }
+            fadeOut.Stop();
+            fadeOut.volume = 0f;
+            yield break;
+        }
 
         fadeIn.clip = newClip;
         fadeIn.volume = 0f;
         fadeIn.Play();
 
-        float elapsed = 0f;
-        while (elapsed < crossfadeDuration)
+        float elapsed2 = 0f;
+        while (elapsed2 < crossfadeDuration)
         {
-            elapsed += Time.deltaTime;
-            float t = elapsed / crossfadeDuration;
+            elapsed2 += Time.deltaTime;
+            float t = elapsed2 / crossfadeDuration;
             fadeOut.volume = Mathf.Lerp(ambientVolume, 0f, t);
             fadeIn.volume = Mathf.Lerp(0f, ambientVolume, t);
             yield return null;

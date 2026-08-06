@@ -105,17 +105,28 @@ public class WeatherFeedbackSystem : MonoBehaviour
         if (wrongRecycleStormTimer > 0f)
         {
             wrongRecycleStormTimer -= Time.deltaTime;
+
+            // If player dropped/lost the item during cooldown, calm immediately.
+            if (heldItem == null)
+            {
+                wrongRecycleStormTimer = 0f;
+                currentStormIntensity = 0f;
+                ApplyStormIntensity(0f);
+                weatherState.SetSunny();
+                weatherEffects?.SetWeather(WeatherState.State.Sunny);
+                windEffect?.SetWeatherState(WeatherState.State.Sunny);
+                RampWindPush(Vector3.zero);
+                return;
+            }
+
+            // Storm cooldown expired — calm.
             if (wrongRecycleStormTimer <= 0f)
             {
-                // Storm cooldown expired — calm to rainy if no item held.
-                if (heldItem == null)
-                {
-                    currentStormIntensity = 0f;
-                    ApplyStormIntensity(0f);
-                    weatherState.SetSunny();
-                    weatherEffects?.SetWeather(WeatherState.State.Sunny);
-                    windEffect?.SetWeatherState(WeatherState.State.Sunny);
-                }
+                currentStormIntensity = 0f;
+                ApplyStormIntensity(0f);
+                weatherState.SetSunny();
+                weatherEffects?.SetWeather(WeatherState.State.Sunny);
+                windEffect?.SetWeatherState(WeatherState.State.Sunny);
             }
             RampWindPush(Vector3.zero);
             return;

@@ -59,14 +59,6 @@ public class WeatherEffects : MonoBehaviour
 
     #endregion
 
-    #region Private Fields
-
-    private WeatherState.State currentState;
-    private Coroutine transitionRoutine;
-    private float currentStormIntensity;
-
-    #endregion
-
     #region Public Methods
 
     /// <summary>Applies the visual effects and ambient audio for a weather state.</summary>

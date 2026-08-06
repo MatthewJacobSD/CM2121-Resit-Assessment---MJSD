@@ -48,6 +48,8 @@ public class ScoreManager : MonoBehaviour
         }
 
         Instance = this;
+        if (transform.root == transform)
+            DontDestroyOnLoad(gameObject);
         LoadHighScore();
     }
 

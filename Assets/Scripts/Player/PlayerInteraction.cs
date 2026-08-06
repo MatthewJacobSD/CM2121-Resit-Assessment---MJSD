@@ -229,6 +229,7 @@ public class PlayerInteraction : MonoBehaviour
 
         currentHeldObject = null;
         isAiming = false;
+        currentThrowForce = throwForce;
         AudioManager.Instance?.PlayDropSFX();
         OnObjectDropped?.Invoke();
     }

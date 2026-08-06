@@ -40,6 +40,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float groundDistance = 0.2f;
     [SerializeField] private LayerMask groundMask;
 
+    [Header("Wind Push")]
+    [Tooltip("How quickly wind push decays toward zero when no external push is applied.")]
+    [SerializeField] private float windPushRampSpeed = 4f;
+
     #endregion
 
     #region Private Fields
@@ -161,6 +165,9 @@ public class PlayerMovement : MonoBehaviour
         currentMovement = moveInput.sqrMagnitude > MoveInputThreshold
             ? Vector3.MoveTowards(currentMovement, inputDirection, currentAccel * Time.deltaTime)
             : Vector3.MoveTowards(currentMovement, Vector3.zero, deceleration * Time.deltaTime);
+
+        // Auto-decay wind push so it never persists indefinitely.
+        windPush = Vector3.MoveTowards(windPush, Vector3.zero, windPushRampSpeed * Time.deltaTime);
 
         Vector3 finalMovement = currentMovement * targetSpeed + Vector3.up * velocity.y + windPush;
         controller.Move(finalMovement * Time.deltaTime);

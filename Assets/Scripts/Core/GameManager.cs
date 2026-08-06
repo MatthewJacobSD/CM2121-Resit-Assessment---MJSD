@@ -255,7 +255,8 @@ public class GameManager : MonoBehaviour
     {
         consecutivePlants++;
 
-        if (consecutivePlants == chainThreshold)
+        // Fire bonus every chainThreshold consecutive correct plant recycles.
+        if (consecutivePlants >= chainThreshold && consecutivePlants % chainThreshold == 0)
         {
             if (ScoreManager.Instance != null)
                 ScoreManager.Instance.AddScore(chainBonus);

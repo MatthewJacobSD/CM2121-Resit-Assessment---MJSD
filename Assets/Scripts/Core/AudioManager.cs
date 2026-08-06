@@ -59,6 +59,8 @@ public class AudioManager : MonoBehaviour
         }
 
         Instance = this;
+        if (transform.root == transform)
+            DontDestroyOnLoad(gameObject);
         SetupAudioSources();
     }
 

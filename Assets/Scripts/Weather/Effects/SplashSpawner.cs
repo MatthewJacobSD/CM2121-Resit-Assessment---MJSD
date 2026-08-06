@@ -21,6 +21,7 @@ public class SplashSpawner : MonoBehaviour
 
         SplashEffect splash = Instantiate(splashPrefab, position, Quaternion.identity);
         splash.PlaySplash(position, data);
+        Destroy(splash.gameObject, data.lifetime + 0.5f);
     }
 
     #endregion

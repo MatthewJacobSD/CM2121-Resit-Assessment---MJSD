@@ -46,10 +46,15 @@ public class PauseMenuManager : MonoBehaviour
     {
         uiManagers = FindFirstObjectByType<UIManager>();
 
+        // Apply saved volume on load.
+        float savedVolume = PlayerPrefs.GetFloat(VolumeKey, 1f);
+        AudioListener.volume = savedVolume;
+
         if (volumeSlider != null)
         {
             volumeSlider.minValue = 0f;
             volumeSlider.maxValue = 1f;
+            volumeSlider.value = savedVolume;
             volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
         }
 

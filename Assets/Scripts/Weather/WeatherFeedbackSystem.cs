@@ -28,6 +28,8 @@ public class WeatherFeedbackSystem : MonoBehaviour
     [SerializeField] private float maxWindPushSpeed = 3f;
     [Tooltip("How quickly the wind push ramps up/down (m/s per second).")]
     [SerializeField] private float windPushRampSpeed = 2.5f;
+    [Tooltip("If a correct bin is within this distance, cancel wind push entirely (player is at the right place).")]
+    [SerializeField] private float correctBinPushCancelRadius = 5f;
 
     [Header("Transition")]
     [Tooltip("Cooldown between weather changes to avoid rapid flickering.")]
@@ -156,6 +158,16 @@ public class WeatherFeedbackSystem : MonoBehaviour
 
         // No wrong bins around: mild rain while carrying an item.
         if (!foundAnyBin)
+        {
+            EnsureState(WeatherState.State.Rainy);
+            currentStormIntensity = 0f;
+            ApplyStormIntensity(0f);
+            RampWindPush(Vector3.zero);
+            return;
+        }
+
+        // If the player is close to a correct bin, cancel all push — they're at the right place.
+        if (nearestCorrectBinDistance <= correctBinPushCancelRadius)
         {
             EnsureState(WeatherState.State.Rainy);
             currentStormIntensity = 0f;

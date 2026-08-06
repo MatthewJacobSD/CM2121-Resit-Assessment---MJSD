@@ -108,3 +108,17 @@ InitTestScene*.unity*
 
 # Documentation folder (local only, not committed)
 docs/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Word lock files
+output/~$*
+
+# Raw audio originals (not used in-game, 102MB)
+Assets/Sounds/RawAudio/
+
+# Unreferenced terrain duplicates
+Assets/New\ Terrain\ 2.asset*
+Assets/New\ Terrain\ 3.asset*

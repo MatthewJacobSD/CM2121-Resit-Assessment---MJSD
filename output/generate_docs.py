@@ -93,8 +93,8 @@ def create_cover_page(doc, title, subtitle="", extra_lines=None):
 
     lines = extra_lines or [
         ("Student:", "Matthew Jacob SD"),
-        ("Student ID:", "[ID Placeholder]"),
-        ("University:", "University of [University Name]"),
+        ("Student ID:", "2506116"),
+        ("University:", "Robert Gordon University"),
         ("Date:", "30 July 2026"),
         ("Extension Deadline:", "6 August 2026"),
     ]
@@ -232,8 +232,8 @@ def build_project_documentation():
             ("Module:", "CM2121 — 3D Reconstructive Techniques"),
             ("Project:", "Eco Rescue FPS — SDG 12 Recycling Game"),
             ("Student:", "Matthew Jacob SD"),
-            ("Student ID:", "[ID Placeholder]"),
-            ("University:", "[University Name]"),
+            ("Student ID:", "2506116"),
+            ("University:", "Robert Gordon University"),
             ("Date:", "6 August 2026"),
             ("Extension Deadline:", "6 August 2026"),
         ],
@@ -1125,7 +1125,7 @@ def build_test_log():
             ("Module:", "CM2121 — 3D Reconstructive Techniques"),
             ("Project:", "Eco Rescue FPS — SDG 12 Recycling Game"),
             ("Student:", "Matthew Jacob SD"),
-            ("Student ID:", "[ID Placeholder]"),
+            ("Student ID:", "2506116"),
             ("Date:", "6 August 2026"),
         ],
     )

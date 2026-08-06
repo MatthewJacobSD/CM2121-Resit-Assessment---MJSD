@@ -1,9 +1,10 @@
-# CM2121 Eco Rescue FPS — Combined Project Timeline
+# CM2121 ChainFragrance — Combined Project Timeline
 
 ## Project Overview
 
 - **Module:** CM2121 — 3D Reconstructive Techniques
-- **Student:** Matthew Jacob SD
+- **Student:** Matthew Jacob SD (2506116)
+- **University:** Robert Gordon University
 - **SDG:** Goal 12 — Responsible Consumption & Production (Recycling)
 - **Engine:** Unity 6 URP (6000.3.18f1)
 - **Deadline (Extension):** Thursday 6 August 2026 @ 1pm

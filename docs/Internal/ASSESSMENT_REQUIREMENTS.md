@@ -1,4 +1,4 @@
-# CM2121 Eco Rescue FPS — Assessment Requirements
+# CM2121 ChainFragrance — Assessment Requirements
 
 ## Module Info
 
@@ -7,6 +7,8 @@
 - **Academic Year:** 2025-2026
 - **Semester:** 2
 - **Module Coordinator:** Verda Munir
+- **Student:** Matthew Jacob SD (2506116)
+- **University:** Robert Gordon University
 - **Deadline (Extension):** Thursday 6 August 2026 @ 1pm
 
 ---

@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Idempotent, Undo-aware editor tool that fixes the serialized gameplay asset
-/// data of the FloranceOverflow project:
+/// data of the ChainFragrance project:
 ///
 ///  * Adds a root BoxCollider to every collectible and bin prefab that lacks
 ///    one (fitted to the model mesh bounds).

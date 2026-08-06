@@ -106,8 +106,8 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
-# Documentation folder (local only, not committed)
-docs/
+# Documentation folder - now tracked for project organisation
+# docs/
 
 # Python cache
 __pycache__/

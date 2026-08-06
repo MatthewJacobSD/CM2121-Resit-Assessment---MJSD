@@ -1,0 +1,123 @@
+// ============================================================
+//  New Script Template — CM2121 Eco Rescue FPS
+//
+//  Copy this file into Assets/Scripts/<area>/ and rename the
+//  file and class to match. Follow the ordering below and the
+//  conventions in docs/CODING_STANDARD.md.
+//
+//  Ordering: usings -> class summary/attributes -> Constants ->
+//  Serialized Fields -> Private Fields -> Public Properties ->
+//  Events -> Unity Lifecycle -> Public Methods -> Private
+//  Methods -> Event Callbacks -> Utility.
+// ============================================================
+
+using System;                          // System.* first
+using TMPro;                           // third-party libraries
+using UnityEngine;                     // then UnityEngine.*
+using UnityEngine.InputSystem;         // then sub-namespaces
+
+/// <summary>
+/// One-line summary of what this class does.
+/// </summary>
+// [RequireComponent(typeof(...))]
+public class NewScriptTemplate : MonoBehaviour
+{
+    #region Constants
+
+    private const float SomeConstant = 1f;
+
+    #endregion
+
+    #region Serialized Fields
+
+    [Header("Main")]
+    [Tooltip("Only add tooltips where the field name is not self-explanatory.")]
+    [SerializeField] private float someValue = 1f;
+
+    [Header("References")]
+    [SerializeField] private Transform someReference;
+
+    #endregion
+
+    #region Private Fields
+
+    private float someState;
+
+    #endregion
+
+    #region Public Properties
+
+    /// <summary>Read-only access to internal state.</summary>
+    public float SomeState => someState;
+
+    #endregion
+
+    #region Events
+
+    /// <summary>Invoked when a thing happens.</summary>
+    public event Action OnSomethingHappened;
+
+    #endregion
+
+    #region Unity Lifecycle
+
+    private void Awake()
+    {
+        // Cache references here.
+    }
+
+    private void OnEnable()
+    {
+        // Subscribe to events here.
+    }
+
+    private void OnDisable()
+    {
+        // Unsubscribe from events here.
+    }
+
+    private void Start()
+    {
+        // Initialise at the start of the first frame.
+    }
+
+    private void Update()
+    {
+        // Keep this lightweight.
+    }
+
+    #endregion
+
+    #region Public Methods
+
+    /// <summary>Briefly explains what this public method does.</summary>
+    public void DoSomething()
+    {
+    }
+
+    #endregion
+
+    #region Private Methods
+
+    private void DoInternalThing()
+    {
+    }
+
+    #endregion
+
+    #region Event Callbacks
+
+    private void OnSomethingHappenedHandler()
+    {
+    }
+
+    #endregion
+
+    #region Utility
+
+    private void HelperMethod()
+    {
+    }
+
+    #endregion
+}

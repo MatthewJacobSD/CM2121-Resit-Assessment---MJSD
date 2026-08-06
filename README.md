@@ -1,4 +1,4 @@
-# Eco Rescue FPS
+# ChainFragrance
 
 A first-person recycling simulation game built in Unity 6 (URP) for the CM2121 — 3D Reconstructive Techniques module.
 
@@ -143,6 +143,7 @@ PlayMode tests (10): StartGame reset, per-category progress, wrong-recycle penal
 ## Credits
 
 - **Module:** CM2121 — 3D Reconstructive Techniques
-- **Student:** Matthew Jacob SD
+- **Student:** Matthew Jacob SD (2506116)
+- **University:** Robert Gordon University
 - **Engine:** Unity 6 URP (6000.3.18f1)
 - **Extension Deadline:** 6 August 2026

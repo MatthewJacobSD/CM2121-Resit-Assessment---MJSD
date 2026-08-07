@@ -1,4 +1,4 @@
-# CM2121 Eco Rescue FPS — Project Evolution Report
+# CM2121 ChainFragrance — Project Evolution Report
 
 **Student:** Matthew Jacob SD  
 **Module:** CM2121 — 3D Reconstructive Techniques  
@@ -12,7 +12,7 @@
 
 ### 1.1 Project Purpose
 
-Eco Rescue FPS is a first-person recycling simulation game built for the CM2121 resit assessment. The player collects recyclable items (plants, toys, bottles) scattered across an open environment and disposes of them in the correct recycling bins within a 5-minute time limit, earning points and maintaining lives.
+ChainFragrance is a first-person recycling simulation game built for the CM2121 resit assessment. The player collects recyclable items (plants, toys, bottles) scattered across an open environment and disposes of them in the correct recycling bins within a 5-minute time limit, earning points and maintaining lives.
 
 ### 1.2 SDG Objective
 

@@ -1,4 +1,4 @@
-# FloranceOverflow — Visibility & Verification Report
+# ChainFragrance — Visibility & Verification Report
 
 Result of the read-only verification pass (Phase 0.5) over `Assets/Scenes/Florance.unity`
 and the surrounding assets, **3 August 2026**. The purpose of this report is to

@@ -1,4 +1,4 @@
-# CM2121 Eco Rescue FPS — Migration Checklist
+# CM2121 ChainFragrance — Migration Checklist
 
 ## Audio Migration
 

@@ -1,4 +1,4 @@
-# CM2121 Eco Rescue FPS — Reference (Old Project)
+# CM2121 ChainFragrance — Reference (Old Project)
 
 Consolidated from: AUDIT.md, GAMEPLAY_UPDATE.md, DESIGN_UPDATE_AUDIT.md, VISUAL_FIX_AUDIT.md, IMPLEMENTATION_LOG.md, COMPLETION_FINAL.md, PROJECT_HANDOFF.md, PROJECT_AUDIT_CURRENT.md, POSSIBLE_UPDATES.md
 

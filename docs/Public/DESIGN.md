@@ -327,16 +327,15 @@ PlayerFootstepAudio -> raycast downward to detect surface layer (Water/Environme
 
 ## 9. Asset References
 
-### Audio Assets (19 files)
+### Audio Assets (Optimized Library)
 
-**Ambient (3):**
-- Raining.wav, Sunny.mp3, ThunderRain.wav
+**Ambient (4):**
+- AMB_Rain.wav, AMB_Storm.wav, AMB_StrongRain.wav, AMB_WaterFlowing.wav
 
-**Object Feedback (5):**
-- BinCollectionPlants.wav, BinCollectionToys.wav
-- CollectItem.wav, DropItem.wav, DropPlasticBottle.mp3
-
-**Player (4):**
+**SFX (12):**
+- SFX_Correct.wav, SFX_Buzzer.wav, SFX_CollectItem.wav, SFX_DropItem.wav
+- SFX_DropBottle.wav, SFX_DryWalk.wav, SFX_WetWalk.wav, SFX_Running.wav
+- SFX_Achievement.wav, SFX_Lose.wav, SFX_BinCollect1.wav, SFX_BinCollect2.wav
 - Running.ogg, WalkingInTheRain.mp3, WalkingOnDryLand.mp3
 - ThrowItemIntoBin.wav
 

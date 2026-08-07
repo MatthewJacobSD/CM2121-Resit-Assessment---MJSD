@@ -1,4 +1,4 @@
-# FloranceOverflow — Complete Project Audit (Phase 0)
+# ChainFragrance — Complete Project Audit (Phase 0)
 
 **Date:** 6 August 2026  
 **Auditor:** Automated code analysis  

@@ -1,6 +1,6 @@
-# CM2121 Eco Rescue FPS — Project Coding Standard
+# CM2121 ChainFragrance — Project Coding Standard
 
-This document defines the coding conventions for the CM2121 Eco Rescue FPS project.
+This document defines the coding conventions for the CM2121 ChainFragrance project.
 All existing code follows this standard (see the final organisation pass) and any
 **new scripts created in the future must follow it** unless there is a strong reason
 not to.

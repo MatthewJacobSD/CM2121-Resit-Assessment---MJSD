@@ -226,11 +226,11 @@ def build_project_documentation():
     # -- Cover Page --
     create_cover_page(
         doc,
-        "Eco Rescue FPS",
+        "ChainFragrance",
         subtitle="Project Development Report",
         extra_lines=[
             ("Module:", "CM2121 — 3D Reconstructive Techniques"),
-            ("Project:", "Eco Rescue FPS — SDG 12 Recycling Game"),
+            ("Project:", "ChainFragrance — SDG 12 Recycling Game"),
             ("Student:", "Matthew Jacob SD"),
             ("Student ID:", "2506116"),
             ("University:", "Robert Gordon University"),
@@ -251,7 +251,7 @@ def build_project_documentation():
 
     doc.add_heading("1.1 Project Purpose", level=2)
     doc.add_paragraph(
-        "Eco Rescue FPS is a first-person recycling simulation game built for the CM2121 "
+        "ChainFragrance is a first-person recycling simulation game built for the CM2121 "
         "resit assessment. The player collects recyclable items — plants, toys, and bottles "
         "— scattered across an open environment and disposes of them in the correct recycling "
         "bins within a 5-minute time limit, earning points and maintaining lives."
@@ -1119,11 +1119,11 @@ def build_test_log():
     # -- Cover Page --
     create_cover_page(
         doc,
-        "Eco Rescue FPS",
+        "ChainFragrance",
         subtitle="User Testing Report",
         extra_lines=[
             ("Module:", "CM2121 — 3D Reconstructive Techniques"),
-            ("Project:", "Eco Rescue FPS — SDG 12 Recycling Game"),
+            ("Project:", "ChainFragrance — SDG 12 Recycling Game"),
             ("Student:", "Matthew Jacob SD"),
             ("Student ID:", "2506116"),
             ("Date:", "6 August 2026"),
@@ -1140,7 +1140,7 @@ def build_test_log():
     # =====================================================================
     doc.add_heading("1. Introduction", level=1)
     doc.add_paragraph(
-        "This document presents the testing outcomes for the Eco Rescue FPS project, "
+        "This document presents the testing outcomes for the ChainFragrance project, "
         "a first-person recycling simulation game developed for the CM2121 module. "
         "Testing was conducted to evaluate gameplay functionality, user experience, "
         "and system reliability prior to final submission."
@@ -1434,7 +1434,7 @@ def build_test_log():
     # =====================================================================
     doc.add_heading("6. Conclusion", level=1)
     doc.add_paragraph(
-        "The Eco Rescue FPS project successfully demonstrates a functional first-person "
+        "The ChainFragrance project successfully demonstrates a functional first-person "
         "recycling simulation game built in Unity 6 with URP. The core gameplay loop — "
         "collect, sort, and recycle — is fully implemented and has been verified across "
         "multiple testing sessions."

@@ -1,7 +1,8 @@
-# CM2121 Eco Rescue FPS — Demo Video Script
+# CM2121 ChainFragrance — Demo Video Script
 
 **Duration:** 2 minutes max
-**Narrator:** Matthew Jacob SD
+**Narrator:** Matthew Jacob SD (2506116)
+**University:** Robert Gordon University
 **Date:** 24 July 2026
 
 ---
@@ -10,7 +11,7 @@
 
 ### 0:00–0:15 — Introduction
 
-"Hi, I'm Matthew, and this is Eco Rescue, a recycling sorting game built in Unity 6 URP. The game addresses SDG 12: Responsible Consumption and Production by teaching players about proper recycling habits through interactive gameplay."
+"Hi, I'm Matthew, and this is ChainFragrance, a recycling sorting game built in Unity 6 URP. The game addresses SDG 12: Responsible Consumption and Production by teaching players about proper recycling habits through interactive gameplay."
 
 ### 0:15–0:35 — Photogrammetry Pipeline
 
@@ -44,7 +45,7 @@
 
 ### 1:55–2:00 — Conclusion
 
-"Eco Rescue demonstrates how photogrammetry and game design can create educational experiences that promote sustainability. Thank you for watching."
+"ChainFragrance demonstrates how photogrammetry and game design can create educational experiences that promote sustainability. Thank you for watching."
 
 ---
 

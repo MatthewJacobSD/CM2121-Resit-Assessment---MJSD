@@ -1077,6 +1077,48 @@ script GUID resolution, layer/groundMask membership, scene wiring) all pass;
 no runtime/editor session was available, so runtime feel remains
 POSSIBLE·UNREPRODUCED and is flagged as such.
 
+### 6.18 Score/Best Labels & Bin-Nearby Guidance (10 August)
+
+**What:** Labelled the top-navigation score/High-Score (Best) counts and added
+a centre-screen "bin nearby" cue to the existing bin direction indicator.
+
+**Why:** The navigation displayed bare integers (`0`, `20`); the task required
+`Score: X` and `Best: X` labels that update dynamically and display correctly
+from the initial frame. A follow-up asked for a proximity/navigation aid so the
+player is told (in the centre of the screen) when a recycling bin is nearby.
+
+**1. Sunny ambient audio — NOT AN ISSUE (no change).** The scene wires
+`WeatherEffects.sunnyAmbient` to null and Sunny maps to
+`CrossfadeAmbient(null)`, which fades ambience to silence. No nonexistent clip
+is referenced; re-verified on disk during this pass.
+
+**2. Score / Best labels.** `HUDManager.OnScoreChanged` + `UpdateStats` render
+`Score: {n}` (previously bare `{n}`); high score kept `Best: {n}`. Scene TMP
+initial text updated to `Score: 0` / `Best: 0` so the HUD never shows a bare
+`0`. Values stay integers via `int` interpolation; no duplicate scoring system
+(ScoreManager still owns score/high-score).
+
+**3. Bin proximity / navigation.** `BinDirectionIndicator` previously pinned a
+screen-edge arrow + distance to the nearest accepting bin while carrying. This
+pass adds an auto-created centre-screen message (`This bin is nearby (Xm)`)
+shown within a new `nearbyRadius` (10 m) of that bin. The message hides when
+nothing is held or the game is paused/menu; it reuses
+`RecycleBinInteractable.AcceptsItem` and each bin's world position — no new bin
+system.
+
+**Files affected:** `Assets/Scripts/UI/HUDManager.cs` (Score: prefix),
+`Assets/Scripts/UI/BinDirectionIndicator.cs` (centre nearby message +
+`EnsureNearbyMessageText`), `Assets/Scenes/Florance.unity` (score/Best TMP
+initial text), `docs/Internal/PROJECT_AUDIT.md` (§13.5 correction + §13.9),
+this file.
+
+**Validation:** Serialised-data checks pass (scene `m_text` → `Score: 0` /
+`Best: 0`, HUDManager references unchanged, BinDirectionIndicator fields with
+safe null fallbacks). Runtime behaviour POSSIBLE·UNREPRODUCED (no editor
+session); recommended editor check: hold an item, walk toward a correct bin and
+confirm the centre message appears inside 10 m and the edge arrow still points
+to it.
+
 ## 7. Lessons Learned
 
 ### 7.1 Unity Architecture
@@ -1141,4 +1183,4 @@ POSSIBLE·UNREPRODUCED and is flagged as such.
 
 ---
 
-*Document generated 30 July 2026 · Updated 3 August 2026 (resit audit fix pass) · Updated 5 August 2026 (environment dependency hardening · single terrain migration) · Updated 6 August 2026 (final submission hardening: grounding, wind push, audio remap, bin types, HUD, demo removal) · Updated 6 August 2026 (weather system redesign: 4-state machine, HeavyRain, audio cleanup, WeatherMovementEffect) · Updated 10 August 2026 (final resit fix pass: 1280×720 UI, bin indicator, allocation-free hot paths, demo-sourced terrain) · Updated 10 August 2026 (contextual-audio & mouse-sensitivity final pass: footstep wetness fix, sensitivity 0.5, manager/audio audit, bin inventory confirmed)*
+*Document generated 30 July 2026 · Updated 3 August 2026 (resit audit fix pass) · Updated 5 August 2026 (environment dependency hardening · single terrain migration) · Updated 6 August 2026 (final submission hardening: grounding, wind push, audio remap, bin types, HUD, demo removal) · Updated 6 August 2026 (weather system redesign: 4-state machine, HeavyRain, audio cleanup, WeatherMovementEffect) · Updated 10 August 2026 (final resit fix pass: 1280×720 UI, bin indicator, allocation-free hot paths, demo-sourced terrain) · Updated 10 August 2026 (contextual-audio & mouse-sensitivity final pass: footstep wetness fix, sensitivity 0.5, manager/audio audit, bin inventory confirmed) · Updated 10 August 2026 (Score/Best labels & bin-nearby guidance: Score: prefix, centre nearby message)*

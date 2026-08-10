@@ -22,6 +22,14 @@ public class BinDirectionIndicator : MonoBehaviour
     [Tooltip("Only show once the player is within this many units of the bin.")]
     [SerializeField] private float maxGuideDistance = 60f;
 
+    [Header("Nearby Message")]
+    [Tooltip("Centre-screen message shown when a bin is nearby. Created automatically if left empty.")]
+    [SerializeField] private TextMeshProUGUI nearbyMessageText;
+    [Tooltip("Show the centre message within this many units of the target bin.")]
+    [SerializeField] private float nearbyRadius = 10f;
+    [Tooltip("Text displayed in the centre of the screen when the bin is nearby.")]
+    [SerializeField] private string nearbyMessage = "This bin is nearby";
+
     #endregion
 
     #region Private Fields
@@ -46,8 +54,11 @@ public class BinDirectionIndicator : MonoBehaviour
     private void Start()
     {
         EnsureIndicatorText();
+        EnsureNearbyMessageText();
         if (indicatorText != null)
             indicatorText.gameObject.SetActive(false);
+        if (nearbyMessageText != null)
+            nearbyMessageText.gameObject.SetActive(false);
     }
 
     private void Update()
@@ -74,28 +85,43 @@ public class BinDirectionIndicator : MonoBehaviour
 
     private void UpdateIndicator()
     {
-        if (indicatorText == null) return;
-
         PickupItem held = interaction != null ? interaction.CurrentHeldObject : null;
 
         if (held == null || !GameManager.Instance.IsPlaying)
         {
-            indicatorText.gameObject.SetActive(false);
+            if (indicatorText != null)
+                indicatorText.gameObject.SetActive(false);
+            if (nearbyMessageText != null)
+                nearbyMessageText.gameObject.SetActive(false);
             return;
         }
 
         RecycleBinInteractable best = FindNearestAcceptingBin(held.ItemType);
         if (best == null)
         {
-            indicatorText.gameObject.SetActive(false);
+            if (indicatorText != null)
+                indicatorText.gameObject.SetActive(false);
+            if (nearbyMessageText != null)
+                nearbyMessageText.gameObject.SetActive(false);
             return;
         }
 
         Vector3 toBin = best.transform.position - (playerCamera != null ? playerCamera.transform.position : transform.position);
         float distance = toBin.magnitude;
+
+        // Centre-screen "nearby" message when the player is close to the bin.
+        if (nearbyMessageText != null)
+        {
+            bool showNearby = distance <= nearbyRadius;
+            if (showNearby)
+                nearbyMessageText.text = $"{nearbyMessage} ({distance:0}m)";
+            nearbyMessageText.gameObject.SetActive(showNearby);
+        }
+
         if (distance > maxGuideDistance)
         {
-            indicatorText.gameObject.SetActive(false);
+            if (indicatorText != null)
+                indicatorText.gameObject.SetActive(false);
             return;
         }
 
@@ -191,6 +217,34 @@ public class BinDirectionIndicator : MonoBehaviour
         text.raycastTarget = false;
 
         indicatorText = text;
+    }
+
+    private void EnsureNearbyMessageText()
+    {
+        if (nearbyMessageText != null) return;
+
+        Canvas canvas = FindAnyObjectByType<Canvas>();
+        if (canvas == null) return;
+
+        GameObject go = new GameObject("BinNearbyMessage", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        go.layer = 5;
+        go.transform.SetParent(canvas.transform, false);
+
+        RectTransform rect = go.GetComponent<RectTransform>();
+        rect.anchorMin = new Vector2(0.5f, 0.5f);
+        rect.anchorMax = new Vector2(0.5f, 0.5f);
+        rect.pivot = new Vector2(0.5f, 0.5f);
+        rect.anchoredPosition = new Vector2(0f, -160f);
+        rect.sizeDelta = new Vector2(400f, 40f);
+
+        TextMeshProUGUI text = go.GetComponent<TextMeshProUGUI>();
+        text.fontSize = 24f;
+        text.alignment = TextAlignmentOptions.Center;
+        text.color = Color.white;
+        text.fontStyle = FontStyles.Bold;
+        text.raycastTarget = false;
+
+        nearbyMessageText = text;
     }
 
     #endregion

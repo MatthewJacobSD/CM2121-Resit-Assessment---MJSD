@@ -1177,7 +1177,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0
+  m_text: 'Best: 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -8308,7 +8308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd509d70f36cf4846bb0d08193526cbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WindEffect
-  windZone: {fileID: 0}
+  windZone: {fileID: 342524166}
   windParticles: {fileID: 0}
   sunnyWindSpeed: 2
   rainyWindSpeed: 10
@@ -35840,7 +35840,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 0
+  m_text: 'Score: 0'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -74225,6 +74225,9 @@ MonoBehaviour:
   indicatorText: {fileID: 0}
   edgeMargin: 40
   maxGuideDistance: 60
+  nearbyMessageText: {fileID: 0}
+  nearbyRadius: 10
+  nearbyMessage: This bin is nearby
 --- !u!4 &1853147428 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3479583742724934987, guid: 9d620d3f90a286245a9dc80a4e1811da, type: 3}

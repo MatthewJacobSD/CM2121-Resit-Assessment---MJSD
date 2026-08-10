@@ -389,11 +389,9 @@ No raw `m_Resource` clip references remain in game scenes/prefabs — CONFIRMED
   `PlayDropSFX()` on hold/drop/throw — CONFIRMED; clips wired on the
   AudioManager component.
 - Bin success/error: `RecycleBinInteractable` plays `successClip`/`errorClip`
-  on correct/wrong recycle — CONFIRMED on both bin prefabs (`Nature
-  Recycling.prefab`, `Plastic Recycling.prefab`). Note: `General Waste.prefab`
-  is referenced in §4 but only two bin prefabs exist under `Assets/Models/
-  Prefabs/Bins/`; the third bin is not instantiated in this scene — see
-  §13.7.
+  on correct/wrong recycle — CONFIRMED on all three bin prefabs (`Nature
+  Recycling.prefab`, `Plastic Recycling.prefab`, `General Waste.prefab`) — see
+  §13.7 for the full inventory.
 - Master volume: `PauseMenuManager` persists to PlayerPrefs `"Volume"` and
   applies `AudioListener.volume` (and the Pause settings slider) — CONFIRMED.
 
@@ -446,3 +444,27 @@ No raw `m_Resource` clip references remain in game scenes/prefabs — CONFIRMED
   code in this pass (`PlayerFootstepAudio.Awake` + `DetectSurface`) is not
   unit-tested. Recommended follow-up: run EditMode + PlayMode once in the
   editor before submission.
+
+### 13.9 Score/Best labels & bin-nearby guidance (10 August)
+
+- **Sunny ambient audio** — NOT AN ISSUE. There is no sunny ambient clip; the
+  scene wires `WeatherEffects.sunnyAmbient` to `{fileID: 0}` (null) and
+  `PlayAmbientAudio` maps Sunny → `null`, routing it to
+  `AudioManager.CrossfadeAmbient(null)`, which fades the running ambience to
+  silence. No missing-asset reference or error path; no code change required.
+  Re-verified on disk (scene `&1808429661`, `sunnyAmbient: {fileID: 0}`).
+- **Score / High-Score (Best) labels** — CHANGED. `HUDManager.OnScoreChanged`
+  and `UpdateStats` now render `Score: {n}` (was bare `{n}`); high score was
+  already `Best: {n}`. Scene initial text updated to `Score: 0` and `Best: 0`
+  (both TMP `m_text`), so the HUD shows the labelled values from frame one,
+  not a bare `0`. Integer values preserved (`int` interpolation throughout).
+  CONFIRMED on disk.
+- **Bin proximity / navigation** — CHANGED. `BinDirectionIndicator` already
+  pinned a screen-edge arrow + distance to the nearest accepting bin while
+  carrying; this pass added a centre-screen message (`This bin is nearby (Xm)`)
+  shown when the player is within `nearbyRadius` (10 m) of that bin. The text
+  is auto-created under the Canvas if unassigned (mirrors the existing
+  `indicatorText` fallback) and is hidden whenever nothing is held or the game
+  is not playing. Reuses `RecycleBinInteractable.AcceptsItem`/world positions —
+  no duplicate bin logic. CONFIRMED on disk; runtime POSSIBLE·UNREPRODUCED
+  (no editor session).

@@ -172,7 +172,7 @@ public class HUDManager : MonoBehaviour
     private void OnScoreChanged(int newScore)
     {
         if (scoreText != null)
-            scoreText.text = $"{newScore}";
+            scoreText.text = $"Score: {newScore}";
     }
 
     private void OnHighScoreChanged(int newHighScore)
@@ -223,7 +223,7 @@ public class HUDManager : MonoBehaviour
             bottlesText.text = $"Bottles: {GameManager.Instance.BottlesRecycled}/{GameManager.Instance.BottlesRequired}";
 
         if (scoreText != null && ScoreManager.Instance != null)
-            scoreText.text = $"{ScoreManager.Instance.CurrentScore}";
+            scoreText.text = $"Score: {ScoreManager.Instance.CurrentScore}";
 
         if (highScoreText != null && ScoreManager.Instance != null)
             highScoreText.text = $"Best: {ScoreManager.Instance.HighScore}";

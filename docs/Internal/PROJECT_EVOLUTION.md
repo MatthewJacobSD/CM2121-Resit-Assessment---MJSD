@@ -1047,9 +1047,10 @@ drying window engages after the sky clears. No new audio assets; all clips
 reuse the Optimized set.
 
 **2. Mouse sensitivity.** Scene `PlayerLook` (`&1261081359`) lowered from
-`sensitivityX/Y: 1.2` to `0.8/0.8` via the exposed Inspector field (code
-default unchanged at 2.0 as the un-assigned fallback). Frame-rate-independent
-formula (`lookInput * sensitivity * deltaTime * 100f`) unchanged.
+`sensitivityX/Y: 1.2` to `0.8/0.8` and then (on user request) to `0.5/0.5`
+via the exposed Inspector field (code default unchanged at 2.0 as the
+un-assigned fallback). Frame-rate-independent formula
+(`lookInput * sensitivity * deltaTime * 100f`) unchanged.
 
 **3. Manager & audio audit.** Verified (on disk) that all seven managers under
 the scene `Managers` root are wired, every referenced audio clip resolves to
@@ -1057,7 +1058,9 @@ the scene `Managers` root are wired, every referenced audio clip resolves to
 dedicated looping source (not restarted per frame), footsteps use raycast
 surface detection on Default/Water/Environment layers (no hard-coded Y), and
 master volume goes through `AudioListener.volume` from the Pause menu slider.
-Report written with CONFIRMED / POSSIBLE·UNREPRODUCED / NOT AN ISSUE tags.
+All three bin prefabs are confirmed present and instantiated (Nature
+Recycling, Plastic Recycling, General Waste — 13 instances each). Report
+written with CONFIRMED / POSSIBLE·UNREPRODUCED / NOT AN ISSUE tags.
 
 **4. Scene HUD rework (retained from editor session).** The working tree
 carried an editor-generated HUD rework (`Count`/`Header`/`HishScore` labels,
@@ -1138,4 +1141,4 @@ POSSIBLE·UNREPRODUCED and is flagged as such.
 
 ---
 
-*Document generated 30 July 2026 · Updated 3 August 2026 (resit audit fix pass) · Updated 5 August 2026 (environment dependency hardening · single terrain migration) · Updated 6 August 2026 (final submission hardening: grounding, wind push, audio remap, bin types, HUD, demo removal) · Updated 6 August 2026 (weather system redesign: 4-state machine, HeavyRain, audio cleanup, WeatherMovementEffect) · Updated 10 August 2026 (final resit fix pass: 1280×720 UI, bin indicator, allocation-free hot paths, demo-sourced terrain) · Updated 10 August 2026 (contextual-audio & mouse-sensitivity final pass: footstep wetness fix, sensitivity 0.8, manager/audio audit)*
+*Document generated 30 July 2026 · Updated 3 August 2026 (resit audit fix pass) · Updated 5 August 2026 (environment dependency hardening · single terrain migration) · Updated 6 August 2026 (final submission hardening: grounding, wind push, audio remap, bin types, HUD, demo removal) · Updated 6 August 2026 (weather system redesign: 4-state machine, HeavyRain, audio cleanup, WeatherMovementEffect) · Updated 10 August 2026 (final resit fix pass: 1280×720 UI, bin indicator, allocation-free hot paths, demo-sourced terrain) · Updated 10 August 2026 (contextual-audio & mouse-sensitivity final pass: footstep wetness fix, sensitivity 0.5, manager/audio audit, bin inventory confirmed)*

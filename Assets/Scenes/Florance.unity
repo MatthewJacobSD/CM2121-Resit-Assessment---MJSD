@@ -64570,8 +64570,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   playerControls: {fileID: -944628639613478452, guid: e8794d9b3fba38746937503e7bab5d4d, type: 3}
   cameraTransform: {fileID: 871825667}
-  sensitivityX: 0.8
-  sensitivityY: 0.8
+  sensitivityX: 0.5
+  sensitivityY: 0.5
   invertY: 0
   minVerticalAngle: -85
   maxVerticalAngle: 85

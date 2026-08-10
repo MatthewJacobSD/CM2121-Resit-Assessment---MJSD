@@ -400,11 +400,12 @@ No raw `m_Resource` clip references remain in game scenes/prefabs — CONFIRMED
 ### 13.6 Mouse sensitivity
 
 - `PlayerLook` uses `lookInput * sensitivity * Time.deltaTime * 100f` —
-  frame-rate independent. Scene values were `1.2/1.2`; **this pass lowered
-  them to `0.8/0.8`** for a more controlled camera on the 1280×720 desktop
-  setup (change made on the exposed Inspector field, not duplicated in code —
-  code default stays 2.0 as the un-assigned fallback). CONFIRMED on disk;
-  feel NOT REPRODUCED here.
+  frame-rate independent. Scene values were `1.2/1.2`; this pass lowered
+  them first to `0.8/0.8`, then (on user request) further to **`0.5/0.5`**
+  for a calmer camera on the 1280×720 desktop setup. The change is made on
+  the exposed Inspector field, not duplicated in code — code default stays
+  2.0 as the un-assigned fallback. CONFIRMED on disk; feel NOT REPRODUCED
+  here.
 
 ### 13.7 Manager audit (scene `Managers` root, &832482054)
 
@@ -421,17 +422,19 @@ No raw `m_Resource` clip references remain in game scenes/prefabs — CONFIRMED
 - `AutoSpawner` exists as a code-generation fallback but is **not** present in
   the scene — CONFIRMED as intentional (all managers are pre-wired; nothing to
   auto-spawn), NOT AN ISSUE.
-- **Bin inventory mismatch (POSSIBLE·UNREPRODUCED):** `RecycleBinInteractable`
-  supports three `BinType`s and the scoring matrix covers General Waste, but
-  only `Nature Recycling` and `Plastic Recycling` prefabs exist in `Assets/
-  Models/Prefabs/Bins/` (26 scene instances total). `WeatherFeedbackSystem`/
-  `BinDirectionIndicator` locate bins via `FindObjectsByType
-  <RecycleBinInteractable>`, so they only ever find the two bins present. A
-  General-Waste bin is not spawnable from the tracked assets in this scene.
-  This predates this pass and was not changed here; flagged for awareness.
+- **Bin inventory (CONFIRMED, correction 10 Aug):** all three bin prefabs
+  exist under `Assets/Models/Prefabs/Bins/` — `Nature Recycling.prefab`
+  (`binType 0`), `Plastic Recycling.prefab` (`binType 1`) and `General
+  Waste.prefab` (`binType 2`) — each carrying `RecycleBinInteractable` with the
+  Optimized success/error clips. The scene contains 13 instances of each
+  prefab (39 bin instances total). `WeatherFeedbackSystem`/`BinDirectionIndicator`
+  find them via `FindObjectsByType<RecycleBinInteractable>`, so all three bin
+  types are present and reachable. (An earlier draft of this section
+  incorrectly reported only two bin prefabs; corrected after a full-directory
+  scan.)
 - **Edit-mode matrix tests (`RecycleBinMatrixTests`)** construct bins for all
-  three types and passed previously (scoring matrix §4 is code-driven, so the
-  missing third bin does not affect the tests themselves).
+  three types and passed previously (scoring matrix §4 is code-driven and
+  matches the three prefabs' `binType` values above).
 
 ### 13.8 Automated tests
 

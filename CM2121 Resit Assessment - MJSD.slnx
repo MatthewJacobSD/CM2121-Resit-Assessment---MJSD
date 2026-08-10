@@ -3,4 +3,6 @@
   <Project Path="Florance.Runtime.csproj" />
   <Project Path="Florance.Editor.csproj" />
   <Project Path="EditModeTests.csproj" />
+  <Project Path="Assembly-CSharp.csproj" />
+  <Project Path="Assembly-CSharp-Editor.csproj" />
 </Solution>

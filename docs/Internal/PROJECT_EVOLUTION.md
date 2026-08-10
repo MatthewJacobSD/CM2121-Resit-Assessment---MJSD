@@ -1028,6 +1028,52 @@ The `AutoSetupPauseMenu` Editor tool (Tools → Setup UI in Current Scene) autom
 
 **Validation:** All 8 scripts compile (brace balance verified). Scene YAML changes verified via GUID scan (zero old RawAudio GUIDs remain in active gameplay).
 
+### 6.17 Contextual-Audio & Mouse-Sensitivity Final Pass (10 August)
+
+**What:** Read-only audit of the full audio/mouse/manager wiring (documented in
+`PROJECT_AUDIT.md` §13), a wetness-start fix in the footstep audio, and a
+reduced mouse sensitivity for the 1280×720 desktop target.
+
+**Why:** The task asked for contextual movement audio (already implemented by
+the existing architecture), a calmer default camera response, a manager audit,
+and documentation of what is confirmed vs. reproducible vs. not an issue.
+
+**1. Footstep spawn + post-rain drying fix.** `PlayerFootstepAudio.Awake()`
+now sets `wetnessTimer = wetnessDuration` so sunny terrain plays **dry**
+footsteps immediately (previously the drying timer started at zero → wet
+footsteps for the first `wetnessDuration` seconds). `DetectSurface()` also
+primes `wetnessTimer` to zero while rain/storm is active so the documented
+drying window engages after the sky clears. No new audio assets; all clips
+reuse the Optimized set.
+
+**2. Mouse sensitivity.** Scene `PlayerLook` (`&1261081359`) lowered from
+`sensitivityX/Y: 1.2` to `0.8/0.8` via the exposed Inspector field (code
+default unchanged at 2.0 as the un-assigned fallback). Frame-rate-independent
+formula (`lookInput * sensitivity * deltaTime * 100f`) unchanged.
+
+**3. Manager & audio audit.** Verified (on disk) that all seven managers under
+the scene `Managers` root are wired, every referenced audio clip resolves to
+`Assets/Sounds/Optimized/`, water-proximity ambience is distance-driven on a
+dedicated looping source (not restarted per frame), footsteps use raycast
+surface detection on Default/Water/Environment layers (no hard-coded Y), and
+master volume goes through `AudioListener.volume` from the Pause menu slider.
+Report written with CONFIRMED / POSSIBLE·UNREPRODUCED / NOT AN ISSUE tags.
+
+**4. Scene HUD rework (retained from editor session).** The working tree
+carried an editor-generated HUD rework (`Count`/`Header`/`HishScore` labels,
+`highScoreText` rewired to the new `Count` element) which is retained; the
+unrelated TextMesh Pro meta GUID regeneration (which would have broken every
+TMP font reference in the scene) was reverted.
+
+**Files affected:** `Assets/Scripts/Player/PlayerFootstepAudio.cs` (Awake +
+DetectSurface), `Assets/Scenes/Florance.unity` (sensitivity `1261081359`,
+HUD rework), `docs/Internal/PROJECT_AUDIT.md` (§13), this file.
+
+**Validation:** Serialised-data checks (clip GUID → `Optimized` resolution,
+script GUID resolution, layer/groundMask membership, scene wiring) all pass;
+no runtime/editor session was available, so runtime feel remains
+POSSIBLE·UNREPRODUCED and is flagged as such.
+
 ## 7. Lessons Learned
 
 ### 7.1 Unity Architecture
@@ -1092,4 +1138,4 @@ The `AutoSetupPauseMenu` Editor tool (Tools → Setup UI in Current Scene) autom
 
 ---
 
-*Document generated 30 July 2026 · Updated 3 August 2026 (resit audit fix pass) · Updated 5 August 2026 (environment dependency hardening · single terrain migration) · Updated 6 August 2026 (final submission hardening: grounding, wind push, audio remap, bin types, HUD, demo removal) · Updated 6 August 2026 (weather system redesign: 4-state machine, HeavyRain, audio cleanup, WeatherMovementEffect) · Updated 10 August 2026 (final resit fix pass: 1280×720 UI, bin indicator, allocation-free hot paths, demo-sourced terrain)*
+*Document generated 30 July 2026 · Updated 3 August 2026 (resit audit fix pass) · Updated 5 August 2026 (environment dependency hardening · single terrain migration) · Updated 6 August 2026 (final submission hardening: grounding, wind push, audio remap, bin types, HUD, demo removal) · Updated 6 August 2026 (weather system redesign: 4-state machine, HeavyRain, audio cleanup, WeatherMovementEffect) · Updated 10 August 2026 (final resit fix pass: 1280×720 UI, bin indicator, allocation-free hot paths, demo-sourced terrain) · Updated 10 August 2026 (contextual-audio & mouse-sensitivity final pass: footstep wetness fix, sensitivity 0.8, manager/audio audit)*

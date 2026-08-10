@@ -2,9 +2,10 @@
 
 Verified audit of the ChainFragrance project taken **3 August 2026** ahead of
 the CM2121 resit submission (due 6 August 2026), with the **6 August final
-submission hardening** and **weather system redesign** passes appended in §11-12.
-All facts below were verified by reading the actual project files on disk;
-nothing is assumed.
+submission hardening**, **weather system redesign** (§11-12) and **10 August
+contextual-audio / mouse-sensitivity audit** (§13) passes appended. All facts
+below were verified by reading the actual project files on disk; nothing is
+assumed.
 
 ---
 
@@ -305,3 +306,140 @@ Added to Player GameObject and wired to WeatherFeedbackSystem:
 - Scene YAML changes verified via GUID scan
 - Zero old RawAudio GUIDs in active gameplay
 - WeatherMovementEffect component added and wired
+
+## 13. Contextual audio & mouse-sensitivity audit (10 August)
+
+Read-only audit of the audio/mouse/manager wiring plus the final code changes
+in this pass. Findings are tagged **CONFIRMED** (verified against the serialised
+scene/prefab/script data on disk), **POSSIBLE·UNREPRODUCED** (logic verified in
+code but no runtime session was available to reproduce), or **NOT AN ISSUE**.
+
+### 13.1 Audio asset hygiene
+
+Every audio clip GUID referenced by the scene and bin prefabs resolves to
+`Assets/Sounds/Optimized/` — CONFIRMED:
+
+| Referenced clip | GUID | Resolves to |
+| --- | --- | --- |
+| rainyAmbient / AudioManager.rainyClip | `581b25e9…` | `Sounds/Optimized/Ambient/AMB_Rain.wav` |
+| heavyRainAmbient | `e47206e9…` | `Sounds/Optimized/Ambient/AMB_StrongRain.wav` |
+| stormyAmbient / AudioManager.stormyClip | `ecd2b90b…` | `Sounds/Optimized/Ambient/AMB_Storm.wav` |
+| WaterAmbienceZone.waterClip | `9f5159ff…` | `Sounds/Optimized/Ambient/AMB_WaterFlowing.wav` |
+| dryWalkFootsteps | `85d10511…` | `Sounds/Optimized/SFX/SFX_DryWalk.wav` |
+| runningFootsteps | `6beec6ba…` | `Sounds/Optimized/SFX/SFX_Running.wav` |
+| wetWalkFootsteps | `d73c1b47…` | `Sounds/Optimized/SFX/SFX_WetWalk.wav` |
+| successClip (AudioManager + bins) | `1f75364b…` | `Sounds/Optimized/SFX/SFX_Correct.wav` |
+| errorClip (AudioManager + bins) | `e587a08b…` | `Sounds/Optimized/SFX/SFX_Buzzer.wav` |
+| pickupClip | `03044e0b…` | `Sounds/Optimized/SFX/SFX_CollectItem.wav` |
+| dropClip | `4be50ad4…` | `Sounds/Optimized/SFX/SFX_DropItem.wav` |
+| achievementClip | `a251a5c2…` | `Sounds/Optimized/SFX/SFX_Achievement.wav` |
+
+No raw `m_Resource` clip references remain in game scenes/prefabs — CONFIRMED
+(§11.3 re-verified). No new audio assets were imported in this pass.
+
+### 13.2 Contextual footstep audio (`PlayerFootstepAudio`)
+
+- Surface is resolved by a downward **raycast** using `groundMask` (`m_Bits
+  81` = Default + Water + Environment layers) with `QueryTriggerInteraction
+  .Ignore` — CONFIRMED. The scene Terrain (`Terrain_1_2…`, layer 0 Default)
+  and `WaterPlane` (layer 4 Water, MeshCollider non-trigger) both fall inside
+  the mask, so detection uses real collisions/layers, not a hard-coded height.
+- Footstep selection: sprint → `runningFootsteps`; on water → `wetWalkFootsteps`;
+  otherwise wet vs dry via `IsSurfaceWet()` (weather state + drying timer) —
+  CONFIRMED. Footsteps are not played while stationary or airborne (`IsMoving`
+  gate + grounded check, `stepTimer` reset) — CONFIRMED.
+- **This pass fixed the spawn state:** `Awake()` now starts `wetnessTimer` at
+  `wetnessDuration` so sunny terrain plays **dry** footsteps from the first
+  step (previously the timer began at zero → wet footsteps at spawn). Also
+  primed `wetnessTimer` to zero during rain/storm so the documented
+  "wetnessDuration seconds after rain" drying window actually engages when
+  the sky clears. CONFIRMED against code; runtime feel NOT REPRODUCED here
+  (no editor session).
+- `audioSource`/`characterController` are auto-resolved with `GetComponent`
+  when the serialized field is null (scene shows `{fileID: 0}`) — CONFIRMED,
+  not a wiring bug. Splash (`splashSpawner`/`wetGrassSplash`) is null in the
+  scene and is guarded, so no splash spawns — CONFIRMED as intentionally
+  optional, NOT AN ISSUE.
+
+### 13.3 Weather ambience (`WeatherEffects` → `AudioManager`)
+
+- Per-state ambient mapping wired in the scene: Sunny → `null` (silence),
+  Rainy → `AMB_Rain`, HeavyRain → `AMB_StrongRain`, Stormy → `AMB_Storm` —
+  CONFIRMED. `CrossfadeAmbient(null)` fades to silence, so sunny is not left
+  on a stale loop.
+- Stormy uses its own `AMB_Storm` track only (no extra rain track stacked on
+  top) — matches the existing design and avoids overlapping loud ambience —
+  CONFIRMED (decision recorded, no code change).
+- `WeatherEffects` lives on the WeatherManager GameObject together with
+  `WeatherState` and `WeatherFeedbackSystem`; `PlayerFootstepAudio.weatherState`
+  references the same `WeatherState` (`&1808429660`) — CONFIRMED.
+
+### 13.4 Water proximity ambience (`WaterAmbienceZone`)
+
+- Attached to the AudioManager GameObject; `waterPlane` → `WaterPlane`
+  transform, `waterClip` = `AMB_WaterFlowing`, distances 20 m fade-in start /
+  5 m full volume — CONFIRMED. Volume is applied to a dedicated, self-created
+  looping AudioSource (not the crossfade pair) and playback stops at full
+  fade-out, so the flow loop is **not** restarted every frame — CONFIRMED.
+  Runtime fade behaviour itself POSSIBLE·UNREPRODUCED (no editor session).
+
+### 13.5 Pickup / drop / bin / UI / volume audio
+
+- Pickup & drop: `PlayerInteraction` calls `AudioManager.PlayPickupSFX()` /
+  `PlayDropSFX()` on hold/drop/throw — CONFIRMED; clips wired on the
+  AudioManager component.
+- Bin success/error: `RecycleBinInteractable` plays `successClip`/`errorClip`
+  on correct/wrong recycle — CONFIRMED on both bin prefabs (`Nature
+  Recycling.prefab`, `Plastic Recycling.prefab`). Note: `General Waste.prefab`
+  is referenced in §4 but only two bin prefabs exist under `Assets/Models/
+  Prefabs/Bins/`; the third bin is not instantiated in this scene — see
+  §13.7.
+- Master volume: `PauseMenuManager` persists to PlayerPrefs `"Volume"` and
+  applies `AudioListener.volume` (and the Pause settings slider) — CONFIRMED.
+
+### 13.6 Mouse sensitivity
+
+- `PlayerLook` uses `lookInput * sensitivity * Time.deltaTime * 100f` —
+  frame-rate independent. Scene values were `1.2/1.2`; **this pass lowered
+  them to `0.8/0.8`** for a more controlled camera on the 1280×720 desktop
+  setup (change made on the exposed Inspector field, not duplicated in code —
+  code default stays 2.0 as the un-assigned fallback). CONFIRMED on disk;
+  feel NOT REPRODUCED here.
+
+### 13.7 Manager audit (scene `Managers` root, &832482054)
+
+| Manager | GameObject | Scene component | Status |
+| --- | --- | --- | --- |
+| GameManager | &947271160 | present, objectives 12/8/4 (§4) | CONFIRMED wired |
+| ScoreManager | &1525541454 | present, PlayerPrefs high score | CONFIRMED wired |
+| AudioManager | &1646009441 | + WaterAmbienceZone (&1646009444) | CONFIRMED wired |
+| WeatherManager | &1808429656 | WeatherState + WeatherEffects + WeatherFeedbackSystem | CONFIRMED wired |
+| UIManager | &438008473 | panel state machine + input maps | CONFIRMED wired |
+| HUDManager | &1838788583 | + BinDirectionIndicator; highScoreText → new `Count` element (§ scene rework) | CONFIRMED wired |
+| PauseMenuManager | &1037489631 | volume slider + pause flow | CONFIRMED wired |
+
+- `AutoSpawner` exists as a code-generation fallback but is **not** present in
+  the scene — CONFIRMED as intentional (all managers are pre-wired; nothing to
+  auto-spawn), NOT AN ISSUE.
+- **Bin inventory mismatch (POSSIBLE·UNREPRODUCED):** `RecycleBinInteractable`
+  supports three `BinType`s and the scoring matrix covers General Waste, but
+  only `Nature Recycling` and `Plastic Recycling` prefabs exist in `Assets/
+  Models/Prefabs/Bins/` (26 scene instances total). `WeatherFeedbackSystem`/
+  `BinDirectionIndicator` locate bins via `FindObjectsByType
+  <RecycleBinInteractable>`, so they only ever find the two bins present. A
+  General-Waste bin is not spawnable from the tracked assets in this scene.
+  This predates this pass and was not changed here; flagged for awareness.
+- **Edit-mode matrix tests (`RecycleBinMatrixTests`)** construct bins for all
+  three types and passed previously (scoring matrix §4 is code-driven, so the
+  missing third bin does not affect the tests themselves).
+
+### 13.8 Automated tests
+
+- EditMode: `RecycleBinMatrixTests` + `ScoreManagerTests`; PlayMode:
+  `GameManagerPlayTests` — as documented in §12/PROJECT_EVOLUTION §6.12.
+- **POSSIBLE·UNREPRODUCED:** no test-runner invocation was available in this
+  environment; the suite's last documented run predates the footstep changes
+  (footstep audio is not covered by the EditMode/PlayMode suite). The changed
+  code in this pass (`PlayerFootstepAudio.Awake` + `DetectSurface`) is not
+  unit-tested. Recommended follow-up: run EditMode + PlayMode once in the
+  editor before submission.

@@ -69,6 +69,10 @@ public class PlayerFootstepAudio : MonoBehaviour
 
         if (characterController == null)
             characterController = GetComponent<CharacterController>();
+
+        // The ground starts dry: without this the drying timer begins at zero,
+        // so sunny terrain would play wet footsteps for the first few seconds.
+        wetnessTimer = wetnessDuration;
     }
 
     private void Update()
@@ -168,9 +172,18 @@ public class PlayerFootstepAudio : MonoBehaviour
             onWater = false;
         }
 
-        if (!onWater && IsGroundDry())
+        if (!onWater)
         {
-            wetnessTimer += Time.deltaTime;
+            if (IsGroundDry())
+            {
+                wetnessTimer += Time.deltaTime;
+            }
+            else
+            {
+                // Raining: keep the countdown primed at zero so the ground
+                // stays wet for wetnessDuration after the rain clears.
+                wetnessTimer = 0f;
+            }
         }
     }
 

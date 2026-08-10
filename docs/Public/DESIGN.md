@@ -131,8 +131,12 @@ The project addresses SDG 12 by creating an interactive recycling game where pla
 |              [Game View]                |
 |                                          |
 |          [Announcement Text]            |
+|    [Bin indicator arrow (edge-clamped)] |
 +------------------------------------------+
 ```
+
+The root Canvas Scaler uses **Scale With Screen Size (reference 1280×720)**,
+so the HUD scales consistently across displays.
 
 ### Game Flow
 ```

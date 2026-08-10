@@ -789,7 +789,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: b9dcdd697adf50d4bb2a7b397c256c2e, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -24577,7 +24577,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 67.88794, y: 0}
+  m_AnchoredPosition: {x: 81.5, y: 0}
   m_SizeDelta: {x: 29.1112, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &643529321
@@ -35543,7 +35543,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 67.73928, y: 0}
+  m_AnchoredPosition: {x: -1, y: 0}
   m_SizeDelta: {x: 29.4094, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &798564654
@@ -73858,6 +73858,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1838788585}
   - component: {fileID: 1838788584}
+  - component: {fileID: 1838788599}
   m_Layer: 0
   m_Name: HUDManager
   m_TagString: Untagged
@@ -73890,6 +73891,21 @@ MonoBehaviour:
   toyScorePopup: {fileID: 1623911326}
   plasticBottleScorePopup: {fileID: 856041136}
   popupDuration: 1.5
+--- !u!114 &1838788599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838788583}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BinDirectionIndicator
+  indicatorText: {fileID: 0}
+  edgeMargin: 40
+  maxGuideDistance: 60
 --- !u!4 &1838788585
 Transform:
   m_ObjectHideFlags: 0
@@ -74536,10 +74552,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
-  m_UiScaleMode: 0
+  m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 800, y: 600}
+  m_ReferenceResolution: {x: 1280, y: 720}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

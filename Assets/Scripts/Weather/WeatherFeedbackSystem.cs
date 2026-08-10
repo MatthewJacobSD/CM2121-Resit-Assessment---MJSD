@@ -57,6 +57,7 @@ public class WeatherFeedbackSystem : MonoBehaviour
     private Vector3 currentWindPush;
     private PickupItem heldItem;
     private PlayerMovement playerMovement;
+    private Collider[] binOverlapBuffer = new Collider[16];
 
     #endregion
 
@@ -157,10 +158,11 @@ public class WeatherFeedbackSystem : MonoBehaviour
         Vector3 nearestWrongBinPosition = player.position;
         bool foundAnyBin = false;
 
-        Collider[] nearby = Physics.OverlapSphere(player.position, binDetectionRadius, binLayer);
+        int binCount = Physics.OverlapSphereNonAlloc(player.position, binDetectionRadius, binOverlapBuffer, binLayer);
 
-        foreach (Collider col in nearby)
+        for (int i = 0; i < binCount; i++)
         {
+            Collider col = binOverlapBuffer[i];
             RecycleBinInteractable bin = col.GetComponentInParent<RecycleBinInteractable>();
             if (bin == null) continue;
 

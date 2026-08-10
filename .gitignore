@@ -122,3 +122,25 @@ Assets/Sounds/RawAudio/
 # Unreferenced terrain duplicates
 Assets/New\ Terrain\ 2.asset*
 Assets/New\ Terrain\ 3.asset*
+
+# Terrain demo assets - track only the terrain data file the scene uses
+Assets/TerrainDemoScene_URP/*
+!Assets/TerrainDemoScene_URP/Terrain/
+Assets/TerrainDemoScene_URP/Terrain/*
+!Assets/TerrainDemoScene_URP/Terrain/Data/
+Assets/TerrainDemoScene_URP/Terrain/Data/*
+!Assets/TerrainDemoScene_URP/Terrain/Data/Terrain_1_2_1694bb0f-cffe-402c-b6f9-cf47692fbb78.asset
+!Assets/TerrainDemoScene_URP/Terrain/Data/Terrain_1_2_1694bb0f-cffe-402c-b6f9-cf47692fbb78.asset.meta
+
+# Scratch prefab work (TerrainProxy, Trees) - unreferenced by the scene
+Assets/Environment/Prefabs/Terrain/
+Assets/Environment/Prefabs/Terrain.meta
+Assets/Environment/Prefabs/Trees/
+Assets/Environment/Prefabs/Trees.meta
+
+# Orphaned demo scene meta (no .unity file on disk)
+Assets/Scenes/TerrainDemoScene.meta
+Assets/TerrainDemoScene_URP.meta
+
+# RawAudio folder meta (folder already ignored above)
+Assets/Sounds/RawAudio.meta

@@ -197,6 +197,57 @@ The demo folder is now an optional reference only — nothing in the game
 depends on it. Importing the demo's 4×4 terrain grid is a separate, optional
 decision (terrain is still authored in Unity by the user).
 
+### 2.9 Phase 9: Final Resit Fix Pass (10 August)
+
+A final UI, terrain and performance pass on the resit submission:
+
+**UI (1280×720 target):**
+- Root Canvas Scaler switched from Constant Pixel Size (800×600) to
+  **Scale With Screen Size, reference 1280×720** so the HUD scales on
+  modern displays.
+- Lives and Score value labels re-anchored against their left-aligned
+  labels: Lives value to `x: 81.5`, Score value to `x: -1`, eliminating
+  the ~75px gap at default resolution.
+
+**Bin direction indicator:**
+- New `BinDirectionIndicator.cs` (HUDManager component): shows the nearest
+  correct bin's name, distance and an arrow (clamped to screen edges,
+  40px margin) so players can find a correct bin in the storm. Scans bins
+  every 60 frames, auto-creates its TextMeshPro label when unassigned.
+
+**Mouse sensitivity — NOT AN ISSUE:**
+- `PlayerLook` uses `lookInput * sensitivity * Time.deltaTime * 100f`
+  (frame-rate independent). No change required.
+
+**Performance (allocation-free hot paths):**
+- `WeatherFeedbackSystem.EvaluateBinProximity` converted from
+  `Physics.OverlapSphere` (per-frame array alloc) to cached
+  `Collider[16] binOverlapBuffer` + `OverlapSphereNonAlloc`.
+- Verified: HUDManager.Update, PlayerMovement.CheckSphere, footsteps and
+  splash are allocation-free; `Instantiate` only fires on events.
+
+**Audio:**
+- Cleared the legacy `m_Resource` RawAudio reference on the SunlightEffect
+  AudioSource (raw `Sunny.mp3`); gameplay audio stays on the Optimized
+  clips. Zero RawAudio GUID references remain.
+
+**Terrain (same GUID, demo-sourced):**
+- The scene keeps terrain data GUID `584c420d…`. The duplicate tracked
+  copy under `Assets/Environment/Terrain/Data/` (which conflicted with the
+  demo asset carrying the same GUID) was removed; the single terrain data
+  asset now lives at `Assets/TerrainDemoScene_URP/Terrain/Data/` — content
+  identical after line-ending normalisation. The rest of the 4 GB demo
+  folder is gitignored; the scene's `TerrainLit.mat` material reference is
+  unaffected.
+
+**Untracked-file hygiene:**
+- Committed `WaterAmbienceZone.cs.meta` (referenced by the scene's script
+  GUID `8126dcfc…`).
+- Gitignored scratch/working files: `TerrainDemoScene_URP/` (except the
+  terrain data), `Environment/Prefabs/Terrain` (TerrainProxy scratch),
+  `Environment/Prefabs/Trees`, orphaned `Scenes/TerrainDemoScene.meta`,
+  `Sounds/RawAudio.meta`.
+
 ### 2.7 Phase 7: Resit Audit & Fix Pass (3 August)
 
 A pre-submission audit of the actual scene/prefab serialised data uncovered several issues invisible in code review: collectible and bin prefabs had no colliders or layers, HUD texts pointed at popup objects, the duplicate PauseMenuManager overrode the wired one, and ESC was bound to a UI-map Pause action unreachable during gameplay.
@@ -1041,4 +1092,4 @@ The `AutoSetupPauseMenu` Editor tool (Tools → Setup UI in Current Scene) autom
 
 ---
 
-*Document generated 30 July 2026 · Updated 3 August 2026 (resit audit fix pass) · Updated 5 August 2026 (environment dependency hardening · single terrain migration) · Updated 6 August 2026 (final submission hardening: grounding, wind push, audio remap, bin types, HUD, demo removal) · Updated 6 August 2026 (weather system redesign: 4-state machine, HeavyRain, audio cleanup, WeatherMovementEffect)*
+*Document generated 30 July 2026 · Updated 3 August 2026 (resit audit fix pass) · Updated 5 August 2026 (environment dependency hardening · single terrain migration) · Updated 6 August 2026 (final submission hardening: grounding, wind push, audio remap, bin types, HUD, demo removal) · Updated 6 August 2026 (weather system redesign: 4-state machine, HeavyRain, audio cleanup, WeatherMovementEffect) · Updated 10 August 2026 (final resit fix pass: 1280×720 UI, bin indicator, allocation-free hot paths, demo-sourced terrain)*

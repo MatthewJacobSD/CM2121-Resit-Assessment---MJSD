@@ -35,6 +35,7 @@ Collect recyclable items — plants, toys, and bottles — scattered across an o
 - **Correct recycle:** Earn points, weather calms
 - **Wrong recycle:** Lose a life, score penalty, storm feedback
 - **Plant chain bonus:** 2+ consecutive correct plant recycles = +40 bonus
+- **Bin indicator:** HUD arrow points to the nearest correct bin (name + distance), clamped to the screen edge while it is off-camera
 
 ### Weather System
 
@@ -96,6 +97,8 @@ Assets/
 ├── Scenes/
 │   ├── Florance.unity     # Main game scene (build target)
 │   └── ChainFragrance.unity  # UI prototyping scene
+├── TerrainDemoScene_URP/  # Demo terrain data referenced by the scene (tracked)
+│   └── Terrain/Data/      # Terrain_1_2…asset (GUID 584c420d); rest of folder gitignored
 ├── Scripts/
 │   ├── Core/              # GameManager, ScoreManager, AudioManager, AutoSpawner
 │   ├── Player/            # Movement, Look, Interaction, FootstepAudio, WeatherEffect
@@ -119,7 +122,7 @@ Assets/
 
 - **Engine:** Unity 6 URP (6000.3.18f1)
 - **Input:** New Input System (Player + UI action maps)
-- **UI:** TextMesh Pro, event-driven panel state machine
+- **UI:** TextMesh Pro, event-driven panel state machine, Scale With Screen Size canvas (1280×720)
 - **Audio:** Dual-source ambient crossfade, surface-based footsteps
 - **Testing:** 21 automated tests (EditMode + PlayMode)
 - **Version Control:** Git + LFS (audio assets)

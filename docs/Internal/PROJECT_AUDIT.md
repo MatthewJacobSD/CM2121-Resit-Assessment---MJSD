@@ -160,6 +160,12 @@ and Toys (+25); this is the author's intended design and is preserved.
   .shadergraph`, `WaterDepthBased.mat`, `Lake_Margins.tif`, `TerrainLit.mat`
   all now live under `Assets/Environment/` with fresh GUIDs; zero references
   to `Assets/TerrainDemoScene_URP/` remain in the game.
+- **Correction (10 Aug):** the *terrain data* was intentionally re-sourced
+  from the demo folder. The scene's `m_TerrainData` keeps GUID `584c420d…`,
+  now owned by the single tracked
+  `Assets/TerrainDemoScene_URP/Terrain/Data/Terrain_1_2_….asset`; the
+  duplicate copy under `Assets/Environment/Terrain/Data/` was removed. All
+  other demo-folder references remain eliminated.
 - **URP is correctly assigned** (`PC_RPAsset.asset`); the water material uses
   the included `WaterDepthBased.shadergraph` (see water shader review).
 - **Camera culling mask = all layers** (`m_Bits 4294967295`) — nothing culled.

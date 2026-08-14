@@ -42,6 +42,8 @@ public class LightingFlash : MonoBehaviour
     /// <summary>Begins the random flash loop.</summary>
     public void StartFlashing()
     {
+        if (flashLight == null) return;
+
         if (flashRoutine == null)
             flashRoutine = StartCoroutine(FlashRoutine());
     }
@@ -54,7 +56,9 @@ public class LightingFlash : MonoBehaviour
             StopCoroutine(flashRoutine);
             flashRoutine = null;
         }
-        flashLight.enabled = false;
+
+        if (flashLight != null)
+            flashLight.enabled = false;
     }
 
     #endregion

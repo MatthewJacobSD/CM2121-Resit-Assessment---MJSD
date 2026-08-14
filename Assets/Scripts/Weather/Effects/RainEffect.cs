@@ -2,6 +2,8 @@
 
 /// <summary>
 /// Controls the rain particle system: toggles it on/off and adjusts intensity.
+/// Manages its own GameObject activation lifecycle — inactive when not needed,
+/// activated on demand when the weather state requires rain.
 /// </summary>
 [RequireComponent(typeof(ParticleSystem))]
 public class RainEffect : MonoBehaviour
@@ -33,18 +35,32 @@ public class RainEffect : MonoBehaviour
 
     #region Public Methods
 
-    /// <summary>Turns the rain on or off.</summary>
+    /// <summary>Turns the rain on or off. Activates/deactivates the GameObject as needed.</summary>
     public void SetActive(bool active)
     {
         if (active)
-            rainParticles.Play();
+        {
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
+
+            if (rainParticles != null)
+                rainParticles.Play();
+        }
         else
-            rainParticles.Stop();
+        {
+            if (rainParticles != null)
+                rainParticles.Stop();
+
+            if (gameObject.activeSelf)
+                gameObject.SetActive(false);
+        }
     }
 
     /// <summary>Sets the rain emission rate, clamped to the configured maximum.</summary>
     public void SetIntensity(float intensity)
     {
+        if (rainParticles == null) return;
+
         float clamped = Mathf.Clamp(intensity, 0f, maxIntensity);
         emission.rateOverTime = clamped;
     }

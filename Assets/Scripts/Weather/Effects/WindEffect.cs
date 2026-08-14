@@ -3,6 +3,7 @@
 /// <summary>
 /// Drives the wind zone and wind particles, with per-weather-state speeds and
 /// a storm intensity that scales wind from calm to maximum strength.
+/// Manages its own GameObject activation lifecycle.
 /// </summary>
 public class WindEffect : MonoBehaviour
 {
@@ -72,9 +73,13 @@ public class WindEffect : MonoBehaviour
         SetWindSpeed(speed);
     }
 
-    /// <summary>Applies a wind speed to the zone and particle emission/velocity.</summary>
+    /// <summary>Applies a wind speed to the zone and particle emission/velocity.
+    /// Activates the GameObject if inactive so the WindZone affects physics.</summary>
     public void SetWindSpeed(float speed)
     {
+        if (!gameObject.activeSelf)
+            gameObject.SetActive(true);
+
         float clamped = Mathf.Clamp(speed, 0f, maxWindSpeed);
 
         if (windZone != null)

@@ -18,8 +18,8 @@ public class PlayerLook : MonoBehaviour
     [SerializeField] private Transform cameraTransform;
 
     [Header("Settings")]
-    [SerializeField, Range(0.1f, 10f)] private float sensitivityX = 2f;
-    [SerializeField, Range(0.1f, 10f)] private float sensitivityY = 2f;
+    [SerializeField, Range(0.1f, 10f)] private float sensitivityX = 0.1f;
+    [SerializeField, Range(0.1f, 10f)] private float sensitivityY = 0.1f;
     [SerializeField] private bool invertY = false;
 
     [SerializeField] private float minVerticalAngle = -85f;

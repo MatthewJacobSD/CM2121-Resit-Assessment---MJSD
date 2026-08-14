@@ -2,7 +2,8 @@
 
 /// <summary>
 /// Controls the sunny weather visuals: brightens the directional light and
-/// plays or stops the god-rays particle effect.
+/// plays or stops the god-rays particle effect. Manages its own GameObject
+/// activation lifecycle — active only during Sunny weather.
 /// </summary>
 [RequireComponent(typeof(Light))]
 public class SunnyEffect : MonoBehaviour
@@ -37,16 +38,30 @@ public class SunnyEffect : MonoBehaviour
 
     #region Public Methods
 
-    /// <summary>Turns the sunny effect on or off.</summary>
+    /// <summary>Turns the sunny effect on or off. Activates/deactivates the GameObject.</summary>
     public void SetActive(bool active)
     {
-        if (sunLight != null)
-            sunLight.intensity = active ? 1.8f : defaultIntensity;
-
-        if (godRays != null)
+        if (active)
         {
-            if (active) godRays.Play();
-            else godRays.Stop();
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
+
+            if (sunLight != null)
+                sunLight.intensity = 1.8f;
+
+            if (godRays != null)
+                godRays.Play();
+        }
+        else
+        {
+            if (sunLight != null)
+                sunLight.intensity = defaultIntensity;
+
+            if (godRays != null)
+                godRays.Stop();
+
+            if (gameObject.activeSelf)
+                gameObject.SetActive(false);
         }
     }
 

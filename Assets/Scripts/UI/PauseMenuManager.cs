@@ -84,7 +84,7 @@ public class PauseMenuManager : MonoBehaviour
         pausePanel.SetActive(true);
 
         if (currentScoreText != null && ScoreManager.Instance != null)
-            currentScoreText.text = $"Score: {ScoreManager.Instance.CurrentScore}";
+            currentScoreText.text = ScoreManager.Instance.CurrentScore.ToString();
 
         if (uiManagers != null)
             uiManagers.ShowPauseMenu();

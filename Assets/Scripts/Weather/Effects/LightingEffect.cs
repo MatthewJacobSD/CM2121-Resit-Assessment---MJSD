@@ -2,6 +2,7 @@
 
 /// <summary>
 /// Toggles the lightning flash effect on and off.
+/// Manages its own GameObject activation lifecycle — active only during Stormy weather.
 /// </summary>
 public class LightingEffect : MonoBehaviour
 {
@@ -25,15 +26,25 @@ public class LightingEffect : MonoBehaviour
 
     #region Public Methods
 
-    /// <summary>Starts or stops the lightning flashes.</summary>
+    /// <summary>Starts or stops the lightning flashes. Activates/deactivates the GameObject.</summary>
     public void SetActive(bool active)
     {
-        if (lightningFlash == null) return;
-
         if (active)
-            lightningFlash.StartFlashing();
+        {
+            if (!gameObject.activeSelf)
+                gameObject.SetActive(true);
+
+            if (lightningFlash != null)
+                lightningFlash.StartFlashing();
+        }
         else
-            lightningFlash.StopFlashing();
+        {
+            if (lightningFlash != null)
+                lightningFlash.StopFlashing();
+
+            if (gameObject.activeSelf)
+                gameObject.SetActive(false);
+        }
     }
 
     #endregion

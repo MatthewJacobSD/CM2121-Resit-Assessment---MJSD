@@ -172,19 +172,19 @@ public class HUDManager : MonoBehaviour
     private void OnScoreChanged(int newScore)
     {
         if (scoreText != null)
-            scoreText.text = $"Score: {newScore}";
+            scoreText.text = newScore.ToString();
     }
 
     private void OnHighScoreChanged(int newHighScore)
     {
         if (highScoreText != null)
-            highScoreText.text = $"Best: {newHighScore}";
+            highScoreText.text = newHighScore.ToString();
     }
 
     private void OnLivesChanged(int lives, int maxLives)
     {
         if (livesText != null)
-            livesText.text = $"{lives}/{maxLives}";
+            livesText.text = lives.ToString();
     }
 
     private void OnTimerTick(float timeRemaining)
@@ -223,10 +223,10 @@ public class HUDManager : MonoBehaviour
             bottlesText.text = $"Bottles: {GameManager.Instance.BottlesRecycled}/{GameManager.Instance.BottlesRequired}";
 
         if (scoreText != null && ScoreManager.Instance != null)
-            scoreText.text = $"Score: {ScoreManager.Instance.CurrentScore}";
+            scoreText.text = ScoreManager.Instance.CurrentScore.ToString();
 
         if (highScoreText != null && ScoreManager.Instance != null)
-            highScoreText.text = $"Best: {ScoreManager.Instance.HighScore}";
+            highScoreText.text = ScoreManager.Instance.HighScore.ToString();
     }
 
     #endregion

@@ -56,6 +56,11 @@ public class RecycleBinInteractable : MonoBehaviour
         if (col != null && !col.isTrigger)
             col.isTrigger = true;
 
+        // Add a solid (non-trigger) collider so the player cannot walk through
+        // the bin body. The solid is shorter than the trigger so thrown items
+        // entering from above still reach the trigger volume.
+        EnsureSolidCollider();
+
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null)
             audioSource = gameObject.AddComponent<AudioSource>();
@@ -105,6 +110,31 @@ public class RecycleBinInteractable : MonoBehaviour
         GameManager.Instance.ReportRecycled(item.gameObject, CalculateScore(item.ItemType, binType));
         OnItemProcessed?.Invoke(isCorrect);
         Destroy(item.gameObject);
+    }
+
+    /// <summary>
+    /// Ensures a solid (non-trigger) BoxCollider exists on the bin for physical
+    /// blocking. This collider is always active — the player collides with it
+    /// regardless of held item. It is shorter than the trigger so thrown items
+    /// entering from above still reach the trigger volume.
+    /// </summary>
+    private void EnsureSolidCollider()
+    {
+        // Check if a non-trigger collider already exists.
+        foreach (var c in GetComponents<Collider>())
+        {
+            if (!c.isTrigger)
+                return;
+        }
+
+        // No solid collider found — add one covering the bin body.
+        // The existing trigger (1.28 × 1.89 × 1.20, center 0,1,0.23) covers
+        // the full bin including the opening. The solid is shorter, leaving
+        // the top open for thrown items to reach the trigger.
+        BoxCollider solid = gameObject.AddComponent<BoxCollider>();
+        solid.isTrigger = false;
+        solid.size = new Vector3(1.2f, 1.5f, 1.1f);
+        solid.center = new Vector3(0f, 0.75f, 0.23f);
     }
 
     // Scoring matrix: positive values are correct matches, negative are penalties.

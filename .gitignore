@@ -144,3 +144,7 @@ Assets/TerrainDemoScene_URP.meta
 
 # RawAudio folder meta (folder already ignored above)
 Assets/Sounds/RawAudio.meta
+
+# Unity Version Control (Plastic SCM) local config
+.plastic/
+ignore.conf
